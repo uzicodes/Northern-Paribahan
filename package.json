@@ -1,0 +1,17 @@
+{
+  "name": "northern-paribahan",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "backend",
+    "frontend-next"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace backend run dev",
+    "dev:frontend": "npm --workspace frontend-next run dev",
+    "build:backend": "npm --workspace backend run build",
+    "start:backend": "npm --workspace backend run start",
+    "seed": "npm --workspace backend run seed"
+  }
+}
+
