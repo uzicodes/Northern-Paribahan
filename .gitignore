@@ -10,4 +10,6 @@ backend/node_modules/
 .turbo/
 .idea/
 .vscode/
+.next/
+**/.next/
 

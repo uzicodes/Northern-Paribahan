@@ -571,6 +571,11 @@ img, video {
   color: rgba(17, 24, 39, var(--tw-text-opacity, 1));
 }
 
+.hover\:text-red-700:hover {
+  --tw-text-opacity: 1;
+  color: rgba(185, 28, 28, var(--tw-text-opacity, 1));
+}
+
 .hover\:underline:hover {
   -webkit-text-decoration-line: underline;
   text-decoration-line: underline;
