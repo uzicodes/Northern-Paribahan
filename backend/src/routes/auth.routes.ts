@@ -6,7 +6,7 @@ import { signToken } from '../utils/tokens.js';
 const router = Router();
 
 router.post('/register', async (req, res) => {
-  const { email, password, name } = req.body;
+  const { email, password, name } = req.body as { email: string; password: string; name: string };
   if (!email || !password || !name) return res.status(400).json({ message: 'Missing fields' });
   const hashed = await bcrypt.hash(password, 10);
   try {
@@ -18,7 +18,7 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body as { email: string; password: string };
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(401).json({ message: 'Invalid credentials' });
   const ok = await bcrypt.compare(password, user.password);

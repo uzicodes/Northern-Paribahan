@@ -5,9 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 const router = Router();
 
 router.get('/', async (_req, res) => {
-  const buses = await prisma.bus.findMany({
-    include: { route: true, seats: true }
-  });
+  const buses = await prisma.bus.findMany({ include: { route: true, seats: true } });
   res.json(buses);
 });
 
@@ -18,23 +16,23 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/:id/book', requireAuth, async (req, res) => {
-  const { seatId } = req.body;
+  const { seatId } = req.body as { seatId: string };
   const busId = req.params.id;
   try {
     const booking = await prisma.$transaction(async (tx) => {
       const seat = await tx.seat.findUnique({ where: { id: seatId } });
       if (!seat || seat.busId !== busId || seat.isBooked) throw new Error('Seat unavailable');
       await tx.seat.update({ where: { id: seatId }, data: { isBooked: true } });
-      return tx.booking.create({ data: { userId: req.user.id, busId, seatId } });
+      return tx.booking.create({ data: { userId: (req as any).user.id, busId, seatId } });
     });
     res.status(201).json(booking);
-  } catch (e) {
+  } catch (e: any) {
     res.status(400).json({ message: e.message || 'Booking failed' });
   }
 });
 
 router.post('/:id/cancel', requireAuth, async (req, res) => {
-  const { bookingId } = req.body;
+  const { bookingId } = req.body as { bookingId: string };
   try {
     const booking = await prisma.booking.update({ where: { id: bookingId }, data: { status: 'CANCELED' } });
     await prisma.seat.update({ where: { id: booking.seatId }, data: { isBooked: false } });

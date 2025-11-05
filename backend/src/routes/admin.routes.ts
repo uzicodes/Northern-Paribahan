@@ -11,13 +11,13 @@ router.post('/routes', ...adminOnly, async (req, res) => {
 });
 
 router.post('/buses', ...adminOnly, async (req, res) => {
-  const { name, number, routeId } = req.body;
+  const { name, number, routeId } = req.body as { name: string; number: string; routeId: string };
   const bus = await prisma.bus.create({ data: { name, number, routeId } });
   res.status(201).json(bus);
 });
 
 router.post('/buses/:busId/seats', ...adminOnly, async (req, res) => {
-  const { seats } = req.body; // array of seatNumbers
+  const { seats } = req.body as { seats: string[] };
   const busId = req.params.busId;
   const created = await prisma.$transaction(
     seats.map((seatNumber) => prisma.seat.create({ data: { seatNumber, busId } }))

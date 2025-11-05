@@ -49,10 +49,10 @@ async function main() {
     create: { name: 'Express B', number: 'BC-2002', routeId: route2.id },
   });
 
-  async function ensureSeats(busId) {
+  async function ensureSeats(busId: string) {
     const count = await prisma.seat.count({ where: { busId } });
     if (count >= 40) return;
-    const ops = [];
+    const ops = [] as any[];
     for (let i = 1; i <= 40; i++) {
       ops.push(prisma.seat.upsert({
         where: { id: `${busId}-seat-${i}` },
