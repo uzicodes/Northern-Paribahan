@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 11, "column": 0}, "map": {"version":3,"sources":["file:///D:/Northern%20Paribahan/frontend/app/page.tsx"],"sourcesContent":["export default function Page() {\r\n  return (\r\n    <section className=\"py-8\">\r\n      <h1 className=\"text-2xl font-semibold mb-2\">Welcome to Bus Ticket Booking</h1>\r\n      <p className=\"text-gray-600\">Browse buses, pick seats, and book in real time.</p>\r\n    </section>\r\n  );\r\n}\r\n\r\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAQ,WAAU;;0BACjB,8OAAC;gBAAG,WAAU;0BAA8B;;;;;;0BAC5C,8OAAC;gBAAE,WAAU;0BAAgB;;;;;;;;;;;;AAGnC","debugId":null}}]
-}
