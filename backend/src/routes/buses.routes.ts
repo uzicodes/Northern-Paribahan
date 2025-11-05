@@ -20,9 +20,12 @@ router.post('/:id/book', requireAuth, async (req, res) => {
   const busId = req.params.id;
   try {
     const booking = await prisma.$transaction(async (tx) => {
-      const seat = await tx.seat.findUnique({ where: { id: seatId } });
-      if (!seat || seat.busId !== busId || seat.isBooked) throw new Error('Seat unavailable');
-      await tx.seat.update({ where: { id: seatId }, data: { isBooked: true } });
+      // Optimistic concurrency guard: update if not already booked
+      const updated = await tx.seat.updateMany({
+        where: { id: seatId, busId, isBooked: false },
+        data: { isBooked: true },
+      });
+      if (updated.count !== 1) throw new Error('Seat unavailable');
       return tx.booking.create({ data: { userId: (req as any).user.id, busId, seatId } });
     });
     res.status(201).json(booking);

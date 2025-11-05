@@ -46,6 +46,8 @@ model Seat {
   busId     String
   isBooked  Boolean @default(false)
   booking   Booking?
+
+  @@unique([busId, seatNumber])
 }
 
 model Booking {

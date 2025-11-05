@@ -3,6 +3,8 @@ import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import { Server as SocketIOServer } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
 import { env } from './config/env.js';
 import { connectDB, prisma } from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
@@ -18,6 +20,16 @@ const io = new SocketIOServer(server, {
 });
 
 const { broadcastSeatUpdate } = registerSeatNamespace(io);
+
+// Redis adapter for horizontal scaling of websockets
+(async () => {
+  const url = process.env.REDIS_URL || 'redis://localhost:6379';
+  const pubClient = createClient({ url });
+  const subClient = pubClient.duplicate();
+  await pubClient.connect();
+  await subClient.connect();
+  io.adapter(createAdapter(pubClient, subClient));
+})();
 
 app.use(cors({ origin: env.clientOrigin, credentials: true }));
 app.use(helmet());

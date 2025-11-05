@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "workspaces": [
     "backend",
-    "frontend-next"
+    "frontend",
+    "packages/*"
   ],
   "scripts": {
     "dev:backend": "npm --workspace backend run dev",
