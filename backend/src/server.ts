@@ -41,7 +41,7 @@ app.use('/api/buses', busesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/admin', adminRoutes);
 
-prisma.$use(async (params, next) => {
+prisma.$use(async (params: any, next: any) => {
   const result = await next(params);
   if (params.model === 'Booking' && (params.action === 'create' || params.action === 'update')) {
     const busId = (result as any).busId as string;

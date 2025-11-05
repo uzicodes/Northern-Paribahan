@@ -19,7 +19,7 @@ router.post('/:id/book', requireAuth, async (req, res) => {
   const { seatId } = req.body as { seatId: string };
   const busId = req.params.id;
   try {
-    const booking = await prisma.$transaction(async (tx) => {
+    const booking = await prisma.$transaction(async (tx: any) => {
       // Optimistic concurrency guard: update if not already booked
       const updated = await tx.seat.updateMany({
         where: { id: seatId, busId, isBooked: false },
