@@ -18,8 +18,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className="min-h-screen bg-gray-50 text-gray-900">
-        <header className="border-b" style={{ backgroundColor: '#029FBE' }}>
+  <body className="min-h-screen" style={{ backgroundColor: '#9ED9D3', color: '#1a202c' }}>
+  <header className="border-b" style={{ backgroundColor: '#2F632B' }}>
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
             <Link href="/" className="font-semibold text-lg" style={{ color: '#F1F604' }}>Northern Paribahan</Link>
             <div style={{ color: '#F1F604' }}><NavbarClient /></div>
