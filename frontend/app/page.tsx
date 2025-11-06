@@ -31,7 +31,7 @@ export default function Page() {
           >
             {/* From input */}
             <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 py-2 sm:py-0">
-              <span className="text-2xl mr-2">🚌</span>
+              <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/get-on-bus.png" alt="get-on-bus" className="mr-2" />
               <input
                 type="text"
                 placeholder="From"
@@ -41,7 +41,7 @@ export default function Page() {
             </div>
             {/* To input */}
             <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 pl-4 py-2 sm:py-0">
-              <span className="text-2xl mr-2">🚌</span>
+              <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/get-off-bus.png" alt="get-off-bus" className="mr-2" />
               <input
                 type="text"
                 placeholder="To"
@@ -58,7 +58,7 @@ export default function Page() {
             </div>
           </div>
         </div>
-        <div className="w-full flex justify-center mt-8">
+        <div className="w-full flex justify-center mt-16">
           <button
             className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3 mt-6"
             style={{ fontSize: 22 }}
