@@ -1,5 +1,5 @@
 {
-  "name": "busapp-backend",
+  "name": "northern-paribahan-backend",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/server.js",

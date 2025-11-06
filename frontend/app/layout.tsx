@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen bg-gray-50 text-gray-900">
         <header className="bg-white border-b">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href="/" className="font-semibold text-lg">BusApp</Link>
+            <Link href="/" className="font-semibold text-lg">Northern Paribahan</Link>
             <NavbarClient />
           </div>
         </header>

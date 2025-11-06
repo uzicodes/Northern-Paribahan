@@ -2,11 +2,11 @@ version: '3.9'
 services:
   db:
     image: postgres:16-alpine
-    container_name: busapp_postgres
+  container_name: northernparibahan_postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: busapp
+  POSTGRES_DB: northernparibahan
     ports:
       - "5432:5432"
     volumes:
@@ -18,7 +18,7 @@ services:
       retries: 10
   redis:
     image: redis:7-alpine
-    container_name: busapp_redis
+  container_name: northernparibahan_redis
     ports:
       - "6379:6379"
     healthcheck:
