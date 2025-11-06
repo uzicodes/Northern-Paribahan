@@ -1,21 +1,21 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { prisma } from '../config/db.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
+router.get('/', async (_req: Request, res: Response) => {
   const buses = await prisma.bus.findMany({ include: { route: true, seats: true } });
   res.json(buses);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response) => {
   const bus = await prisma.bus.findUnique({ where: { id: req.params.id }, include: { route: true, seats: true } });
   if (!bus) return res.status(404).json({ message: 'Bus not found' });
   res.json(bus);
 });
 
-router.post('/:id/book', requireAuth, async (req, res) => {
+router.post('/:id/book', requireAuth, async (req: Request, res: Response) => {
   const { seatId } = req.body as { seatId: string };
   const busId = req.params.id;
   try {
@@ -34,7 +34,7 @@ router.post('/:id/book', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/:id/cancel', requireAuth, async (req, res) => {
+router.post('/:id/cancel', requireAuth, async (req: Request, res: Response) => {
   const { bookingId } = req.body as { bookingId: string };
   try {
     const booking = await prisma.booking.update({ where: { id: bookingId }, data: { status: 'CANCELED' } });
