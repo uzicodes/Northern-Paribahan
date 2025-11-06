@@ -33,13 +33,13 @@ export default function NavbarClient() {
 
   return (
     <nav className="flex items-center gap-4 text-sm">
-  <Link href="/buses" className="text-black hover:text-gray-900">Buses</Link>
+  <Link href="/buses" className="text-white hover:text-gray-300">Buses</Link>
       {token && <Link href="/my-bookings" className="text-gray-600 hover:text-gray-900">My Bookings</Link>}
       {role === 'ADMIN' && <Link href="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>}
       {!token ? (
         <>
-          <Link href="/login" className="text-black hover:text-gray-900">Login</Link>
-          <Link href="/register" className="text-black hover:text-gray-900">Register</Link>
+          <Link href="/login" className="text-white hover:text-gray-300">Login</Link>
+          <Link href="/register" className="text-white hover:text-gray-300">Register</Link>
         </>
       ) : (
         <button onClick={logout} className="text-gray-600 hover:text-gray-900">Logout</button>

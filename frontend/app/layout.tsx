@@ -18,10 +18,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-  <body className="min-h-screen" style={{ backgroundColor: '#9ED9D3', color: '#1a202c' }}>
-  <header className="border-b" style={{ backgroundColor: '#2F632B' }}>
+  <body className="min-h-screen" style={{ backgroundColor: '#BEE9E8', color: '#1a202c' }}>
+  <header className="border-b" style={{ backgroundColor: '#172144' }}>
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
-            <Link href="/" className="font-semibold text-lg" style={{ color: '#F1F604' }}>Northern Paribahan</Link>
+            <Link href="/" className="font-semibold text-lg flex items-center gap-2">
+              <img src="/logo.png" alt="Northern Paribahan Logo" style={{ height: 32, width: 32, display: 'inline-block', verticalAlign: 'middle' }} />
+              <span style={{ color: '#FCA311' }}>Northern Paribahan</span>
+            </Link>
             <div style={{ color: '#F1F604' }}><NavbarClient /></div>
           </div>
         </header>
