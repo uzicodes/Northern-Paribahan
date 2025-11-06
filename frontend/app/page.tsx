@@ -58,12 +58,12 @@ export default function Page() {
             </div>
           </div>
         </div>
-        <div className="w-full flex justify-center mt-16">
+        <div className="w-full flex justify-center mt-16 mb-12">
           <button
             className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3 mt-6"
             style={{ fontSize: 22 }}
           >
-            <span className="text-2xl">🔍</span> Search buses
+            <img width="28" height="28" src="https://img.icons8.com/sf-black/64/search.png" alt="search" className="mr-2" /> Search buses
           </button>
         </div>
       </div>

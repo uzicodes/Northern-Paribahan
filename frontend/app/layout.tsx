@@ -29,9 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </div>
         </header>
         <main className="max-w-6xl mx-auto p-4">{children}</main>
-        <footer className="py-6 text-center text-sm text-gray-500">
-          <Link className="hover:underline" href="/">Bus Ticket Booking</Link>
-        </footer>
+
       </body>
     </html>
   );
