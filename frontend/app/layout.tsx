@@ -4,7 +4,7 @@ import Link from 'next/link';
 import NavbarClient from '../components/NavbarClient';
 
 export const metadata = {
-  title: 'Bus Ticket Booking',
+  title: 'Northern Paribahan',
   description: 'Real-time bus booking',
 };
 
