@@ -75,7 +75,7 @@ export default function Page() {
                         setFromValue(location);
                         setShowFromDropdown(false);
                       }}
-                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-base"
+                      className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
                       style={{ fontSize: 16 }}
                     >
                       {location}
@@ -106,7 +106,7 @@ export default function Page() {
                         setToValue(location);
                         setShowToDropdown(false);
                       }}
-                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer text-base"
+                      className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
                       style={{ fontSize: 16 }}
                     >
                       {location}
