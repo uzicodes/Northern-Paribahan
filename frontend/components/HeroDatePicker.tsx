@@ -183,10 +183,12 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                 {days.map((dayObj, index) => {
                   const isSelected = isSameDay(dayObj.date, selectedDate);
                   const isTodayDate = isToday(dayObj.date);
+                  const isPastDate = dayObj.date < new Date(new Date().setHours(0,0,0,0));
                   return (
                     <button
                       key={index}
-                      onClick={() => handleDateClick(dayObj.date)}
+                      onClick={() => !isPastDate && handleDateClick(dayObj.date)}
+                      disabled={isPastDate}
                       className={`
                         aspect-square rounded-xl text-sm font-medium transition-all duration-300
                         ${!dayObj.isCurrentMonth ? 'text-gray-300' : 'text-gray-700'}
@@ -195,6 +197,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                           : 'hover:bg-purple-50 hover:scale-105'
                         }
                         ${isTodayDate && !isSelected ? 'ring-2 ring-purple-400' : ''}
+                        ${isPastDate ? 'opacity-40 cursor-not-allowed' : ''}
                       `}
                     >
                       {dayObj.day}
