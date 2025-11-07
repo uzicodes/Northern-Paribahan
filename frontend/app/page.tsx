@@ -1,3 +1,4 @@
+import HeroDatePicker from '../components/HeroDatePicker';
 export default function Page() {
   return (
     <section
@@ -54,7 +55,7 @@ export default function Page() {
               <div className="text-xs text-gray-500 mr-2">Date of Journey</div>
               <div className="font-semibold text-base">06 Nov, 2025</div>
               <button className="ml-3 bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm mr-2">Today</button>
-              <button className="bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm">Tomorrow</button>
+              <HeroDatePicker />
             </div>
           </div>
         </div>
