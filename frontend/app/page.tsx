@@ -22,11 +22,11 @@ export default function Page() {
   ];
 
   const filteredFromLocations = locations.filter(location =>
-    location.toLowerCase().includes(fromValue.toLowerCase())
+    location.toLowerCase().includes(fromValue.toLowerCase()) && location !== toValue
   );
 
   const filteredToLocations = locations.filter(location =>
-    location.toLowerCase().includes(toValue.toLowerCase())
+    location.toLowerCase().includes(toValue.toLowerCase()) && location !== fromValue
   );
 
   return (
