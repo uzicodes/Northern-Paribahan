@@ -152,9 +152,9 @@ const ModernDatePicker = () => {
         )}
       </button>
       {open && (
-        <div className="datepicker-popover absolute left-0 mt-2 z-50 w-[320px]">
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-            <div className="p-6">
+        <div className="datepicker-popover absolute left-0 mt-2 z-50 w-[240px]">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="p-4">
               {/* Month Navigation */}
               <div className="flex items-center justify-between mb-6">
                 <button
@@ -205,13 +205,6 @@ const ModernDatePicker = () => {
                   );
                 })}
               </div>
-              {/* Today Button */}
-              <button
-                onClick={handleToday}
-                className="w-full mt-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:scale-105"
-              >
-                Jump to Today
-              </button>
             </div>
           </div>
         </div>
