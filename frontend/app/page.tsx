@@ -2,7 +2,7 @@ import HeroDatePicker from '../components/HeroDatePicker';
 export default function Page() {
   return (
     <section
-      className="w-full flex flex-col items-center justify-end min-h-[340px] rounded-b-[40px] overflow-hidden relative"
+      className="w-full flex flex-col items-center justify-end min-h-[340px] rounded-b-[40px] relative"
       style={{
         background: 'linear-gradient(90deg, #3a4660 0%, #b6b6e5 100%)',
         padding: 0,
