@@ -1,5 +1,9 @@
+"use client";
+import React from 'react';
 import HeroDatePicker from '../components/HeroDatePicker';
 export default function Page() {
+  const [dateOfJourney, setDateOfJourney] = React.useState<Date>(new Date());
+
   return (
     <section
       className="w-full flex flex-col items-center justify-end min-h-[340px] rounded-b-[40px] relative"
@@ -53,9 +57,12 @@ export default function Page() {
             {/* Date of Journey */}
             <div className="flex items-center border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 pl-4 py-2 sm:py-0">
               <div className="text-xs text-gray-500 mr-2">Date of Journey</div>
-              <div className="font-semibold text-base">06 Nov, 2025</div>
-              <button className="ml-3 bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm mr-2">Today</button>
-              <HeroDatePicker />
+              <div className="font-semibold text-base">
+                {dateOfJourney.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </div>
+              <div className="ml-2">
+                <HeroDatePicker selectedDate={dateOfJourney} onDateChange={setDateOfJourney} />
+              </div>
             </div>
           </div>
         </div>

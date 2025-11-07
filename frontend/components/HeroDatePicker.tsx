@@ -31,9 +31,13 @@ const ChevronRight = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const ModernDatePicker = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+interface HeroDatePickerProps {
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
+}
+
+const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateChange }) => {
+  const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
   const [open, setOpen] = useState(false);
 
   // Close calendar when clicking outside
@@ -117,16 +121,12 @@ const ModernDatePicker = () => {
   };
 
   const handleDateClick = (date: Date) => {
-    setSelectedDate(date);
+    onDateChange(date);
+    setCurrentMonth(date);
     setOpen(false);
   };
 
-  const handleToday = () => {
-    const today = new Date();
-    setSelectedDate(today);
-    setCurrentMonth(today);
-    setOpen(false);
-  };
+  // Remove handleToday (no longer needed)
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { 
@@ -143,13 +143,10 @@ const ModernDatePicker = () => {
     <div className="relative inline-block">
       <button
         type="button"
-        className="bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm flex items-center gap-2"
+        className="bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center"
         onClick={() => setOpen((v) => !v)}
       >
         <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" />
-        {selectedDate && (
-          <span>{selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-        )}
       </button>
       {open && (
         <div className="datepicker-popover absolute left-0 mt-2 z-50 w-[240px]">
@@ -213,4 +210,4 @@ const ModernDatePicker = () => {
   );
 };
 
-export default ModernDatePicker;
+export default HeroDatePicker;
