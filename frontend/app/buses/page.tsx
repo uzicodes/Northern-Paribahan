@@ -51,15 +51,6 @@ export default function BusesPage() {
     },
     {
       id: 5,
-      name: "Iveco Magelys",
-      brand: "Iveco",
-      features: ["Ergonomic Seats", "Climate Control", "USB Ports", "LED Lighting"],
-      capacity: "48-53 Passengers",
-      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80",
-      description: "Modern design meets efficiency in our Iveco fleet for your comfortable journey."
-    },
-    {
-      id: 6,
       name: "Hino RK8",
       brand: "Hino",
       features: ["Comfortable Seating", "AC System", "Safety Features", "Fuel Efficient"],
@@ -68,7 +59,7 @@ export default function BusesPage() {
       description: "Dependable and economical travel with Hino's trusted performance."
     },
     {
-      id: 7,
+      id: 6,
       name: "Ashok Leyland Viking",
       brand: "Ashok Leyland",
       features: ["Spacious Interior", "Air Conditioning", "Music System", "Storage Space"],
@@ -111,31 +102,16 @@ export default function BusesPage() {
               </div>
 
               {/* Bus Details */}
-              <div className="p-6">
+              <div className="p-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">{bus.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{bus.description}</p>
 
                 {/* Capacity */}
-                <div className="flex items-center gap-2 mb-4 text-indigo-600">
+                <div className="flex items-center justify-center gap-2 mb-4 text-indigo-600">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
                   </svg>
                   <span className="font-semibold text-sm">{bus.capacity}</span>
-                </div>
-
-                {/* Features */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Features:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {bus.features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-50 text-blue-700 text-xs px-3 py-1 rounded-full border border-blue-200"
-                      >
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
