@@ -63,7 +63,7 @@ export default function Page() {
                 onChange={(e) => setFromValue(e.target.value)}
                 onFocus={() => setShowFromDropdown(true)}
                 onBlur={() => setTimeout(() => setShowFromDropdown(false), 200)}
-                className="border-none outline-none text-base w-full bg-transparent"
+                className="border-2 border-[#c44d4d] outline-none text-base w-full bg-transparent rounded-lg px-3 py-2"
                 style={{ fontSize: 18 }}
               />
               {showFromDropdown && (
@@ -94,7 +94,7 @@ export default function Page() {
                 onChange={(e) => setToValue(e.target.value)}
                 onFocus={() => setShowToDropdown(true)}
                 onBlur={() => setTimeout(() => setShowToDropdown(false), 200)}
-                className="border-none outline-none text-base w-full bg-transparent"
+                className="border-2 border-[#c44d4d] outline-none text-base w-full bg-transparent rounded-lg px-3 py-2"
                 style={{ fontSize: 18 }}
               />
               {showToDropdown && (
