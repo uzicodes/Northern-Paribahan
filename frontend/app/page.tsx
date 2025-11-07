@@ -1,35 +1,30 @@
 "use client";
 import React from 'react';
 import HeroDatePicker from '../components/HeroDatePicker';
+
 export default function Page() {
   const [dateOfJourney, setDateOfJourney] = React.useState<Date>(new Date());
 
   return (
-    <section
-      className="w-full flex flex-col items-center justify-end min-h-[340px] rounded-b-[40px] relative"
-      style={{
-        background: 'linear-gradient(90deg, #3a4660 0%, #b6b6e5 100%)',
-        padding: 0,
-        margin: 0,
-        borderBottomLeftRadius: 40,
-        borderBottomRightRadius: 40,
-      }}
-    >
+    <section className="w-full flex flex-col items-center justify-end min-h-[340px] relative">
+      {/* Lowest layer image */}
+      <img
+        src="/1.jpg"
+        alt="Hero Layer"
+        className="absolute inset-0 z-0 w-full h-full object-cover opacity-80"
+        style={{ pointerEvents: 'none', maxHeight: '340px' }}
+      />
       <div
         className="absolute inset-0 z-10"
         style={{
           background: 'url(/bus-hero-bg.svg) center/cover no-repeat',
           opacity: 0.7,
+          maxHeight: '340px'
         }}
       />
-      <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col items-start px-4 pt-12 sm:pt-16 md:pt-20">
-        <h1
-          className="text-white font-bold leading-tight mb-8 drop-shadow-lg"
-          style={{ fontSize: 'clamp(2rem, 6vw, 3rem)', marginLeft: 0 }}
-        >
-          No. 1 online<br />bus ticket booking site
-        </h1>
-        <div className="w-full flex justify-center items-center -mb-16">
+      
+      <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col items-start px-4 pt-44 sm:pt-52 md:pt-60">
+        <div className="w-full flex justify-center items-center -mb-8 mt-16">
           <div
             className="bg-white rounded-3xl shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center w-full max-w-3xl gap-2 sm:gap-0"
             style={{ position: 'relative' }}
@@ -66,9 +61,10 @@ export default function Page() {
             </div>
           </div>
         </div>
-        <div className="w-full flex justify-center mt-16 mb-12">
+        
+        <div className="w-full flex justify-center mt-20 mb-12">
           <button
-            className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3 mt-6"
+            className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3"
             style={{ fontSize: 22 }}
           >
             <img width="28" height="28" src="https://img.icons8.com/sf-black/64/search.png" alt="search" className="mr-2" /> Search Buses
@@ -78,4 +74,3 @@ export default function Page() {
     </section>
   );
 }
-
