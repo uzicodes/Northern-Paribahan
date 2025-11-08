@@ -76,8 +76,8 @@ export default function LoginPage() {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full lg:w-1/2 p-8 sm:p-12 flex items-center">
-          <div className="max-w-md mx-auto w-full">
+        <div className="w-full lg:w-1/2 p-6 sm:p-8 flex items-center">
+          <div className="max-w-sm mx-auto w-full">
             {/* Mobile Logo */}
             <div className="lg:hidden flex justify-center mb-8">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-lg">
@@ -89,10 +89,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-            <p className="text-gray-600 mb-8">Sign in to your account to continue</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+            <p className="text-gray-600 mb-6">Sign in to your account to continue</p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -105,7 +105,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                 />
               </div>
 
@@ -122,7 +122,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                   />
                   <button
                     type="button"
@@ -153,7 +153,7 @@ export default function LoginPage() {
               {/* Login Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 Sign In
               </button>

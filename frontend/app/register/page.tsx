@@ -83,26 +83,26 @@ export default function RegisterPage() {
         </div>
 
         {/* Right Side - Register Form */}
-        <div className="w-full lg:w-1/2 p-8 sm:p-12 flex items-center">
-          <div className="max-w-md mx-auto w-full">
+        <div className="w-full lg:w-1/2 p-4 sm:p-6 flex items-center">
+          <div className="max-w-xs mx-auto w-full">
             {/* Mobile Logo */}
-            <div className="lg:hidden flex justify-center mb-8">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-lg">
+            <div className="lg:hidden flex justify-center mb-4">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
                 <img 
                   src="/logo.png" 
                   alt="Brand Logo" 
-                  className="h-12 w-auto"
+                  className="h-10 w-auto"
                 />
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
-            <p className="text-gray-600 mb-8">Sign up to get started</p>
+            <h1 className="text-xl font-bold text-gray-800 mb-1">Create Account</h1>
+            <p className="text-gray-600 mb-4 text-sm"></p>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* Name Input */}
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-xs font-semibold text-gray-700 mb-1">
                   Full Name
                 </label>
                 <input
@@ -112,13 +112,13 @@ export default function RegisterPage() {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your full name"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                 />
               </div>
 
               {/* Email Input */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="email" className="block text-xs font-semibold text-gray-700 mb-1">
                   Email Address
                 </label>
                 <input
@@ -128,13 +128,13 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                 />
               </div>
 
               {/* Password Input */}
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="password" className="block text-xs font-semibold text-gray-700 mb-1">
                   Password
                 </label>
                 <div className="relative">
@@ -145,7 +145,7 @@ export default function RegisterPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                   />
                   <button
                     type="button"
@@ -179,7 +179,7 @@ export default function RegisterPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your password"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300"
                   />
                   <button
                     type="button"
@@ -203,7 +203,7 @@ export default function RegisterPage() {
               {/* Register Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
               >
                 Create Account
               </button>
