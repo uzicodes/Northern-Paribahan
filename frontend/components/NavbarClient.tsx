@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type JwtPayload = { role?: string };
@@ -16,6 +17,7 @@ function decodeRole(token: string | null): string | null {
 }
 
 export default function NavbarClient() {
+  const pathname = usePathname();
   const [token, setToken] = useState<string | null>(null);
   const role = useMemo(() => decodeRole(token), [token]);
 
@@ -31,18 +33,49 @@ export default function NavbarClient() {
     setToken(null);
   }
 
+  const isActive = (path: string) => pathname === path;
+
   return (
     <nav className="flex items-center gap-4 text-sm">
-  <Link href="/buses" className="text-white hover:text-gray-300">Buses</Link>
-      {token && <Link href="/my-bookings" className="text-gray-600 hover:text-gray-900">My Bookings</Link>}
-      {role === 'ADMIN' && <Link href="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>}
+      <Link 
+        href="/buses" 
+        className={isActive('/buses') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+      >
+        Buses
+      </Link>
+      {token && (
+        <Link 
+          href="/my-bookings" 
+          className={isActive('/my-bookings') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+        >
+          My Bookings
+        </Link>
+      )}
+      {role === 'ADMIN' && (
+        <Link 
+          href="/admin" 
+          className={isActive('/admin') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+        >
+          Admin
+        </Link>
+      )}
       {!token ? (
         <>
-          <Link href="/login" className="text-white hover:text-gray-300">Login</Link>
-          <Link href="/register" className="text-white hover:text-gray-300">Register</Link>
+          <Link 
+            href="/login" 
+            className={isActive('/login') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+          >
+            Login
+          </Link>
+          <Link 
+            href="/register" 
+            className={isActive('/register') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+          >
+            Register
+          </Link>
         </>
       ) : (
-        <button onClick={logout} className="text-gray-600 hover:text-gray-900">Logout</button>
+        <button onClick={logout} className="text-white hover:text-gray-300">Logout</button>
       )}
     </nav>
   );
