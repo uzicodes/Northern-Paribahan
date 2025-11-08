@@ -96,7 +96,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <h1 className="text-xl font-bold text-gray-800 mb-1">Create Account</h1>
+            <h1 className="text-xl font-bold text-gray-800 mb-1 text-center">Create Account</h1>
             <p className="text-gray-600 mb-4 text-sm"></p>
 
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -168,7 +168,7 @@ export default function RegisterPage() {
 
               {/* Confirm Password Input */}
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-xs font-semibold text-gray-700 mb-1">
                   Confirm Password
                 </label>
                 <div className="relative">
