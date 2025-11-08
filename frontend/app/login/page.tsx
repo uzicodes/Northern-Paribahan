@@ -89,8 +89,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-            <p className="text-gray-600 mb-6">Sign in to your account to continue</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">Welcome Back !</h1>
+            <p className="text-gray-600 mb-6"></p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Input */}
