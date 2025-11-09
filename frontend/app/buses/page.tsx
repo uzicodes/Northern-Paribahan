@@ -76,7 +76,7 @@ export default function BusesPage() {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Our Premium Fleet</h1>
           <p className="text-xl text-blue-100 text-center max-w-3xl mx-auto">
-            Experience world-class comfort and safety with our diverse range of luxury buses
+            Experience world-class comfort & safety with luxury buses 
           </p>
         </div>
       </div>
