@@ -87,7 +87,8 @@ export default function BusesPage() {
           {buses.map((bus) => (
             <div
               key={bus.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              className="rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              style={{ backgroundColor: '#ACE69C' }}
             >
               {/* Bus Image */}
               <div className="relative h-56 overflow-hidden bg-gray-200">
