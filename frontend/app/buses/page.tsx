@@ -75,7 +75,7 @@ export default function BusesPage() {
   <div className="py-8 px-4" style={{ backgroundColor: '#C5E6E6' }}>
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Our Premium Fleet</h1>
-          <p className="text-xl text-red-600 text-center max-w-3xl mx-auto">
+          <p className="text-l text-red-600 text-center max-w-1xl mx-auto">
             Experience world-class comfort & safety with luxury buses
           </p>
         </div>
