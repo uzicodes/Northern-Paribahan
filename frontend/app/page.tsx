@@ -145,7 +145,7 @@ export default function Page() {
         {/* Promo Cards */}
         <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
           {/* Card 1 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
+          <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{backgroundColor:'#B4EDD0'}}>
             <div className="font-bold text-lg mt-2 mb-1">Save up to Tk 500 on bkash payments</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 31 Dec</div>
             <div className="flex items-center mt-auto">
@@ -156,7 +156,7 @@ export default function Page() {
             <img src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
           </div>
           {/* Card 2 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
+          <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{backgroundColor:'#B4EDD0'}}>
             <div className="font-bold text-lg mt-2 mb-1">Get upto 10% off on Return tickets</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
@@ -167,7 +167,7 @@ export default function Page() {
             <img src="/promo-bus1.png" alt="promo bus" className="absolute bottom-0 right-4 w-24 h-24 object-contain" />
           </div>
           {/* Card 3 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
+          <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{backgroundColor:'#B4EDD0'}}>
             <div className="font-bold text-lg mt-2 mb-1">Save up to Tk 300 on selected hotels in Cox's Bazar</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
@@ -175,10 +175,10 @@ export default function Page() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>BUS300
               </span>
             </div>
-            <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
+              <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain" />
           </div>
           {/* Card 4 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
+          <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{backgroundColor:'#B4EDD0'}}>
             <div className="font-bold text-lg mt-2 mb-1">Save upto Tk 500 with BRAC Bank Cards</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 15 Dec</div>
             <div className="flex items-center mt-auto">
