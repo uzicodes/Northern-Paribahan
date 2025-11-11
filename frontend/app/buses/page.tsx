@@ -72,11 +72,11 @@ export default function BusesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-4">
+  <div className="py-8 px-4" style={{ backgroundColor: '#C5E6E6' }}>
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Our Premium Fleet</h1>
-          <p className="text-xl text-blue-100 text-center max-w-3xl mx-auto">
-            Experience world-class comfort & safety with luxury buses 
+          <p className="text-xl text-red-600 text-center max-w-3xl mx-auto">
+            Experience world-class comfort & safety with luxury buses
           </p>
         </div>
       </div>
@@ -121,7 +121,7 @@ export default function BusesPage() {
       </div>
 
       {/* Why Choose Us Section */}
-      <div className="bg-white py-16 px-4 mt-12">
+  <div className="py-16 px-4 mt-12" style={{ backgroundColor: '#C5E6E6' }}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">Why Choose Our Buses?</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
