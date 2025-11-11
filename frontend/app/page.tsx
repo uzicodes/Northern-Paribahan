@@ -140,18 +140,12 @@ export default function Page() {
 
       {/* Promo & What's New Section */}
       <div className="w-full flex flex-col items-center px-2 sm:px-0">
-        {/* Filter Tabs */}
-        <div className="flex gap-2 mt-2 mb-6">
-          <button className="px-5 py-2 rounded-full bg-[#F8E7E7] text-black font-semibold shadow-sm border border-[#F8E7E7] focus:outline-none">All</button>
-          <button className="px-5 py-2 rounded-full bg-white text-black font-semibold shadow-sm border border-gray-200 focus:outline-none">Bus</button>
-          <button className="px-5 py-2 rounded-full bg-white text-black font-semibold shadow-sm border border-gray-200 focus:outline-none">Train</button>
-        </div>
+
 
         {/* Promo Cards */}
         <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
           {/* Card 1 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[200px] shadow-md relative">
-            <span className="absolute top-4 left-4 bg-[#6B5B5B] text-white text-xs px-3 py-1 rounded-full font-semibold">Bus</span>
+          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
             <div className="font-bold text-lg mt-8 mb-1">Save up to Rs 500 on bus tickets</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 31 Dec</div>
             <div className="flex items-center mt-auto">
@@ -162,8 +156,7 @@ export default function Page() {
             <img src="/promo-person.png" alt="promo person" className="absolute bottom-0 right-4 w-24 h-24 object-contain" />
           </div>
           {/* Card 2 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[200px] shadow-md relative">
-            <span className="absolute top-4 left-4 bg-[#6B5B5B] text-white text-xs px-3 py-1 rounded-full font-semibold">Bus</span>
+          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
             <div className="font-bold text-lg mt-8 mb-1">Save up to Rs 250 on bus tickets</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
@@ -174,8 +167,7 @@ export default function Page() {
             <img src="/promo-bus1.png" alt="promo bus" className="absolute bottom-0 right-4 w-24 h-24 object-contain" />
           </div>
           {/* Card 3 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[200px] shadow-md relative">
-            <span className="absolute top-4 left-4 bg-[#6B5B5B] text-white text-xs px-3 py-1 rounded-full font-semibold">Bus</span>
+          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
             <div className="font-bold text-lg mt-8 mb-1">Save up to Rs 300 on bus tickets</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
@@ -186,8 +178,7 @@ export default function Page() {
             <img src="/promo-bus2.png" alt="promo bus" className="absolute bottom-0 right-4 w-24 h-24 object-contain" />
           </div>
           {/* Card 4 */}
-          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[200px] shadow-md relative">
-            <span className="absolute top-4 left-4 bg-[#6B5B5B] text-white text-xs px-3 py-1 rounded-full font-semibold">Bus</span>
+          <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[110px] shadow-md relative">
             <div className="font-bold text-lg mt-8 mb-1">Save upto Rs 500 with Axis Bank Credit Cards</div>
             <div className="text-sm text-gray-700 mb-2">Valid till 15 Dec</div>
             <div className="flex items-center mt-auto">
@@ -196,7 +187,6 @@ export default function Page() {
               </span>
             </div>
             <img src="/promo-axis.png" alt="axis bank" className="absolute bottom-0 right-4 w-24 h-24 object-contain" />
-            <span className="absolute top-4 right-4 bg-white w-8 h-8 flex items-center justify-center rounded-full shadow"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></span>
           </div>
         </div>
 
@@ -205,7 +195,7 @@ export default function Page() {
           <h2 className="text-2xl font-bold mb-4">What's new</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {/* Card 1 */}
-            <div className="rounded-2xl bg-[#2B2D42] p-6 flex flex-col justify-between min-h-[140px] shadow-md text-white relative">
+            <div className="rounded-2xl bg-[#2B2D42] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
               <div className="flex items-center gap-2 mb-2">
                 <img src="/acko-logo.png" alt="acko" className="h-6 w-6" />
                 <span className="font-semibold">ACKO</span>
@@ -214,21 +204,21 @@ export default function Page() {
               <button className="mt-2 bg-white text-[#2B2D42] font-semibold px-4 py-2 rounded-full text-sm">Insure now</button>
             </div>
             {/* Card 2 */}
-            <div className="rounded-2xl bg-[#8B1E3F] p-6 flex flex-col justify-between min-h-[140px] shadow-md text-white relative">
+            <div className="rounded-2xl bg-[#8B1E3F] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
               <div className="font-bold text-base mb-1">Free Cancellation</div>
               <div className="text-sm mb-2">Get 100% refund on cancellation</div>
               <a href="#" className="mt-auto text-white font-semibold flex items-center gap-1">Know more <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
               <span className="absolute top-4 right-4 bg-white bg-opacity-10 rounded-full p-2"><svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span>
             </div>
             {/* Card 3 */}
-            <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[140px] shadow-md text-black relative">
+            <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-black relative">
               <div className="font-bold text-base mb-1">Introducing Bus timetable</div>
               <div className="text-sm mb-2">Get local bus timings between cities in your state</div>
               <a href="#" className="mt-auto text-black font-semibold flex items-center gap-1">Know more <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
               <span className="absolute bottom-4 right-4"><img src="/promo-bus3.png" alt="bus timetable" className="h-12 w-12 object-contain" /></span>
             </div>
             {/* Card 4 */}
-            <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[140px] shadow-md text-[#2B2D42] relative">
+            <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-[#2B2D42] relative">
               <div className="font-bold text-base mb-1">FlexiTicket</div>
               <div className="text-sm mb-2">Get amazing benefits on Date Change & Cancellation</div>
               <a href="#" className="mt-auto text-[#2B2D42] font-semibold flex items-center gap-1">Know More <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
