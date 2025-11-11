@@ -143,7 +143,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
     <div className="relative inline-block">
       <button
         type="button"
-        className="bg-[#f7e3df] text-[#7a4c3b] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center"
+        className="bg-[#C5E6CB] text-[#22543d] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center border-2 border-[#C5E6CB]"
         onClick={() => setOpen((v) => !v)}
       >
         <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" />

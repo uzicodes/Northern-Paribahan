@@ -50,8 +50,8 @@ export default function Page() {
       <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col items-start px-4 pt-44 sm:pt-52 md:pt-60">
         <div className="w-full flex justify-center items-center -mb-8 mt-16">
           <div
-            className="bg-white rounded-3xl shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center w-full max-w-3xl gap-2 sm:gap-0"
-            style={{ position: 'relative' }}
+            className="rounded-3xl shadow-lg p-4 sm:p-6 flex flex-col sm:flex-row items-center w-full max-w-3xl gap-2 sm:gap-0"
+            style={{ position: 'relative', backgroundColor: '#EDF5F0' }}
           >
             {/* From input */}
             <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 py-2 sm:py-0 relative">
