@@ -223,6 +223,9 @@ export default function Page() {
           </div>
         </div>
       </div>
+      
+      {/* Extra spacing under last row */}
+      <div className="pb-16"></div>
     </section>
   );
 }
