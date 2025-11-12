@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import Link from 'next/link';
 
 interface Bus {
   id: number;
@@ -85,9 +86,10 @@ export default function BusesPage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {buses.map((bus) => (
-            <div
+            <Link
               key={bus.id}
-              className="rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+              href={`/buses/${bus.id}`}
+              className="rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 block"
               style={{ backgroundColor: '#ACE69C' }}
             >
               {/* Bus Image */}
@@ -115,7 +117,7 @@ export default function BusesPage() {
                   <span className="font-semibold text-sm">{bus.capacity}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

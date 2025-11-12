@@ -165,7 +165,7 @@ export default function Page() {
               </span>
             </div>
             <img src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
-          </div>
+          </div> 
           {/* Card 3 */}
           <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{backgroundColor:'#B4EDD0'}}>
             <div className="font-bold text-lg mt-2 mb-1">Save up to Tk 300 on selected hotels in Cox's Bazar</div>
@@ -219,8 +219,6 @@ export default function Page() {
             <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-[#2B2D42] relative">
               <div className="font-bold text-base mb-1">Flexible Ticketing</div>
               <div className="text-sm mb-2">Get amazing benefits on Date Change & Cancellation</div>
-
-              {/* Removed image from last row card */}
             </div>
           </div>
         </div>
@@ -228,3 +226,4 @@ export default function Page() {
     </section>
   );
 }
+
