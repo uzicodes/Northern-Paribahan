@@ -87,8 +87,8 @@ export default function BusDetailPage() {
   const generateSeats = (): Seat[] => {
     const seats: Seat[] = [];
     
-    // Driver seat
-    seats.push({ id: 'driver', row: 0, column: 0, isAvailable: false, type: 'driver' });
+    // Driver seat (on the right side)
+    seats.push({ id: 'driver', row: 0, column: 4, isAvailable: false, type: 'driver' });
     
     // Regular seats in 2-2 configuration (11 rows)
     for (let row = 1; row <= 11; row++) {
@@ -127,13 +127,6 @@ export default function BusDetailPage() {
         type: 'seat' 
       });
     }
-    
-    // Last row - 5 seats
-    seats.push({ id: 'E12', row: 12, column: 0, isAvailable: true, type: 'seat' });
-    seats.push({ id: 'F12', row: 12, column: 1, isAvailable: true, type: 'seat' });
-    seats.push({ id: 'G12', row: 12, column: 2, isAvailable: true, type: 'seat' });
-    seats.push({ id: 'H12', row: 12, column: 3, isAvailable: true, type: 'seat' });
-    seats.push({ id: 'I12', row: 12, column: 4, isAvailable: true, type: 'seat' });
     
     return seats;
   };
@@ -252,9 +245,9 @@ export default function BusDetailPage() {
               <div className="bg-gray-100 rounded-2xl p-6 inline-block">
                 <div className="space-y-3">
                   {/* Driver Row */}
-                  <div className="flex gap-2 items-center justify-center mb-4">
+                  <div className="flex gap-2 items-center justify-end mb-4">
+                    <div className="text-xs text-gray-600 mr-2">Driver</div>
                     {renderSeat(seats[0])}
-                    <div className="text-xs text-gray-600 ml-2">Driver</div>
                   </div>
 
                   {/* Regular Rows */}
@@ -263,11 +256,6 @@ export default function BusDetailPage() {
                       {getSeatsByRow(row).map(seat => renderSeat(seat))}
                     </div>
                   ))}
-
-                  {/* Last Row */}
-                  <div className="flex gap-2 items-center pt-2 border-t-2 border-gray-300">
-                    {getSeatsByRow(12).map(seat => renderSeat(seat))}
-                  </div>
                 </div>
               </div>
             </div>
