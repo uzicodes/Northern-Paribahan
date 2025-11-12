@@ -97,14 +97,14 @@ export default function BusDetailPage() {
         id: `A${row}`, 
         row, 
         column: 0, 
-        isAvailable: Math.random() > 0.3, 
+        isAvailable: true, 
         type: 'seat' 
       });
       seats.push({ 
         id: `B${row}`, 
         row, 
         column: 1, 
-        isAvailable: Math.random() > 0.3, 
+        isAvailable: true, 
         type: 'seat' 
       });
       
@@ -116,24 +116,24 @@ export default function BusDetailPage() {
         id: `C${row}`, 
         row, 
         column: 3, 
-        isAvailable: Math.random() > 0.3, 
+        isAvailable: true, 
         type: 'seat' 
       });
       seats.push({ 
         id: `D${row}`, 
         row, 
         column: 4, 
-        isAvailable: Math.random() > 0.3, 
+        isAvailable: true, 
         type: 'seat' 
       });
     }
     
     // Last row - 5 seats
-    seats.push({ id: 'E12', row: 12, column: 0, isAvailable: Math.random() > 0.3, type: 'seat' });
-    seats.push({ id: 'F12', row: 12, column: 1, isAvailable: Math.random() > 0.3, type: 'seat' });
-    seats.push({ id: 'G12', row: 12, column: 2, isAvailable: Math.random() > 0.3, type: 'seat' });
-    seats.push({ id: 'H12', row: 12, column: 3, isAvailable: Math.random() > 0.3, type: 'seat' });
-    seats.push({ id: 'I12', row: 12, column: 4, isAvailable: Math.random() > 0.3, type: 'seat' });
+    seats.push({ id: 'E12', row: 12, column: 0, isAvailable: true, type: 'seat' });
+    seats.push({ id: 'F12', row: 12, column: 1, isAvailable: true, type: 'seat' });
+    seats.push({ id: 'G12', row: 12, column: 2, isAvailable: true, type: 'seat' });
+    seats.push({ id: 'H12', row: 12, column: 3, isAvailable: true, type: 'seat' });
+    seats.push({ id: 'I12', row: 12, column: 4, isAvailable: true, type: 'seat' });
     
     return seats;
   };
