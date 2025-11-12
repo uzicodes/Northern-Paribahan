@@ -197,29 +197,29 @@ export default function Page() {
             {/* Card 1 */}
             <div className="rounded-2xl bg-[#2B2D42] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
               <div className="flex items-center gap-2 mb-2">
-                <span className="font-semibold">ACKO</span>
+                
               </div>
               <div className="font-bold text-base mb-1">Maximum savings on car insurance. Cashless claims everywhere.</div>
-              <button className="mt-2 bg-white text-[#2B2D42] font-semibold px-4 py-2 rounded-full text-sm">Insure now</button>
+
             </div>
             {/* Card 2 */}
             <div className="rounded-2xl bg-[#8B1E3F] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
               <div className="font-bold text-base mb-1">Free Cancellation</div>
               <div className="text-sm mb-2">Get 100% refund on cancellation</div>
-              <a href="#" className="mt-auto text-white font-semibold flex items-center gap-1">Know more <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
+
               {/* Removed image from last row card */}
             </div>
             {/* Card 3 */}
             <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-black relative">
               <div className="font-bold text-base mb-1">Introducing Bus timetable</div>
               <div className="text-sm mb-2">Get local bus timings between cities in your state</div>
-              <a href="#" className="mt-auto text-black font-semibold flex items-center gap-1">Know more <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
+
             </div>
             {/* Card 4 */}
             <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-[#2B2D42] relative">
-              <div className="font-bold text-base mb-1">FlexiTicket</div>
+              <div className="font-bold text-base mb-1">Flexible Ticketing</div>
               <div className="text-sm mb-2">Get amazing benefits on Date Change & Cancellation</div>
-              <a href="#" className="mt-auto text-[#2B2D42] font-semibold flex items-center gap-1">Know More <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></a>
+
               {/* Removed image from last row card */}
             </div>
           </div>
