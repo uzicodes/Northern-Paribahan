@@ -150,7 +150,7 @@ export default function Page() {
             <div className="text-sm text-gray-700 mb-2">Valid till 31 Dec</div>
             <div className="flex items-center mt-auto">
               <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>RED500
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>BK500
               </span>
             </div>
             <img src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
@@ -161,7 +161,7 @@ export default function Page() {
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
               <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>FIRST
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>RETURN10
               </span>
             </div>
             <img src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
@@ -172,7 +172,7 @@ export default function Page() {
             <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
             <div className="flex items-center mt-auto">
               <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>BUS300
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>HOTEL300
               </span>
             </div>
               <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain" />
@@ -183,7 +183,7 @@ export default function Page() {
             <div className="text-sm text-gray-700 mb-2">Valid till 15 Dec</div>
             <div className="flex items-center mt-auto">
               <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>AXIS500
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#F8B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" /></svg>BB500
               </span>
             </div>
             <img src="/brac_bank.png" alt="brac bank logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
