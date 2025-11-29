@@ -15,18 +15,18 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#C9CBA3' }}>
       {/* Main Container */}
       <div className="w-full max-w-5xl flex rounded-3xl shadow-2xl overflow-hidden bg-white h-auto">
-        
+
         {/* Left Side - Image/Branding */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-12 flex-col justify-between relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-10 rounded-full -ml-48 -mb-48"></div>
-          
+
           <div className="relative z-10">
             <div className="bg-white p-4 rounded-2xl inline-block mb-8 shadow-lg">
-              <img 
-                src="/logo.png" 
-                alt="Brand Logo" 
+              <img
+                src="/logo.png"
+                alt="Brand Logo"
                 className="h-12 w-auto"
               />
             </div>
@@ -37,7 +37,7 @@ export default function LoginPage() {
               Book your bus tickets easily and travel safely to your destination.
             </p>
           </div>
-          
+
           <div className="relative z-10 space-y-4">
             <div className="flex items-start gap-3">
               <div className="bg-white bg-opacity-20 p-2 rounded-lg">
@@ -81,9 +81,9 @@ export default function LoginPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden flex justify-center mb-8">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-lg">
-                <img 
-                  src="/logo.png" 
-                  alt="Brand Logo" 
+                <img
+                  src="/logo.png"
+                  alt="Brand Logo"
                   className="h-12 w-auto"
                 />
               </div>
@@ -166,6 +166,16 @@ export default function LoginPage() {
                     Create Account
                   </a>
                 </p>
+                <div className="mt-3 flex justify-center">
+                  <a href="/admin">
+                    <button
+                      type="button"
+                      className="bg-green-100 hover:bg-green-200 text-green-800 py-2 px-6 rounded-xl font-semibold transition-all duration-300 border border-green-300"
+                    >
+                      ADMIN LOGIN
+                    </button>
+                  </a>
+                </div>
               </div>
             </form>
           </div>
