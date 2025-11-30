@@ -30,21 +30,20 @@ export default function AdminLoginPage() {
             <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
 
                 {/* Header Section */}
-                <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 text-center">
-                    <div className="bg-white p-3 rounded-2xl inline-block mb-3 shadow-lg">
+                <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 text-center">
+                    <div className="bg-white p-2 rounded-2xl inline-block mb-2 shadow-lg">
                         <img
                             src="/logo.png"
                             alt="Admin Logo"
-                            className="h-12 w-auto"
+                            className="h-10 w-auto"
                         />
                     </div>
-                    <h1 className="text-2xl font-bold text-white mb-1">Admin Portal</h1>
-                    <p className="text-green-100 text-sm">Secure Access Only</p>
+                    <h1 className="text-xl font-bold text-white mb-1">Admin Login Portal</h1>
+                    <p className="text-xs font-semibold" style={{ color: '#7d0f0fff' }}>Secured Access Only !</p>
                 </div>
 
                 {/* Form Section */}
                 <div className="p-6">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Admin Login</h2>
 
                     {error && (
                         <div className="mb-3 p-2.5 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm">
@@ -116,12 +115,14 @@ export default function AdminLoginPage() {
                         </div>
 
                         {/* Login Button */}
-                        <button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2.5 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                        >
-                            Sign In as Admin
-                        </button>
+                        <div className="flex justify-center">
+                            <button
+                                type="submit"
+                                className="w-3/5 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2.5 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                            >
+                                Sign In as Admin
+                            </button>
+                        </div>
 
                         {/* Back to User Login */}
                         <div className="text-center pt-3">
