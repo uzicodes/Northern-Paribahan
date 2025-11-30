@@ -2,6 +2,7 @@ import './globals.css';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import NavbarClient from '../components/NavbarClient';
+import Footer from '../components/Footer';
 
 export const metadata = {
   title: 'Northern Paribahan',
@@ -18,8 +19,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/favicon.ico" />
       </head>
-  <body className="min-h-screen" style={{ backgroundColor: '#C9CBA3' }}>
-  <header className="border-b" style={{ backgroundColor: '#172144' }}>
+      <body className="min-h-screen flex flex-col" style={{ backgroundColor: '#C9CBA3' }}>
+        <header className="border-b" style={{ backgroundColor: '#172144' }}>
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
             <Link href="/" className="font-semibold text-lg flex items-center gap-2">
               <img src="/logo.png" alt="Northern Paribahan Logo" style={{ height: 32, width: 32, display: 'inline-block', verticalAlign: 'middle' }} />
@@ -28,8 +29,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <div style={{ color: '#F1F604' }}><NavbarClient /></div>
           </div>
         </header>
-        <main>{children}</main>
-
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
     </html>
   );
