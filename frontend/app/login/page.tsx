@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
+  const [emailOrPhone, setEmailOrPhone] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password });
+    console.log('Login attempt:', { emailOrPhone, password });
   };
 
   return (
@@ -93,17 +93,17 @@ export default function LoginPage() {
             <p className="text-gray-600 mb-6"></p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Input */}
+              {/* Email or Phone Input */}
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email Address
+                <label htmlFor="emailOrPhone" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email or Phone Number
                 </label>
                 <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  id="emailOrPhone"
+                  type="text"
+                  value={emailOrPhone}
+                  onChange={(e) => setEmailOrPhone(e.target.value)}
+                  placeholder="Enter your email or phone number"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
                 />

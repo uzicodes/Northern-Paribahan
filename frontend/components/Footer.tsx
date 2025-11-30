@@ -134,7 +134,7 @@ export default function Footer() {
                 <div className="border-t pt-6" style={{ borderColor: '#F1F604', opacity: 0.3 }}>
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-sm" style={{ color: '#F1F604' }}>
-                            © {new Date().getFullYear()} Northern Paribahan. All rights reserved.
+                            © 2026 Northern Paribahan. All rights reserved.
                         </p>
                         <div className="flex gap-6">
                             <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
