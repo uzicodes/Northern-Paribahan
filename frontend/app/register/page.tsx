@@ -7,9 +7,17 @@ export default function RegisterPage() {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitted(true);
+
+    // Check if phone number is exactly 11 digits
+    if (phoneNumber.length !== 11) {
+      return;
+    }
+
     console.log('Register attempt:', { name, email, phoneNumber, password });
   };
 
@@ -155,7 +163,7 @@ export default function RegisterPage() {
                     className="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
                   />
                 </div>
-                {phoneNumber && phoneNumber.length !== 11 && (
+                {submitted && phoneNumber.length !== 11 && (
                   <p className="text-xs text-red-500 mt-1">Phone number must be exactly 11 digits</p>
                 )}
               </div>
