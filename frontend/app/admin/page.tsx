@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '../../lib/api';
 
 export default function AdminPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
   const [routeId, setRouteId] = useState('');
@@ -13,6 +15,33 @@ export default function AdminPage() {
   const [busIdForSeats, setBusIdForSeats] = useState('');
   const [seatCount, setSeatCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'routes' | 'buses' | 'seats'>('routes');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const isLoggedIn = typeof window !== 'undefined' ? localStorage.getItem('adminLoggedIn') : null;
+    if (!isLoggedIn) {
+      router.push('/admin/login');
+    } else {
+      setIsLoading(false);
+    }
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminLoggedIn');
+    router.push('/admin/login');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   async function createBus(e: React.FormEvent) {
     e.preventDefault();
@@ -49,16 +78,27 @@ export default function AdminPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-xl shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Admin Dashboard</h1>
+                <p className="text-gray-600 text-sm md:text-base">Manage routes, buses, and seats</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-            </div>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Admin Dashboard</h1>
-              <p className="text-gray-600 text-sm md:text-base">Manage routes, buses, and seats</p>
-            </div>
+              Logout
+            </button>
           </div>
         </div>
 
@@ -68,8 +108,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('routes')}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === 'routes'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -82,8 +122,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('buses')}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === 'buses'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <div className="flex items-center justify-center gap-2">
@@ -96,8 +136,8 @@ export default function AdminPage() {
             <button
               onClick={() => setActiveTab('seats')}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === 'seats'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                : 'text-gray-600 hover:bg-gray-100'
                 }`}
             >
               <div className="flex items-center justify-center gap-2">

@@ -167,7 +167,7 @@ export default function LoginPage() {
                   </a>
                 </p>
                 <div className="mt-3 flex justify-center">
-                  <a href="/admin">
+                  <a href="/admin/login">
                     <button
                       type="button"
                       className="bg-green-100 hover:bg-green-200 text-green-800 py-2 px-6 rounded-xl font-semibold transition-all duration-300 border border-green-300"
