@@ -17,18 +17,18 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#C9CBA3' }}>
       {/* Main Container */}
       <div className="w-full max-w-5xl flex rounded-3xl shadow-2xl overflow-hidden bg-white h-auto">
-        
+
         {/* Left Side - Image/Branding */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-12 flex-col justify-between relative overflow-hidden">
           {/* Decorative circles */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-32 -mt-32"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-10 rounded-full -ml-48 -mb-48"></div>
-          
+
           <div className="relative z-10">
             <div className="bg-white p-4 rounded-2xl inline-block mb-8 shadow-lg">
-              <img 
-                src="/logo.png" 
-                alt="Brand Logo" 
+              <img
+                src="/logo.png"
+                alt="Brand Logo"
                 className="h-12 w-auto"
               />
             </div>
@@ -39,7 +39,7 @@ export default function RegisterPage() {
               Create your account and start your journey with us.
             </p>
           </div>
-          
+
           <div className="relative z-10 space-y-4">
             <div className="flex items-start gap-3">
               <div className="bg-white bg-opacity-20 p-2 rounded-lg">
@@ -83,9 +83,9 @@ export default function RegisterPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden flex justify-center mb-4">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
-                <img 
-                  src="/logo.png" 
-                  alt="Brand Logo" 
+                <img
+                  src="/logo.png"
+                  alt="Brand Logo"
                   className="h-10 w-auto"
                 />
               </div>
@@ -123,6 +123,8 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                  title="Please enter a valid email address with @ symbol"
                   className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
                 />
               </div>
@@ -132,15 +134,30 @@ export default function RegisterPage() {
                 <label htmlFor="phoneNumber" className="block text-xs font-semibold text-gray-700 mb-1">
                   Phone Number
                 </label>
-                <input
-                  id="phoneNumber"
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Enter your phone number"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
-                />
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-700 font-medium">
+                    +880
+                  </span>
+                  <input
+                    id="phoneNumber"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      if (value.length <= 11) {
+                        setPhoneNumber(value);
+                      }
+                    }}
+                    placeholder="17XXXXXXXXX"
+                    required
+                    maxLength={11}
+                    pattern="[0-9]{11}"
+                    className="w-full pl-14 pr-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
+                  />
+                </div>
+                {phoneNumber && phoneNumber.length !== 11 && (
+                  <p className="text-xs text-red-500 mt-1">Phone number must be exactly 11 digits</p>
+                )}
               </div>
 
               {/* Password Input */}
