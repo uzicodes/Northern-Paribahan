@@ -13,6 +13,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setSubmitted(true);
 
+    // Validate email format
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+      return;
+    }
+
     // Check if phone number is exactly 11 digits
     if (phoneNumber.length !== 11) {
       return;
@@ -102,7 +108,7 @@ export default function RegisterPage() {
             <h1 className="text-xl font-bold text-gray-800 mb-1 text-center">Create Account</h1>
             <p className="text-gray-600 mb-4 text-sm"></p>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} noValidate className="space-y-3">
               {/* Name Input */}
               <div>
                 <label htmlFor="name" className="block text-xs font-semibold text-gray-700 mb-1">
@@ -126,15 +132,16 @@ export default function RegisterPage() {
                 </label>
                 <input
                   id="email"
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
-                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
-                  title="Please enter a valid email address with @ symbol"
                   className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
                 />
+                {submitted && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email) && (
+                  <p className="text-xs text-red-500 mt-1">Please use a valid email '@' is required.</p>
+                )}
               </div>
 
               {/* Phone Number Input */}
@@ -164,7 +171,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 {submitted && phoneNumber.length !== 11 && (
-                  <p className="text-xs text-red-500 mt-1">Phone number must be exactly 11 digits</p>
+                  <p className="text-xs text-red-500 mt-1">Please use a valid phone number.</p>
                 )}
               </div>
 
