@@ -14,7 +14,7 @@ export default function Footer() {
                                 Northern Paribahan
                             </span>
                         </Link>
-                        <p className="text-sm mb-4" style={{ color: '#F1F604' }}>
+                        <p className="text-sm mb-4" style={{ color: '#0769d9' }}>
                             Your trusted partner for comfortable and safe bus journeys across Bangladesh.
                         </p>
                         <div className="flex gap-3">
@@ -50,22 +50,22 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-2">
                             <li>
-                                <Link href="/" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <Link href="/" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Home
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/buses" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <Link href="/buses" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Search Buses
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/my-bookings" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <Link href="/my-bookings" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     My Bookings
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/login" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <Link href="/login" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Login
                                 </Link>
                             </li>
@@ -79,22 +79,22 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-2">
                             <li>
-                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Help Center
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Contact Us
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     FAQs
                                 </a>
                             </li>
                             <li>
-                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#F1F604' }}>
+                                <a href="#" className="text-sm hover:underline transition-all" style={{ color: '#458208' }}>
                                     Terms & Conditions
                                 </a>
                             </li>
@@ -108,23 +108,23 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-3">
                             <li className="flex items-start gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#F1F604' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#0769d9' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                 </svg>
-                                <span className="text-sm" style={{ color: '#F1F604' }}>+880 1700-000000</span>
+                                <span className="text-sm" style={{ color: '#0769d9' }}>+880 1700-000000</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#F1F604' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#0769d9' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                 </svg>
-                                <span className="text-sm" style={{ color: '#F1F604' }}>info@northernparibahan.com</span>
+                                <span className="text-sm" style={{ color: '#0769d9' }}>info@northernparibahan.com</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#F1F604' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mt-0.5 flex-shrink-0" style={{ color: '#0769d9' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
-                                <span className="text-sm" style={{ color: '#F1F604' }}>Dhaka, Bangladesh</span>
+                                <span className="text-sm" style={{ color: '#0769d9' }}>Dhaka, Bangladesh</span>
                             </li>
                         </ul>
                     </div>
