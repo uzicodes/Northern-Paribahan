@@ -1,79 +1,70 @@
-// backend/prisma/schema.prisma
-
-datasource db {
-  provider = "postgresql"
-  // DELETE the 'url' and 'directUrl' lines from here!
-  // They are now handled by prisma.config.ts
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
 model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
-  password   String
-  name       String
-  role       Role     @default(USER)
-  bookings   Booking[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  email     String    @unique
+  password  String
+  name      String
+  role      String    @default("USER")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  bookings  Booking[]
 }
 
 model Bus {
-  id         String   @id @default(uuid())
-  name       String
-  number     String   @unique
-  route      Route    @relation(fields: [routeId], references: [id])
-  routeId    String
-  seats      Seat[]
-  bookings   Booking[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String    @id @default(dbgenerated("(gen_random_uuid())::text"))
+  name      String
+  number    String    @unique
+  routeId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  bookings  Booking[]
+  route     Route     @relation(fields: [routeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  seats     Seat[]
+
+  @@index([routeId])
 }
 
 model Route {
-  id         String  @id @default(uuid())
-  origin     String
+  id          String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  origin      String
   destination String
-  departure  DateTime
-  arrival    DateTime
-  buses      Bus[]
+  departure   DateTime
+  arrival     DateTime
+  buses       Bus[]
 }
 
 model Seat {
-  id        String  @id @default(uuid())
+  id         String   @id @default(dbgenerated("(gen_random_uuid())::text"))
   seatNumber String
-  bus       Bus     @relation(fields: [busId], references: [id])
-  busId     String
-  isBooked  Boolean @default(false)
-  booking   Booking?
+  busId      String
+  isBooked   Boolean  @default(false)
+  booking    Booking?
+  bus        Bus      @relation(fields: [busId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([busId, seatNumber])
+  @@index([busId])
 }
 
 model Booking {
-  id        String  @id @default(uuid())
-  user      User    @relation(fields: [userId], references: [id])
+  id        String   @id @default(dbgenerated("(gen_random_uuid())::text"))
   userId    String
-  bus       Bus     @relation(fields: [busId], references: [id])
   busId     String
-  seat      Seat    @relation(fields: [seatId], references: [id])
-  seatId    String  @unique
-  status    BookingStatus @default(CONFIRMED)
+  seatId    String   @unique
+  status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
-}
+  bus       Bus      @relation(fields: [busId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  seat      Seat     @relation(fields: [seatId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-enum Role {
-  USER
-  ADMIN
+  @@index([busId])
+  @@index([userId])
 }
-
-enum BookingStatus {
-  CONFIRMED
-  CANCELED
-}
-
