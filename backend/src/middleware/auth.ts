@@ -1,27 +1,26 @@
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { env } from '../config/env.js';
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
   try {
-    const decoded = jwt.verify(token, env.jwtSecret) as any;
-    (req as any).user = decoded;
+    // Verify using Supabase's JWT Secret
+    const decoded = jwt.verify(token, process.env.SUPABASE_JWT_SECRET as string) as any;
+
+    // Supabase stores the user ID in 'sub'
+    (req as any).user = {
+      id: decoded.sub,
+      email: decoded.email,
+      role: decoded.app_metadata?.role || 'USER' // You can set custom roles in Supabase later
+    };
+
     next();
-  } catch {
+  } catch (err) {
+    console.error("Token verification failed:", err);
     return res.status(401).json({ message: 'Invalid token' });
   }
 }
-
-export function requireRole(role: string) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
-    if (!user || user.role !== role) {
-      return res.status(403).json({ message: 'Forbidden' });
-    }
-    next();
-  };
-}
-
