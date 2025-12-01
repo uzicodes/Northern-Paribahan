@@ -1,14 +1,45 @@
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+// FIX: Changed alias to relative path to avoid resolution errors
+import { supabase } from '../../lib/supabase';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [emailOrPhone, setEmailOrPhone] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { emailOrPhone, password });
+    setLoading(true);
+    setError('');
+
+    try {
+      // Authenticate with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailOrPhone,
+        password: password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.session) {
+        // Store token for backend API calls (matches lib/api.ts)
+        localStorage.setItem('token', data.session.access_token);
+
+        // Redirect to home
+        router.push('/');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,22 +121,28 @@ export default function LoginPage() {
             </div>
 
             <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">Welcome Back !</h1>
-            <p className="text-gray-600 mb-6"></p>
+            <p className="text-gray-600 mb-6 text-center">Please sign in to continue</p>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-xl text-sm">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email or Phone Input */}
+              {/* Email Input */}
               <div>
                 <label htmlFor="emailOrPhone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email or Phone Number
+                  Email Address
                 </label>
                 <input
                   id="emailOrPhone"
-                  type="text"
+                  type="email"
                   value={emailOrPhone}
                   onChange={(e) => setEmailOrPhone(e.target.value)}
-                  placeholder="Enter your email or phone number"
+                  placeholder="Enter your email"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-gray-700"
                 />
               </div>
 
@@ -122,7 +159,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-green-700"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all duration-300 text-gray-700"
                   />
                   <button
                     type="button"
@@ -153,9 +190,10 @@ export default function LoginPage() {
               {/* Login Button */}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                disabled={loading}
+                className={`w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </button>
 
               {/* Sign Up Link */}
