@@ -6,12 +6,12 @@ import { signToken } from '../utils/tokens.js';
 const router = Router();
 
 router.post('/register', async (req, res) => {
-  const { email, password, name } = req.body as { email: string; password: string; name: string };
-  if (!email || !password || !name) return res.status(400).json({ message: 'Missing fields' });
+  const { email, password, name, phoneNumber } = req.body as { email: string; password: string; name: string; phoneNumber: string };
+  if (!email || !password || !name || !phoneNumber) return res.status(400).json({ message: 'Missing fields' });
   const hashed = await bcrypt.hash(password, 10);
   try {
-    const user = await prisma.user.create({ data: { email, password: hashed, name } });
-    return res.status(201).json({ id: user.id, email: user.email, name: user.name });
+    const user = await prisma.user.create({ data: { email, password: hashed, name, phoneNumber } });
+    return res.status(201).json({ id: user.id, email: user.email, name: user.name, phoneNumber: user.phoneNumber });
   } catch (e) {
     return res.status(409).json({ message: 'Email already in use' });
   }

@@ -21,14 +21,19 @@ const io = new SocketIOServer(server, {
 
 const { broadcastSeatUpdate } = registerSeatNamespace(io);
 
-// Redis adapter for horizontal scaling of websockets
+// Redis adapter for horizontal scaling of websockets (optional)
 (async () => {
-  const url = process.env.REDIS_URL || 'redis://localhost:6379';
-  const pubClient = createClient({ url });
-  const subClient = pubClient.duplicate();
-  await pubClient.connect();
-  await subClient.connect();
-  io.adapter(createAdapter(pubClient, subClient));
+  try {
+    const url = process.env.REDIS_URL || 'redis://localhost:6379';
+    const pubClient = createClient({ url });
+    const subClient = pubClient.duplicate();
+    await pubClient.connect();
+    await subClient.connect();
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log('Redis adapter connected for WebSocket scaling');
+  } catch (error) {
+    console.warn('Redis not available, WebSocket will work without scaling:', error);
+  }
 })();
 
 app.use(cors({ origin: env.clientOrigin, credentials: true }));
@@ -41,17 +46,29 @@ app.use('/api/buses', busesRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/admin', adminRoutes);
 
-prisma.$use(async (params: any, next: any) => {
-  const result = await next(params);
-  if (params.model === 'Booking' && (params.action === 'create' || params.action === 'update')) {
-    const busId = (result as any).busId as string;
-    broadcastSeatUpdate(busId, { busId });
-  }
-  if (params.model === 'Seat' && params.action === 'update') {
-    const busId = (result as any).busId as string;
-    broadcastSeatUpdate(busId, { busId });
-  }
-  return result;
+// Prisma middleware to broadcast seat updates via WebSocket
+const extendedPrisma = prisma.$extends({
+  query: {
+    booking: {
+      async create({ args, query }) {
+        const result = await query(args);
+        broadcastSeatUpdate(result.busId, { busId: result.busId });
+        return result;
+      },
+      async update({ args, query }) {
+        const result = await query(args);
+        broadcastSeatUpdate(result.busId, { busId: result.busId });
+        return result;
+      },
+    },
+    seat: {
+      async update({ args, query }) {
+        const result = await query(args);
+        broadcastSeatUpdate(result.busId, { busId: result.busId });
+        return result;
+      },
+    },
+  },
 });
 
 async function start() {

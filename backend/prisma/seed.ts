@@ -10,7 +10,7 @@ async function main() {
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {},
-    create: { email: adminEmail, password: adminPass, name: 'Admin', role: 'ADMIN' },
+    create: { email: adminEmail, password: adminPass, name: 'Admin', phoneNumber: '01700000000', role: 'ADMIN' },
   });
 
   const route1 = await prisma.route.upsert({
