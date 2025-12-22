@@ -35,10 +35,8 @@ interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  tier: 'Silver' | 'Gold' | 'Platinum';
   points: number;
   totalTrips: number;
-  carbonSaved: number; // in kg
 }
 
 // --- Mock Data ---
@@ -46,10 +44,8 @@ const currentUser: UserProfile = {
   name: "Alex Sterling",
   email: "alex.sterling@example.com",
   phone: "+1 (555) 012-3456",
-  tier: "Gold",
   points: 2450,
   totalTrips: 34,
-  carbonSaved: 120
 };
 
 const tickets: Ticket[] = [
@@ -175,9 +171,6 @@ export default function BusProfilePage() {
             </div>
             <h2 className="text-xl font-bold text-slate-800">{currentUser.name}</h2>
             <p className="text-sm text-slate-400 mb-4">{currentUser.email}</p>
-            <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-              {currentUser.tier} Member
-            </span>
           </div>
 
           <nav className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 space-y-2">
@@ -198,33 +191,11 @@ export default function BusProfilePage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-2xl font-bold text-slate-800">Welcome back, Alex! 👋</h1>
-              <p className="text-slate-400">Here is your travel summary.</p>
+              <p className="text-black-400">Here is your travel summary.</p>
             </div>
             <button className="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-medium hover:bg-slate-800 transition-colors shadow-lg shadow-slate-200">
               Book New Trip
             </button>
-          </div>
-
-          {/* Bento Grid Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StatCard 
-              icon={Trophy} 
-              label="Reward Points" 
-              value={currentUser.points} 
-              colorClass="text-amber-500 bg-amber-500"
-            />
-            <StatCard 
-              icon={MapPin} 
-              label="Total Trips" 
-              value={currentUser.totalTrips} 
-              colorClass="text-indigo-500 bg-indigo-500"
-            />
-            <StatCard 
-              icon={Leaf} 
-              label="Carbon Saved" 
-              value={`${currentUser.carbonSaved} kg`} 
-              colorClass="text-emerald-500 bg-emerald-500"
-            />
           </div>
 
           {/* Content Tabs */}
