@@ -1,8 +1,10 @@
 "use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import HeroDatePicker from '../components/HeroDatePicker';
 
 export default function Page() {
+  const router = useRouter();
   const [dateOfJourney, setDateOfJourney] = React.useState<Date>(new Date());
   const [fromValue, setFromValue] = React.useState<string>('');
   const [toValue, setToValue] = React.useState<string>('');
@@ -130,6 +132,17 @@ export default function Page() {
         
         <div className="w-full flex justify-center mt-20 mb-12">
           <button
+            onClick={() => {
+              if (fromValue && toValue) {
+                const params = new URLSearchParams();
+                params.set('from', fromValue);
+                params.set('to', toValue);
+                params.set('date', dateOfJourney.toISOString());
+                router.push(`/timetable?${params.toString()}`);
+              } else {
+                alert('Please select both From and To locations');
+              }
+            }}
             className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3"
             style={{ fontSize: 22 }}
           >

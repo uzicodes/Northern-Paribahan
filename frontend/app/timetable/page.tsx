@@ -1,12 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, ArrowRight, Bus, Armchair, MapPin, ArrowLeftRight } from "lucide-react";
+import { Clock, ArrowRight, Bus, Armchair, MapPin, Search, AlertCircle } from "lucide-react";
+
+// --- Constants ---
+const CITIES = [
+  "Dinajpur",
+  "Dhaka",
+  "Bogura",
+  "Sylhet",
+  "Khulna",
+  "Barisal",
+  "Rajshahi",
+  "Chittagong",
+  "Cox's Bazar",
+];
+
+// Routes that are "too close" or invalid
+const INVALID_ROUTES = [
+  { from: "Khulna", to: "Barisal" },
+  { from: "Barisal", to: "Khulna" },
+  { from: "Chittagong", to: "Cox's Bazar" },
+  { from: "Cox's Bazar", to: "Chittagong" },
+];
+
+const BUS_FLEET = [
+  { name: "Mercedes-Benz Turismo", type: "AC", capacity: "45-55", priceBase: 1200 },
+  { name: "Scania Touring", type: "AC", capacity: "48-52", priceBase: 1100 },
+  { name: "MAN Lion's Coach", type: "AC", capacity: "50-55", priceBase: 1500 },
+  { name: "Volvo 9700", type: "AC", capacity: "45-50", priceBase: 1300 },
+  { name: "Hino RK8", type: "Non-AC", capacity: "40-45", priceBase: 600 },
+  { name: "Ashok Leyland Viking", type: "Non-AC", capacity: "42-48", priceBase: 400 },
+];
 
 // --- Types ---
 interface BusRoute {
-  id: number;
+  id: string;
   busName: string;
   type: "AC" | "Non-AC";
   capacity: string;
@@ -15,170 +45,240 @@ interface BusRoute {
   origin: string;
   destination: string;
   price: number;
-  direction: "outbound" | "inbound"; // New field to categorize trips
 }
 
-// --- expanded Data (Outbound & Return) ---
-const scheduleData: BusRoute[] = [
-  // --- OUTBOUND (From Dinajpur) ---
-  { id: 1, busName: "Mercedes-Benz Turismo", type: "AC", capacity: "45-55", departureTime: "08:00 AM", duration: "8h", origin: "Dinajpur", destination: "Dhaka", price: 1200, direction: "outbound" },
-  { id: 2, busName: "Scania Touring", type: "AC", capacity: "48-52", departureTime: "10:00 AM", duration: "7h", origin: "Dinajpur", destination: "Khulna", price: 1100, direction: "outbound" },
-  { id: 3, busName: "MAN Lion's Coach", type: "AC", capacity: "50-55", departureTime: "12:00 PM", duration: "9h", origin: "Dinajpur", destination: "Chittagong", price: 1500, direction: "outbound" },
-  { id: 4, busName: "Volvo 9700", type: "AC", capacity: "45-50", departureTime: "02:00 PM", duration: "6h", origin: "Dinajpur", destination: "Sylhet", price: 1300, direction: "outbound" },
-  { id: 5, busName: "Hino RK8", type: "Non-AC", capacity: "40-45", departureTime: "04:00 PM", duration: "4h", origin: "Dinajpur", destination: "Rajshahi", price: 600, direction: "outbound" },
-  { id: 6, busName: "Ashok Leyland Viking", type: "Non-AC", capacity: "42-48", departureTime: "06:00 PM", duration: "3h", origin: "Dinajpur", destination: "Bogura", price: 400, direction: "outbound" },
-  { id: 7, busName: "Mercedes-Benz Turismo", type: "AC", capacity: "45-55", departureTime: "08:00 PM", duration: "8h", origin: "Dinajpur", destination: "Barisal", price: 1250, direction: "outbound" },
-  { id: 8, busName: "Scania Touring", type: "AC", capacity: "48-52", departureTime: "10:00 PM", duration: "10h", origin: "Dinajpur", destination: "Cox's Bazar", price: 1800, direction: "outbound" },
-
-  // --- INBOUND (Return to Dinajpur) ---
-  { id: 9, busName: "Mercedes-Benz Turismo", type: "AC", capacity: "45-55", departureTime: "08:00 AM", duration: "8h", origin: "Dhaka", destination: "Dinajpur", price: 1200, direction: "inbound" },
-  { id: 10, busName: "Scania Touring", type: "AC", capacity: "48-52", departureTime: "10:00 AM", duration: "7h", origin: "Khulna", destination: "Dinajpur", price: 1100, direction: "inbound" },
-  { id: 11, busName: "MAN Lion's Coach", type: "AC", capacity: "50-55", departureTime: "12:00 PM", duration: "9h", origin: "Chittagong", destination: "Dinajpur", price: 1500, direction: "inbound" },
-  { id: 12, busName: "Volvo 9700", type: "AC", capacity: "45-50", departureTime: "02:00 PM", duration: "6h", origin: "Sylhet", destination: "Dinajpur", price: 1300, direction: "inbound" },
-  { id: 13, busName: "Hino RK8", type: "Non-AC", capacity: "40-45", departureTime: "04:00 PM", duration: "4h", origin: "Rajshahi", destination: "Dinajpur", price: 600, direction: "inbound" },
-  { id: 14, busName: "Ashok Leyland Viking", type: "Non-AC", capacity: "42-48", departureTime: "06:00 PM", duration: "3h", origin: "Bogura", destination: "Dinajpur", price: 400, direction: "inbound" },
-  { id: 15, busName: "Mercedes-Benz Turismo", type: "AC", capacity: "45-55", departureTime: "08:00 PM", duration: "8h", origin: "Barisal", destination: "Dinajpur", price: 1250, direction: "inbound" },
-  { id: 16, busName: "Scania Touring", type: "AC", capacity: "48-52", departureTime: "10:00 PM", duration: "10h", origin: "Cox's Bazar", destination: "Dinajpur", price: 1800, direction: "inbound" },
-];
-
-const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
 export default function BusSchedulePage() {
-  const [activeDay, setActiveDay] = useState("Mon");
-  const [direction, setDirection] = useState<"outbound" | "inbound">("outbound");
+  const [origin, setOrigin] = useState("Dinajpur");
+  const [destination, setDestination] = useState("Dhaka");
+  const [schedule, setSchedule] = useState<BusRoute[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Filter data based on selected direction
-  const filteredData = scheduleData.filter((item) => item.direction === direction);
+  // --- Logic: Generate Schedule on Search ---
+  const handleSearch = () => {
+    setError(null);
+    setLoading(true);
+    setSchedule([]);
+
+    // 1. Validation
+    if (origin === destination) {
+      setError("Origin and Destination cannot be the same.");
+      setLoading(false);
+      return;
+    }
+
+    const isRestricted = INVALID_ROUTES.some(
+      (route) => route.from === origin && route.to === destination
+    );
+
+    if (isRestricted) {
+      setError(`Travel between ${origin} and ${destination} is currently unavailable (Too close/Restricted).`);
+      setLoading(false);
+      return;
+    }
+
+    // 2. Simulate API/Calculation Delay
+    setTimeout(() => {
+      const generatedSchedule = generateDailySchedule(origin, destination);
+      setSchedule(generatedSchedule);
+      setLoading(false);
+    }, 600);
+  };
+
+  // --- Helper: Schedule Generator ---
+  const generateDailySchedule = (from: string, to: string): BusRoute[] => {
+    const basePrice = Math.floor(Math.random() * (1500 - 500) + 500); 
+    const baseDuration = Math.floor(Math.random() * (12 - 4) + 4);
+
+    const timeSlots = [
+      "08:00 AM", "09:00 AM", "11:00 AM", "01:00 PM", 
+      "03:00 PM", "05:00 PM", "07:00 PM", "09:00 PM", "11:00 PM"
+    ];
+
+    return timeSlots.map((time, index) => {
+      const bus = BUS_FLEET[index % BUS_FLEET.length];
+      const finalPrice = bus.type === 'AC' ? basePrice + 400 : basePrice;
+      
+      return {
+        id: `${from}-${to}-${index}`,
+        busName: bus.name,
+        type: bus.type as "AC" | "Non-AC",
+        capacity: bus.capacity,
+        departureTime: time,
+        duration: `${baseDuration}h`,
+        origin: from,
+        destination: to,
+        price: finalPrice,
+      };
+    });
+  };
+
+  // Run initial search on mount
+  useEffect(() => {
+    handleSearch();
+  }, []);
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 font-sans" style={{ backgroundColor: '#BBE092' }}>
+    <div className="min-h-screen bg-[#BBE092] py-8 px-4 sm:px-6 font-sans">
       <div className="max-w-4xl mx-auto">
         
-        {/* Header Area */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">Bus Schedule</h2>
-          <p className="text-sm text-slate-500">Find the perfect time for your journey.</p>
+        {/* Header */}
+        <div className="mb-8 text-center sm:text-left">
+          <h2 className="text-3xl font-bold text-slate-900 mb-2">Find Your Bus</h2>
+          <p className="text-slate-800 font-medium">Search routes across all major districts.</p>
         </div>
 
-        {/* Controls Container (Stacked on mobile, Row on Desktop) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 sticky top-0 py-2 z-10" style={{ backgroundColor: '#BBE092' }}>
-          
-          {/* Direction Toggle (The new feature) */}
-          <div className="bg-white p-1 rounded-lg border border-slate-200 shadow-sm flex items-center">
-             <button
-                onClick={() => setDirection("outbound")}
-                className={`flex-1 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                   direction === "outbound" ? "bg-slate-900 text-white shadow-md" : "text-slate-500 hover:bg-slate-50"
-                }`}
-             >
-                <MapPin className="w-4 h-3" /> From Dinajpur
-             </button>
-             <button
-                onClick={() => setDirection("inbound")}
-                className={`flex-1 flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                   direction === "inbound" ? "bg-slate-900 text-white shadow-md" : "text-slate-500 hover:bg-slate-50"
-                }`}
-             >
-                <ArrowLeftRight className="w-4 h-4" /> To Dinajpur
-             </button>
-          </div>
+        {/* Search Box Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
 
-          {/* Day Selector */}
-          <div className="flex bg-white p-1 rounded-lg shadow-sm border border-slate-200 overflow-x-auto no-scrollbar">
-            {days.map((day) => (
-              <button
-                key={day}
-                onClick={() => setActiveDay(day)}
-                className={`relative px-3 py-1.5 text-xs font-semibold rounded-md transition-all whitespace-nowrap ${
-                  activeDay === day ? "text-white" : "text-slate-500 hover:bg-slate-50"
-                }`}
-              >
-                {activeDay === day && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-emerald-600 rounded-md shadow-sm"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                <span className="relative z-10">{day}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Dense List */}
-        <div className="space-y-3">
-            <AnimatePresence mode="wait">
-            {filteredData.map((route, index) => (
-              <motion.div
-                key={`${direction}-${activeDay}-${route.id}`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, delay: index * 0.03 }}
-                className="group bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-                  
-                  {/* Time Block */}
-                  <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0 min-w-[100px]">
-                    <div className="text-xl font-bold text-slate-800 tracking-tight">
-                      {route.departureTime}
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-slate-400 font-medium">
-                      <Clock className="w-3 h-3" />
-                      <span>{route.duration} trip</span>
-                    </div>
-                  </div>
-
-                  {/* Route & Bus Info */}
-                  <div className="flex-1">
-                    {/* Route Line - Dynamic Colors based on direction */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`font-bold ${direction === 'outbound' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                        {route.origin}
-                      </span>
-                      <ArrowRight className="w-4 h-4 text-slate-300" />
-                      <span className={`font-bold ${direction === 'inbound' ? 'text-emerald-700' : 'text-slate-700'}`}>
-                        {route.destination}
-                      </span>
-                    </div>
-                    
-                    {/* Bus Details */}
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-50 text-slate-600 font-medium border border-slate-100">
-                          <Bus className="w-3 h-3" /> {route.busName}
-                       </span>
-                       <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md border ${route.type === 'AC' ? 'bg-cyan-50 border-cyan-100 text-cyan-700' : 'bg-orange-50 border-orange-100 text-orange-700'}`}>
-                          {route.type}
-                       </span>
-                       <span className="text-slate-400 flex items-center gap-1">
-                          <Armchair className="w-3 h-3" /> {route.capacity}
-                       </span>
-                    </div>
-                  </div>
-
-                  {/* Price & Action */}
-                  <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-0 border-slate-50 pt-3 sm:pt-0 mt-2 sm:mt-0">
-                     <div className="text-right">
-                        <span className="block text-lg font-bold text-emerald-600">৳{route.price}</span>
-                     </div>
-                     <button className="px-5 py-2 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-wide rounded-lg transition-colors shadow-sm">
-                        Select
-                     </button>
-                  </div>
-
-                </div>
-              </motion.div>
-            ))}
-            </AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end relative z-10">
             
-            {filteredData.length === 0 && (
-                <div className="text-center py-10 text-slate-400">
-                    No buses available for this selection.
-                </div>
-            )}
+            {/* Origin Dropdown */}
+            <div className="md:col-span-5 space-y-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">From</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600" />
+                <select 
+                  value={origin} 
+                  onChange={(e) => setOrigin(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none transition-all hover:bg-slate-100"
+                >
+                  {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Swap Icon */}
+            <div className="hidden md:flex md:col-span-1 justify-center pb-3">
+              <ArrowRight className="w-5 h-5 text-slate-300" />
+            </div>
+
+            {/* Destination Dropdown */}
+            <div className="md:col-span-5 space-y-2">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">To</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-red-500" />
+                <select 
+                   value={destination} 
+                   onChange={(e) => setDestination(e.target.value)}
+                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none transition-all hover:bg-slate-100"
+                >
+                  {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {/* Search Button */}
+            <div className="md:col-span-1">
+              <button 
+                onClick={handleSearch}
+                className="w-full h-[50px] flex items-center justify-center bg-slate-900 hover:bg-emerald-600 text-white rounded-xl transition-all shadow-md active:scale-95"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 bg-red-50 border border-red-100 text-red-600 p-4 rounded-xl mb-6"
+          >
+            <AlertCircle className="w-5 h-5" />
+            <span className="font-medium">{error}</span>
+          </motion.div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+             <div className="text-center py-12">
+                <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-white text-sm animate-pulse font-medium">Checking availability...</p>
+             </div>
+        )}
+
+        {/* Results List */}
+        {!loading && !error && (
+            <div className="space-y-3">
+                <div className="flex items-center justify-between px-2 mb-2">
+                    <span className="text-sm font-bold text-black-800 uppercase opacity-70">Available Buses ({schedule.length})</span>
+                    <span className="text-sm font-bold text-slate-900">
+                        {origin} <span className="opacity-50">→</span> <span className="text-red-700">{destination}</span>
+                    </span>
+                </div>
+
+                <AnimatePresence mode="popLayout">
+                {schedule.map((route, index) => (
+                <motion.div
+                    key={route.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
+                    className="group bg-white rounded-xl p-4 shadow-sm border border-slate-100 hover:shadow-lg hover:border-emerald-200 transition-all duration-300 relative overflow-hidden"
+                >
+                    {/* Hover Accent Line */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+                    
+                    {/* Time */}
+                    <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0 min-w-[100px]">
+                        <div className="text-xl font-bold text-slate-800 tracking-tight">
+                        {route.departureTime}
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-slate-400 font-medium">
+                        <Clock className="w-3 h-3" />
+                        <span>{route.duration} trip</span>
+                        </div>
+                    </div>
+
+                    {/* Bus Info */}
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                            {/* ORIGIN is Standard/Dark */}
+                            <span className="text-lg font-bold text-slate-700">{route.origin}</span>
+                            
+                            <ArrowRight className="w-4 h-4 text-slate-300" />
+                            
+                            {/* DESTINATION is now RED as requested */}
+                            <span className="text-lg font-bold text-red-600">{route.destination}</span>
+                        </div>
+                        
+                        <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 text-slate-600 font-medium">
+                            <Bus className="w-3 h-3" /> {route.busName}
+                        </span>
+                        <span className={`inline-flex items-center px-2 py-1 rounded-md border ${route.type === 'AC' ? 'bg-cyan-50 border-cyan-100 text-cyan-700' : 'bg-orange-50 border-orange-100 text-orange-700'}`}>
+                            {route.type}
+                        </span>
+                        <span className="text-slate-400 flex items-center gap-1 px-2">
+                            <Armchair className="w-3 h-3" /> {route.capacity}
+                        </span>
+                        </div>
+                    </div>
+
+                    {/* Price & Action */}
+                    <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-0 border-slate-50 pt-3 sm:pt-0 mt-2 sm:mt-0">
+                        <div className="text-right">
+                            <span className="block text-xl font-extrabold text-emerald-600">৳{route.price}</span>
+                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Per Seat</span>
+                        </div>
+                        <button className="px-6 py-2.5 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg transition-all shadow-md hover:shadow-emerald-200">
+                            Book
+                        </button>
+                    </div>
+
+                    </div>
+                </motion.div>
+                ))}
+                </AnimatePresence>
+            </div>
+        )}
 
       </div>
     </div>
