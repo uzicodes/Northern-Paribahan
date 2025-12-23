@@ -71,7 +71,7 @@ export default function Page() {
                   {filteredFromLocations.map((location, index) => (
                     <div
                       key={index}
-                      onClick={() => {
+                      onMouseDown={() => {
                         setFromValue(location);
                         setShowFromDropdown(false);
                       }}
@@ -102,7 +102,7 @@ export default function Page() {
                   {filteredToLocations.map((location, index) => (
                     <div
                       key={index}
-                      onClick={() => {
+                      onMouseDown={() => {
                         setToValue(location);
                         setShowToDropdown(false);
                       }}
