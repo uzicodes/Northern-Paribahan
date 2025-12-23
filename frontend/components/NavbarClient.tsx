@@ -37,6 +37,13 @@ export default function NavbarClient() {
 
   return (
     <nav className="flex items-center gap-4 text-sm">
+          <Link 
+        href="/timetable" 
+        className={isActive('/timetable') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+      >
+        Timetable
+      </Link>
+
       <Link 
         href="/buses" 
         className={isActive('/buses') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}

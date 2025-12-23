@@ -13,5 +13,11 @@
     "build:backend": "npm --workspace backend run build",
     "start:backend": "npm --workspace backend run start",
     "seed": "npm --workspace backend run seed"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
+    "tailwind-merge": "^3.4.0"
   }
 }
