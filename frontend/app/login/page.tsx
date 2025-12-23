@@ -1,8 +1,14 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Satisfy } from 'next/font/google';
 // FIX: Changed alias to relative path to avoid resolution errors
 import { supabase } from '../../lib/supabase';
+
+const satisfy = Satisfy({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 export default function LoginPage() {
   const router = useRouter();
@@ -54,12 +60,13 @@ export default function LoginPage() {
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-10 rounded-full -ml-48 -mb-48"></div>
 
           <div className="relative z-10">
-            <div className="bg-white p-4 rounded-2xl inline-block mb-8 shadow-lg">
+            <div className="inline-flex items-center gap-3 mb-8">
               <img
                 src="/logo.png"
                 alt="Brand Logo"
                 className="h-12 w-auto"
               />
+              <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '28px' }}>Northern Paribahan</span>
             </div>
             <h2 className="text-4xl font-bold text-white mb-4">
               Travel With Comfort

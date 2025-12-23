@@ -334,14 +334,12 @@ export default function BusSchedulePage() {
                             Book
                         </button>
                     </div>
-
                     </div>
                 </motion.div>
                 ))}
                 </AnimatePresence>
             </div>
         )}
-
       </div>
     </div>
   );
