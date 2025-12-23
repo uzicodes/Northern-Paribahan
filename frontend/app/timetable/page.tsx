@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, ArrowRight, Bus, Armchair, MapPin, Search, AlertCircle } from "lucide-react";
 
@@ -48,42 +49,12 @@ interface BusRoute {
 }
 
 export default function BusSchedulePage() {
+  const searchParams = useSearchParams();
   const [origin, setOrigin] = useState("Dinajpur");
   const [destination, setDestination] = useState("Dhaka");
   const [schedule, setSchedule] = useState<BusRoute[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // --- Logic: Generate Schedule on Search ---
-  const handleSearch = () => {
-    setError(null);
-    setLoading(true);
-    setSchedule([]);
-
-    // 1. Validation
-    if (origin === destination) {
-      setError("Origin and Destination cannot be the same.");
-      setLoading(false);
-      return;
-    }
-
-    const isRestricted = INVALID_ROUTES.some(
-      (route) => route.from === origin && route.to === destination
-    );
-
-    if (isRestricted) {
-      setError(`Travel between ${origin} and ${destination} is currently unavailable (Too close/Restricted).`);
-      setLoading(false);
-      return;
-    }
-
-    // 2. Simulate API/Calculation Delay
-    setTimeout(() => {
-      const generatedSchedule = generateDailySchedule(origin, destination);
-      setSchedule(generatedSchedule);
-      setLoading(false);
-    }, 600);
-  };
 
   // --- Helper: Schedule Generator ---
   const generateDailySchedule = (from: string, to: string): BusRoute[] => {
@@ -113,10 +84,73 @@ export default function BusSchedulePage() {
     });
   };
 
-  // Run initial search on mount
-  useEffect(() => {
-    handleSearch();
+  // --- Logic: Perform Search ---
+  const performSearch = useCallback((searchOrigin: string, searchDestination: string) => {
+    setError(null);
+    setLoading(true);
+    setSchedule([]);
+
+    // 1. Validation
+    if (searchOrigin === searchDestination) {
+      setError("Origin and Destination cannot be the same.");
+      setLoading(false);
+      return;
+    }
+
+    const isRestricted = INVALID_ROUTES.some(
+      (route) => route.from === searchOrigin && route.to === searchDestination
+    );
+
+    if (isRestricted) {
+      setError(`Travel between ${searchOrigin} and ${searchDestination} is currently unavailable (Too close/Restricted).`);
+      setLoading(false);
+      return;
+    }
+
+    // 2. Simulate API/Calculation Delay
+    setTimeout(() => {
+      const generatedSchedule = generateDailySchedule(searchOrigin, searchDestination);
+      setSchedule(generatedSchedule);
+      setLoading(false);
+    }, 600);
   }, []);
+
+  // --- Handler for Button Click ---
+  const handleSearch = () => {
+    performSearch(origin, destination);
+  };
+
+  // Run initial search on mount or when params change
+  useEffect(() => {
+    const paramFrom = searchParams.get('from');
+    const paramTo = searchParams.get('to');
+
+    if (paramFrom && paramTo) {
+      // Validate if params are valid cities to avoid setting invalid state
+      const validFrom = CITIES.find(c => c.toLowerCase() === paramFrom.toLowerCase());
+      const validTo = CITIES.find(c => c.toLowerCase() === paramTo.toLowerCase());
+
+      if (validFrom && validTo) {
+        setOrigin(validFrom);
+        setDestination(validTo);
+        performSearch(validFrom, validTo);
+      } else {
+        // Fallback if params are invalid, just run default search
+        performSearch(origin, destination);
+      }
+    } else {
+      performSearch(origin, destination);
+    }
+  }, [searchParams, performSearch]); // Removed origin/destination from deps to avoid loops if we wanted, but here we only want to run when params change or on mount. 
+  // Actually, if we include origin/destination in deps, it might trigger on user selection which we don't want until they click search.
+  // So we only depend on searchParams. But we need to handle the initial load.
+  
+  // Correction: The above useEffect will run whenever searchParams changes. 
+  // If the user navigates to the page without params, it runs with default state.
+  // If user navigates WITH params, it runs with params.
+  // We should be careful not to reset to default if user manually changes dropdowns? 
+  // No, this useEffect is for URL synchronization. If user changes dropdown, state changes, but URL doesn't. 
+  // So this effect won't re-run. That's correct.
 
   return (
     <div className="min-h-screen bg-[#BBE092] py-8 px-4 sm:px-6 font-sans">
