@@ -1,4 +1,10 @@
 import Link from 'next/link';
+import { Satisfy } from 'next/font/google';
+
+const satisfy = Satisfy({
+    weight: '400',
+    subsets: ['latin'],
+});
 
 export default function Footer() {
     return (
@@ -10,7 +16,7 @@ export default function Footer() {
                     <div className="col-span-1 md:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-4">
                             <img src="/logo.png" alt="Northern Paribahan Logo" className="h-10 w-10" />
-                            <span className="font-bold text-lg" style={{ color: '#FCA311' }}>
+                            <span className={`font-bold text-lg ${satisfy.className}`} style={{ color: '#FCA311', fontSize: '24px' }}>
                                 Northern Paribahan
                             </span>
                         </Link>

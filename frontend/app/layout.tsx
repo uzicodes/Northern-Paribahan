@@ -1,8 +1,14 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { Satisfy } from 'next/font/google';
 import NavbarClient from '../components/NavbarClient';
 import Footer from '../components/Footer';
+
+const satisfy = Satisfy({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 export const metadata = {
   title: 'Northern Paribahan',
@@ -24,7 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
             <Link href="/" className="font-semibold text-lg flex items-center gap-2">
               <img src="/logo.png" alt="Northern Paribahan Logo" style={{ height: 32, width: 32, display: 'inline-block', verticalAlign: 'middle' }} />
-              <span style={{ color: '#FCA311' }}>Northern Paribahan</span>
+              <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '24px' }}>Northern Paribahan</span>
             </Link>
             <div style={{ color: '#F1F604' }}><NavbarClient /></div>
           </div>
