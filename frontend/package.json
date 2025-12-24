@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@northern/shared": "file:../packages/shared",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
     "axios": "^1.7.7",
     "lucide-react": "^0.562.0",
