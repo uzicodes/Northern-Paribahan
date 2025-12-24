@@ -1,9 +1,11 @@
 "use client";
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
-// FIX: Changed alias to relative path to avoid resolution errors
-import { supabase } from '../../lib/supabase';
+// UPDATED: Import the helper function we created in utils
+import { createClient } from '@/utils/supabase/client';
+import { Loader2 } from 'lucide-react'; // Added Loader icon for better UX
 
 const satisfy = Satisfy({
   weight: '400',
@@ -12,6 +14,9 @@ const satisfy = Satisfy({
 
 export default function LoginPage() {
   const router = useRouter();
+  // Initialize Supabase Client
+  const supabase = createClient();
+
   const [emailOrPhone, setEmailOrPhone] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -24,7 +29,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Authenticate with Supabase
+      // 1. Authenticate with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email: emailOrPhone,
         password: password,
@@ -34,22 +39,27 @@ export default function LoginPage() {
         throw error;
       }
 
+      // 2. Handle Success
       if (data.session) {
-        // Store token for backend API calls (matches lib/api.ts)
+        // Optional: Keep this if your backend specifically needs a manual token
+        // Supabase automatically handles the session in cookies otherwise
         localStorage.setItem('token', data.session.access_token);
 
-        // Redirect to home
-        router.push('/');
+        // 3. Redirect
+        router.refresh(); // Refresh to update server components with new session
+        router.push('/'); // Redirect to home (or /schedule)
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      setError(err.message || 'Failed to login. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#C9CBA3' }}>
+    <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#BBE092' }}> 
+      {/* Note: I updated the BG color to #BBE092 to match your theme request */}
+      
       {/* Main Container */}
       <div className="w-full max-w-5xl flex rounded-3xl shadow-2xl overflow-hidden bg-white h-auto">
 
@@ -131,8 +141,11 @@ export default function LoginPage() {
             <p className="text-gray-600 mb-6 text-center">Please sign in to continue</p>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-xl text-sm">
-                {error}
+              <div className="mb-4 p-3 bg-red-100 border border-red-200 text-red-700 rounded-xl text-sm flex items-center gap-2">
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                 {error}
               </div>
             )}
 
@@ -198,9 +211,14 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-2 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                {loading ? 'Signing In...' : 'Sign In'}
+                {loading ? (
+                    <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Signing In...</span>
+                    </>
+                ) : 'Sign In'}
               </button>
 
               {/* Sign Up Link */}
