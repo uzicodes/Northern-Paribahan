@@ -40,21 +40,21 @@ export default function NavbarClient() {
     <nav className="flex items-center gap-4 text-sm">
           <Link 
         href="/timetable" 
-        className={isActive('/timetable') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+        className={isActive('/timetable') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
       >
         Timetable
       </Link>
 
       <Link 
         href="/buses" 
-        className={isActive('/buses') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+        className={isActive('/buses') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
       >
         Buses
       </Link>
       {token && (
         <Link 
           href="/my-bookings" 
-          className={isActive('/my-bookings') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+          className={isActive('/my-bookings') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
         >
           My Bookings
         </Link>
@@ -62,7 +62,7 @@ export default function NavbarClient() {
       {role === 'ADMIN' && (
         <Link 
           href="/admin" 
-          className={isActive('/admin') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+          className={isActive('/admin') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
         >
           Admin
         </Link>
@@ -71,19 +71,19 @@ export default function NavbarClient() {
         <>
           <Link 
             href="/login" 
-            className={isActive('/login') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+            className={isActive('/login') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
           >
             Login
           </Link>
           <Link 
             href="/register" 
-            className={isActive('/register') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+            className={isActive('/register') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
           >
             Register
           </Link>
           <Link 
             href="/profile"
-            className={isActive('/profile') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-gray-300'}
+            className={isActive('/profile') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -91,7 +91,7 @@ export default function NavbarClient() {
           </Link>
           <button 
             onClick={() => setShowContactPopup(true)}
-            className="text-white hover:text-gray-300"
+            className="text-white hover:text-[#FCA311]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -140,7 +140,7 @@ export default function NavbarClient() {
           )}
         </>
       ) : (
-        <button onClick={logout} className="text-white hover:text-gray-300">Logout</button>
+        <button onClick={logout} className="text-white hover:text-[#FCA311]">Logout</button>
       )}
     </nav>
   );

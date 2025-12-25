@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
-// UPDATED: Import the helper function we created in utils
 import { createClient } from '@/utils/supabase/client';
-import { Loader2 } from 'lucide-react'; // Added Loader icon for better UX
+import { Loader2 } from 'lucide-react'; 
 
 const satisfy = Satisfy({
   weight: '400',
@@ -39,13 +38,12 @@ export default function LoginPage() {
         throw error;
       }
 
-      // 2. Handle Success
+      // Handle Success
       if (data.session) {
-        // Optional: Keep this if your backend specifically needs a manual token
-        // Supabase automatically handles the session in cookies otherwise
+
         localStorage.setItem('token', data.session.access_token);
 
-        // 3. Redirect
+        // Redirect
         router.refresh(); // Refresh to update server components with new session
         router.push('/'); // Redirect to home (or /schedule)
       }
@@ -57,9 +55,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#BBE092' }}> 
-      {/* Note: I updated the BG color to #BBE092 to match your theme request */}
-      
+    <div className="min-h-screen flex items-start justify-center p-4 pt-8" style={{ backgroundColor: '#BBE092' }}>
       {/* Main Container */}
       <div className="w-full max-w-5xl flex rounded-3xl shadow-2xl overflow-hidden bg-white h-auto">
 
