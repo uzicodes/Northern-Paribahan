@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, ArrowRight, Bus, Armchair, MapPin, Search, AlertCircle, Hash, Calendar } from "lucide-react";
+import HeroDatePicker from "../../components/HeroDatePicker";
 
 // --- Constants ---
 const CITIES = [
@@ -85,10 +87,14 @@ interface BusRoute {
 }
 
 export default function BusSchedulePage() {
-  const [origin, setOrigin] = useState("Dinajpur");
-  const [destination, setDestination] = useState("Dhaka");
-  // Default to today's date formatted as YYYY-MM-DD
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const searchParams = useSearchParams();
+  const [origin, setOrigin] = useState(searchParams.get('from') || "Dinajpur");
+  const [destination, setDestination] = useState(searchParams.get('to') || "Dhaka");
+  // Default to today's date
+  const [date, setDate] = useState<Date>(() => {
+    const dateParam = searchParams.get('date');
+    return dateParam ? new Date(dateParam) : new Date();
+  });
   const [schedule, setSchedule] = useState<BusRoute[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -116,7 +122,7 @@ export default function BusSchedulePage() {
 
     // Simulate API delay
     setTimeout(() => {
-      const generatedSchedule = generateDailySchedule(origin, destination, date);
+      const generatedSchedule = generateDailySchedule(origin, destination, date.toISOString().split('T')[0]);
       setSchedule(generatedSchedule);
       setLoading(false);
     }, 500);
@@ -222,15 +228,17 @@ export default function BusSchedulePage() {
             {/* Date Picker (CRITICAL FOR ROTATION LOGIC) */}
             <div className="md:col-span-3 space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</label>
-                <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                    <input 
-                        type="date" 
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:bg-slate-100"
-                    />
-                </div>
+                <HeroDatePicker selectedDate={date} onDateChange={setDate}>
+                    <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <input 
+                            type="text" 
+                            readOnly
+                            value={date.toLocaleDateString('en-GB')}
+                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:bg-slate-100 cursor-pointer"
+                        />
+                    </div>
+                </HeroDatePicker>
             </div>
 
             {/* Search Button */}

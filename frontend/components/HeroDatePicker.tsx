@@ -34,9 +34,10 @@ const ChevronRight = (props: React.SVGProps<SVGSVGElement>) => (
 interface HeroDatePickerProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
+  children?: React.ReactNode;
 }
 
-const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateChange }) => {
+const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateChange, children }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
   const [open, setOpen] = useState(false);
 
@@ -140,14 +141,17 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
   const days = getDaysInMonth(currentMonth);
 
   return (
-    <div className="relative inline-block">
-      <button
-        type="button"
-        className="bg-[#C5E6CB] text-[#22543d] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center border-2 border-[#C5E6CB]"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" />
-      </button>
+    <div className="relative inline-block w-full">
+      <div onClick={() => setOpen((v) => !v)} className="cursor-pointer">
+        {children ? children : (
+          <button
+            type="button"
+            className="bg-[#C5E6CB] text-[#22543d] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center border-2 border-[#C5E6CB]"
+          >
+            <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" />
+          </button>
+        )}
+      </div>
       {open && (
         <div className="datepicker-popover absolute left-0 mt-2 z-50 w-[240px]">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
