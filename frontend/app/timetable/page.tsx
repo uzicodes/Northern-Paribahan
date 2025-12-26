@@ -3,6 +3,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Clock, ArrowRight, Bus, Armchair, MapPin, Search, AlertCircle, Hash, Calendar } from "lucide-react";
 import HeroDatePicker from "../../components/HeroDatePicker";
 
@@ -292,6 +293,18 @@ function TimetableContent() {
 
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                     
+                    {/* Bus Image for Mercedes-Benz Turismo */}
+                    {route.busName === "Mercedes-Benz Turismo" && (
+                      <div className="hidden sm:block w-24 h-16 relative rounded-lg overflow-hidden">
+                        <Image 
+                          src="/bus/mercedes.png" 
+                          alt="Mercedes-Benz Turismo" 
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+
                     {/* Time */}
                     <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0 min-w-[100px]">
                         <div className="text-xl font-bold text-slate-800 tracking-tight">

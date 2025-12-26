@@ -20,7 +20,7 @@ export default function BusesPage() {
       brand: "Mercedes-Benz",
       features: ["Air Conditioning", "Reclining Seats", "WiFi", "USB Charging"],
       capacity: "45-55 Passengers",
-      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80",
+      image: "/bus/mercedes.png",
       description: "Experience luxury travel with our premium Mercedes-Benz fleet, featuring state-of-the-art comfort and safety."
     },
     {
@@ -29,7 +29,7 @@ export default function BusesPage() {
       brand: "Scania",
       features: ["Premium Seats", "Entertainment System", "Climate Control", "Spacious Legroom"],
       capacity: "48-52 Passengers",
-      image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80",
+      image: "/bus/scania.png",
       description: "Travel in style with Scania's renowned engineering excellence and passenger comfort."
     },
     {
@@ -38,7 +38,7 @@ export default function BusesPage() {
       brand: "MAN",
       features: ["Comfort Seats", "Air Suspension", "Reading Lights", "Luggage Space"],
       capacity: "50-55 Passengers",
-      image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&q=80",
+      image: "/bus/man.png",
       description: "Reliable and efficient transportation with MAN's cutting-edge technology."
     },
     {
