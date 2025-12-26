@@ -47,7 +47,7 @@ export default function BusesPage() {
       brand: "Volvo",
       features: ["Premium Comfort", "Safety Systems", "WiFi", "Refreshments"],
       capacity: "45-50 Passengers",
-      image: "https://images.unsplash.com/photo-1570125909517-53cb21c89ff2?w=800&q=80",
+      image: "/bus/volvo.png",
       description: "Journey with confidence in our Volvo buses, known for unmatched safety and comfort."
     },
     {
@@ -56,7 +56,7 @@ export default function BusesPage() {
       brand: "Hino",
       features: ["Comfortable Seating", "AC System", "Safety Features", "Fuel Efficient"],
       capacity: "40-45 Passengers",
-      image: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&q=80",
+      image: "/bus/hino.png",
       description: "Dependable and economical travel with Hino's trusted performance."
     },
     {
@@ -65,7 +65,7 @@ export default function BusesPage() {
       brand: "Ashok Leyland",
       features: ["Spacious Interior", "Air Conditioning", "Music System", "Storage Space"],
       capacity: "42-48 Passengers",
-      image: "https://images.unsplash.com/photo-1570125909517-53cb21c89ff2?w=800&q=80",
+      image: "/bus/ashok.png",
       description: "Affordable comfort with Ashok Leyland's reliable and spacious buses."
     }
   ];
