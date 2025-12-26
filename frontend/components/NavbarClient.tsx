@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, Github, Mail } from 'lucide-react';
 
 type JwtPayload = { role?: string };
 
@@ -234,13 +234,16 @@ export default function NavbarClient() {
                   
                   <div className="border-t border-slate-100 pt-4">
                     <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2">Developer Contact</p>
-                    <a href="mailto:utshozi11@gmail.com" className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors group">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 group-hover:scale-110 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                      </svg>
-                      utshozi11@gmail.com
-                    </a>
+                    <div className="space-y-2">
+                      <a href="https://github.com/uzicodes" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors group">
+                        <Github className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                        uzicodes
+                      </a>
+                      <a href="mailto:utshozi11@gmail.com" className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors group">
+                        <Mail className="h-5 w-5 group-hover:scale-110 transition-transform" />
+                        utshozi11@gmail.com
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
