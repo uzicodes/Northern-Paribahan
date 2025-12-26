@@ -128,10 +128,8 @@ function TimetableContent() {
     }, 500);
   };
 
-  // --- CORE LOGIC: Rotation System ---
   const generateDailySchedule = (from: string, to: string, selectedDate: string): BusRoute[] => {
-    // 1. Convert Date to a numeric "Day Index" (e.g., Day 100 of the year)
-    // This allows us to do math on the date.
+    // Convert Date to a numeric "Day Index"
     const dateObj = new Date(selectedDate);
     const dayIndex = Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
 
@@ -143,14 +141,11 @@ function TimetableContent() {
     ];
 
     return timeSlots.map((time, slotIndex) => {
-      // 2. Select Bus Model based on Time Slot (so 9am is always Scania, 11am always Mercedes, etc.)
+      // Bus Model based on Time Slot 
       const modelIndex = slotIndex % FLEET_MODELS.length;
       const model = FLEET_MODELS[modelIndex];
 
-      // 3. THE ROTATION LOGIC:
-      // We pick the specific unit (1, 2, or 3) based on the (Day + Slot)
-      // If we are on Day 1: Index = (1 + 0) % 3 = Unit 1 (NP-101)
-      // If we are on Day 2: Index = (2 + 0) % 3 = Unit 2 (NP-102) -> NP-101 is resting!
+      // BUS ROTATION LOGIC:
       const unitIndex = (dayIndex + slotIndex) % model.units.length;
       const assignedBusNumber = model.units[unitIndex];
 
@@ -225,7 +220,7 @@ function TimetableContent() {
               </div>
             </div>
 
-            {/* Date Picker (CRITICAL FOR ROTATION LOGIC) */}
+            {/* Date Picker */}
             <div className="md:col-span-3 space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</label>
                 <HeroDatePicker selectedDate={date} onDateChange={setDate}>
