@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, ArrowRight, Bus, Armchair, MapPin, Search, AlertCircle, Hash, Calendar } from "lucide-react";
@@ -86,7 +86,7 @@ interface BusRoute {
   price: number;
 }
 
-export default function BusSchedulePage() {
+function TimetableContent() {
   const searchParams = useSearchParams();
   const [origin, setOrigin] = useState(searchParams.get('from') || "Dinajpur");
   const [destination, setDestination] = useState(searchParams.get('to') || "Dhaka");
@@ -350,5 +350,13 @@ export default function BusSchedulePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function BusSchedulePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <TimetableContent />
+    </Suspense>
   );
 }
