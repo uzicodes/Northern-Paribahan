@@ -85,6 +85,7 @@ interface BusRoute {
   origin: string;
   destination: string;
   price: number;
+  seatsAvailable: number;
 }
 
 function TimetableContent() {
@@ -152,6 +153,9 @@ function TimetableContent() {
 
       const finalPrice = model.type === 'AC' ? model.basePrice + 400 : model.basePrice;
 
+      // Random seats available
+      const seatsAvailable = Math.floor(Math.random() * 30) + 5;
+
       return {
         id: `${from}-${to}-${selectedDate}-${slotIndex}`,
         busNumber: assignedBusNumber,
@@ -163,6 +167,7 @@ function TimetableContent() {
         origin: from,
         destination: to,
         price: finalPrice,
+        seatsAvailable,
       };
     });
   };
@@ -326,6 +331,10 @@ function TimetableContent() {
                         
                         <span className={`inline-flex items-center px-2 py-1 rounded-md border ${route.type === 'AC' ? 'bg-cyan-50 border-cyan-100 text-cyan-700' : 'bg-orange-50 border-orange-100 text-orange-700'}`}>
                             {route.type}
+                        </span>
+
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 border border-red-100 text-red-600 font-medium">
+                            <Armchair className="w-3 h-3" /> {route.seatsAvailable} Seats Left
                         </span>
                         </div>
                     </div>
