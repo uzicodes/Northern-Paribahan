@@ -32,42 +32,42 @@ const FLEET_MODELS = [
   { 
     name: "Mercedes-Benz Turismo", 
     type: "AC", 
-    capacity: "45-55", 
+    capacity: "57", 
     basePrice: 1200,
     units: ["NP-101", "NP-102", "NP-103"] 
   },
   { 
     name: "Scania Touring", 
     type: "AC", 
-    capacity: "48-52", 
+    capacity: "57", 
     basePrice: 1100,
     units: ["NP-201", "NP-202", "NP-203"] 
   },
   { 
     name: "MAN Lion's Coach", 
     type: "AC", 
-    capacity: "50-55", 
+    capacity: "53", 
     basePrice: 1500,
     units: ["NP-301", "NP-302", "NP-303"] 
   },
   { 
     name: "Volvo 9700", 
     type: "AC", 
-    capacity: "45-50", 
+    capacity: "61", 
     basePrice: 1300,
     units: ["NP-401", "NP-402", "NP-403"] 
   },
   { 
     name: "Hino RK8", 
     type: "Non-AC", 
-    capacity: "40-45", 
+    capacity: "50", 
     basePrice: 600,
     units: ["NP-501", "NP-502", "NP-503"] 
   },
   { 
     name: "Ashok Leyland Viking", 
     type: "Non-AC", 
-    capacity: "42-48", 
+    capacity: "58", 
     basePrice: 400,
     units: ["NP-601", "NP-602", "NP-603"] 
   },
@@ -153,8 +153,9 @@ function TimetableContent() {
 
       const finalPrice = model.type === 'AC' ? model.basePrice + 400 : model.basePrice;
 
-      // Random seats available
-      const seatsAvailable = Math.floor(Math.random() * 30) + 5;
+      // Get total capacity
+      const maxSeats = parseInt(model.capacity);
+      const seatsAvailable = maxSeats;
 
       return {
         id: `${from}-${to}-${selectedDate}-${slotIndex}`,
@@ -334,7 +335,7 @@ function TimetableContent() {
                         </span>
 
                         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-50 border border-red-100 text-red-600 font-medium">
-                            <Armchair className="w-3 h-3" /> {route.seatsAvailable} Seats Left
+                            {route.seatsAvailable} Seats Left
                         </span>
                         </div>
                     </div>
@@ -343,7 +344,6 @@ function TimetableContent() {
                     <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-0 border-slate-50 pt-3 sm:pt-0 mt-2 sm:mt-0">
                         <div className="text-right">
                             <span className="block text-xl font-extrabold text-emerald-600">৳{route.price}</span>
-                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wide">Per Seat</span>
                         </div>
                         <button className="px-6 py-2.5 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg transition-all shadow-md hover:shadow-emerald-200">
                             Book
