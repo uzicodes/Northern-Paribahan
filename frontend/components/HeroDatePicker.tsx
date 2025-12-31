@@ -141,7 +141,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
   const days = getDaysInMonth(currentMonth);
 
   return (
-    <div className="relative inline-block w-full">
+    <div className="relative inline-block">
       <div onClick={() => setOpen((v) => !v)} className="cursor-pointer">
         {children ? children : (
           <button
@@ -153,7 +153,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
         )}
       </div>
       {open && (
-        <div className="datepicker-popover absolute left-0 mt-2 z-50 w-[240px]">
+        <div className="datepicker-popover absolute right-0 mt-2 z-50 w-[240px]">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="p-4">
               {/* Month Navigation */}

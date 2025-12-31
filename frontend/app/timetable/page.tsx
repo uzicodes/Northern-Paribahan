@@ -268,8 +268,10 @@ function TimetableContent() {
         </div>
 
         {/* Search Box */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-8 relative">
+          <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end relative z-10">
             
@@ -310,17 +312,10 @@ function TimetableContent() {
             {/* Date Picker */}
             <div className="md:col-span-3 space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</label>
-                <HeroDatePicker selectedDate={date} onDateChange={setDate}>
-                    <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <input 
-                            type="text" 
-                            readOnly
-                            value={date.toLocaleDateString('en-GB')}
-                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 hover:bg-slate-100 cursor-pointer"
-                        />
-                    </div>
-                </HeroDatePicker>
+                <div className="w-full pl-4 pr-2 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold flex items-center justify-between">
+                    <span className="pl-2">{date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <HeroDatePicker selectedDate={date} onDateChange={setDate} />
+                </div>
             </div>
 
             {/* Search Button */}
