@@ -185,23 +185,31 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
               {/* Calendar Days */}
               <div className="grid grid-cols-7 gap-2">
                 {days.map((dayObj, index) => {
+                  const today = new Date();
+                  today.setHours(0,0,0,0);
+                  const maxDate = new Date(today);
+                  maxDate.setDate(today.getDate() + 30);
+
                   const isSelected = isSameDay(dayObj.date, selectedDate);
                   const isTodayDate = isToday(dayObj.date);
-                  const isPastDate = dayObj.date < new Date(new Date().setHours(0,0,0,0));
+                  const isPastDate = dayObj.date < today;
+                  const isTooFarFuture = dayObj.date > maxDate;
+                  const isDisabled = isPastDate || isTooFarFuture;
+
                   return (
                     <button
                       key={index}
-                      onClick={() => !isPastDate && handleDateClick(dayObj.date)}
-                      disabled={isPastDate}
+                      onClick={() => !isDisabled && handleDateClick(dayObj.date)}
+                      disabled={isDisabled}
                       className={`
                         aspect-square rounded-xl text-sm font-medium transition-all duration-300
-                        ${!dayObj.isCurrentMonth ? 'text-gray-300' : 'text-gray-700'}
+                        ${isDisabled ? 'text-gray-300 opacity-40 cursor-not-allowed' : 'text-slate-900'}
+                        ${!dayObj.isCurrentMonth && !isDisabled ? 'text-gray-400' : ''}
                         ${isSelected 
-                          ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-lg scale-105' 
-                          : 'hover:bg-purple-50 hover:scale-105'
+                          ? 'bg-gradient-to-br from-emerald-600 to-green-600 text-white shadow-lg scale-105' 
+                          : !isDisabled ? 'hover:bg-red-500 hover:text-white hover:scale-105' : ''
                         }
-                        ${isTodayDate && !isSelected ? 'ring-2 ring-purple-400' : ''}
-                        ${isPastDate ? 'opacity-40 cursor-not-allowed' : ''}
+                        ${isTodayDate && !isSelected ? 'ring-2 ring-emerald-400' : ''}
                       `}
                     >
                       {dayObj.day}
