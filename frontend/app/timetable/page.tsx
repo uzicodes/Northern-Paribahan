@@ -293,17 +293,7 @@ function TimetableContent() {
 
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
                     
-                    {/* Bus Image for Mercedes-Benz Turismo */}
-                    {route.busName === "Mercedes-Benz Turismo" && (
-                      <div className="hidden sm:block w-24 h-16 relative rounded-lg overflow-hidden">
-                        <Image 
-                          src="/bus/mercedes.png" 
-                          alt="Mercedes-Benz Turismo" 
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
+
 
                     {/* Time */}
                     <div className="flex sm:flex-col items-center sm:items-start gap-3 sm:gap-0 min-w-[100px]">
