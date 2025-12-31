@@ -27,6 +27,86 @@ const INVALID_ROUTES = [
   { from: "Cox's Bazar", to: "Chittagong" },
 ];
 
+// --- DURATION DATA (in minutes) ---
+const BASE_DURATIONS: Record<string, number> = {
+  // To/From Dhaka
+  "Dinajpur-Dhaka": 420, // 7h
+  "Bogura-Dhaka": 210,   // 3h 30m
+  "Sylhet-Dhaka": 390,   // 6h 30m
+  "Khulna-Dhaka": 420,   // 7h
+  "Barisal-Dhaka": 450,  // 7h 30m
+  "Rajshahi-Dhaka": 390, // 6h 30m
+  "Chittagong-Dhaka": 420, // 7h
+  "Cox's Bazar-Dhaka": 480, // 8h
+
+  // To/From Bogura
+  "Dinajpur-Bogura": 210, // 3h 30m
+  "Sylhet-Bogura": 360,   // 6h
+  "Khulna-Bogura": 420,   // 7h
+  "Barisal-Bogura": 450,  // 7h 30m
+  "Rajshahi-Bogura": 180, // 3h
+  "Chittagong-Bogura": 420, // 7h
+  "Cox's Bazar-Bogura": 480, // 8h
+
+  // Other Direct Routes (Estimated)
+  "Chittagong-Cox's Bazar": 240, // 4h
+  "Khulna-Barisal": 240, // 4h
+  "Sylhet-Chittagong": 480, // 8h
+  "Rajshahi-Khulna": 360, // 6h
+  "Dinajpur-Rajshahi": 300, // 5h
+};
+
+const getDuration = (from: string, to: string): string => {
+  if (from === to) return "0h";
+
+  const getKey = (a: string, b: string) => {
+    // Sort to ensure consistent key regardless of direction
+    // But here we have specific pairs defined. Let's check both.
+    if (BASE_DURATIONS[`${a}-${b}`]) return `${a}-${b}`;
+    if (BASE_DURATIONS[`${b}-${a}`]) return `${b}-${a}`;
+    return null;
+  };
+
+  // 1. Direct Route
+  const directKey = getKey(from, to);
+  if (directKey) {
+    const mins = BASE_DURATIONS[directKey];
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+
+  // 2. Via Bogura (Calculate sum of legs)
+  const leg1Bogura = getKey(from, "Bogura");
+  const leg2Bogura = getKey("Bogura", to);
+  let timeViaBogura = Infinity;
+  
+  if (leg1Bogura && leg2Bogura) {
+    timeViaBogura = BASE_DURATIONS[leg1Bogura] + BASE_DURATIONS[leg2Bogura];
+  }
+
+  // 3. Via Dhaka (Calculate sum of legs)
+  const leg1Dhaka = getKey(from, "Dhaka");
+  const leg2Dhaka = getKey("Dhaka", to);
+  let timeViaDhaka = Infinity;
+
+  if (leg1Dhaka && leg2Dhaka) {
+    timeViaDhaka = BASE_DURATIONS[leg1Dhaka] + BASE_DURATIONS[leg2Dhaka];
+  }
+
+  // Find minimum valid time
+  const minTime = Math.min(timeViaBogura, timeViaDhaka);
+
+  if (minTime === Infinity) {
+    // Fallback for unknown routes
+    return "8h"; 
+  }
+
+  const h = Math.floor(minTime / 60);
+  const m = minTime % 60;
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+};
+
 // --- FLEET DATA (Grouped by Model for Rotation Logic) ---
 const FLEET_MODELS = [
   { 
@@ -135,7 +215,7 @@ function TimetableContent() {
     const dateObj = new Date(selectedDate);
     const dayIndex = Math.floor(dateObj.getTime() / (1000 * 60 * 60 * 24));
 
-    const baseDuration = Math.floor(Math.random() * (12 - 4) + 4); // Simulated duration
+    const duration = getDuration(from, to);
 
     const timeSlots = [
       "08:00 AM", "09:00 AM", "11:00 AM", "01:00 PM", 
@@ -164,7 +244,7 @@ function TimetableContent() {
         type: model.type as "AC" | "Non-AC",
         capacity: model.capacity,
         departureTime: time,
-        duration: `${baseDuration}h`,
+        duration: duration,
         origin: from,
         destination: to,
         price: finalPrice,
