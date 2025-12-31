@@ -19,7 +19,7 @@ export default function BusesPage() {
       name: "Mercedes-Benz Tourismo",
       brand: "Mercedes-Benz",
       features: ["Air Conditioning", "Reclining Seats", "WiFi", "USB Charging"],
-      capacity: "45-55 Passengers",
+      capacity: "57 Passengers",
       image: "/bus/mercedes.png",
       description: "Experience luxury travel with our premium Mercedes-Benz fleet, featuring state-of-the-art comfort and safety."
     },
@@ -28,7 +28,7 @@ export default function BusesPage() {
       name: "Scania Touring",
       brand: "Scania",
       features: ["Premium Seats", "Entertainment System", "Climate Control", "Spacious Legroom"],
-      capacity: "48-52 Passengers",
+      capacity: "57 Passengers",
       image: "/bus/scania.png",
       description: "Travel in style with Scania's renowned engineering excellence and passenger comfort."
     },
@@ -37,7 +37,7 @@ export default function BusesPage() {
       name: "MAN Lion's Coach",
       brand: "MAN",
       features: ["Comfort Seats", "Air Suspension", "Reading Lights", "Luggage Space"],
-      capacity: "50-55 Passengers",
+      capacity: "53 Passengers",
       image: "/bus/man.png",
       description: "Reliable and efficient transportation with MAN's cutting-edge technology."
     },
@@ -46,7 +46,7 @@ export default function BusesPage() {
       name: "Volvo 9700",
       brand: "Volvo",
       features: ["Premium Comfort", "Safety Systems", "WiFi", "Refreshments"],
-      capacity: "45-50 Passengers",
+      capacity: "61 Passengers",
       image: "/bus/volvo.png",
       description: "Journey with confidence in our Volvo buses, known for unmatched safety and comfort."
     },
@@ -55,7 +55,7 @@ export default function BusesPage() {
       name: "Hino RK8",
       brand: "Hino",
       features: ["Comfortable Seating", "AC System", "Safety Features", "Fuel Efficient"],
-      capacity: "40-45 Passengers",
+      capacity: "50 Passengers",
       image: "/bus/hino.png",
       description: "Dependable and economical travel with Hino's trusted performance."
     },
@@ -64,7 +64,7 @@ export default function BusesPage() {
       name: "Ashok Leyland Viking",
       brand: "Ashok Leyland",
       features: ["Spacious Interior", "Air Conditioning", "Music System", "Storage Space"],
-      capacity: "42-48 Passengers",
+      capacity: "58 Passengers",
       image: "/bus/ashok.png",
       description: "Affordable comfort with Ashok Leyland's reliable and spacious buses."
     }
