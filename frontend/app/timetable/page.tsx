@@ -170,8 +170,8 @@ interface BusRoute {
 
 function TimetableContent() {
   const searchParams = useSearchParams();
-  const [origin, setOrigin] = useState(searchParams.get('from') || "Dinajpur");
-  const [destination, setDestination] = useState(searchParams.get('to') || "Dhaka");
+  const [origin, setOrigin] = useState(searchParams.get('from') || "");
+  const [destination, setDestination] = useState(searchParams.get('to') || "");
   // Default to today's date
   const [date, setDate] = useState<Date>(() => {
     const dateParam = searchParams.get('date');
@@ -254,7 +254,10 @@ function TimetableContent() {
   };
 
   useEffect(() => {
-    handleSearch();
+    // Only search if both origin and destination are selected
+    if (origin && destination) {
+      handleSearch();
+    }
   }, []); // Initial load
 
   return (
@@ -285,6 +288,7 @@ function TimetableContent() {
                   onChange={(e) => setOrigin(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none hover:bg-slate-100"
                 >
+                  <option value="" disabled>Select Origin</option>
                   {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                 </select>
               </div>
@@ -304,6 +308,7 @@ function TimetableContent() {
                    onChange={(e) => setDestination(e.target.value)}
                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none hover:bg-slate-100"
                 >
+                  <option value="" disabled>Select Destination</option>
                   {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                 </select>
               </div>
