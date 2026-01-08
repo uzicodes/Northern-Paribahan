@@ -87,7 +87,7 @@ export default function BusDetailPage() {
   const generateSeats = (): Seat[] => {
     const seats: Seat[] = [];
     
-    // Driver seat (on the right side)
+    // Driver seat (right side)
     seats.push({ id: 'driver', row: 0, column: 4, isAvailable: false, type: 'driver' });
     
     // Regular seats in 2-2 configuration (11 rows)
@@ -108,7 +108,7 @@ export default function BusDetailPage() {
         type: 'seat' 
       });
       
-      // Aisle (empty space)
+      // Aisle 
       seats.push({ id: `aisle-${row}`, row, column: 2, isAvailable: false, type: 'empty' });
       
       // Right side - 2 seats

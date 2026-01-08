@@ -13,7 +13,7 @@ interface Bus {
 }
 
 export default function BusesPage() {
-  const buses: Bus[] = [
+  const buses: (Bus & { codes?: string[] })[] = [
     {
       id: 1,
       name: "Mercedes-Benz Tourismo",
@@ -21,7 +21,8 @@ export default function BusesPage() {
       features: ["Air Conditioning", "Reclining Seats", "WiFi", "USB Charging"],
       capacity: "57 Passengers",
       image: "/bus/mercedes.png",
-      description: "Experience luxury travel with our premium Mercedes-Benz fleet, featuring state-of-the-art comfort and safety."
+      description: "Experience luxury travel with our premium Mercedes-Benz fleet, featuring state-of-the-art comfort and safety.",
+      codes: ["#NP-101", "#NP-102", "#NP-103"]
     },
     {
       id: 2,
@@ -30,7 +31,8 @@ export default function BusesPage() {
       features: ["Premium Seats", "Entertainment System", "Climate Control", "Spacious Legroom"],
       capacity: "57 Passengers",
       image: "/bus/scania.png",
-      description: "Travel in style with Scania's renowned engineering excellence and passenger comfort."
+      description: "Travel in style with Scania's renowned engineering excellence and passenger comfort.",
+      codes: ["#NP-201", "#NP-202", "#NP-203"]
     },
     {
       id: 3,
@@ -39,7 +41,8 @@ export default function BusesPage() {
       features: ["Comfort Seats", "Air Suspension", "Reading Lights", "Luggage Space"],
       capacity: "53 Passengers",
       image: "/bus/man.png",
-      description: "Reliable and efficient transportation with MAN's cutting-edge technology."
+      description: "Reliable and efficient transportation with MAN's cutting-edge technology.",
+      codes: ["#NP-301", "#NP-302", "#NP-303"]
     },
     {
       id: 4,
@@ -48,7 +51,8 @@ export default function BusesPage() {
       features: ["Premium Comfort", "Safety Systems", "WiFi", "Refreshments"],
       capacity: "61 Passengers",
       image: "/bus/volvo.png",
-      description: "Journey with confidence in our Volvo buses, known for unmatched safety and comfort."
+      description: "Journey with confidence in our Volvo buses, known for unmatched safety and comfort.",
+      codes: ["#NP-401", "#NP-402", "#NP-403"]
     },
     {
       id: 5,
@@ -57,7 +61,8 @@ export default function BusesPage() {
       features: ["Comfortable Seating", "AC System", "Safety Features", "Fuel Efficient"],
       capacity: "50 Passengers",
       image: "/bus/hino.png",
-      description: "Dependable and economical travel with Hino's trusted performance."
+      description: "Dependable and economical travel with Hino's trusted performance.",
+      codes: ["#NP-501", "#NP-502", "#NP-503"]
     },
     {
       id: 6,
@@ -66,7 +71,8 @@ export default function BusesPage() {
       features: ["Spacious Interior", "Air Conditioning", "Music System", "Storage Space"],
       capacity: "58 Passengers",
       image: "/bus/ashok.png",
-      description: "Affordable comfort with Ashok Leyland's reliable and spacious buses."
+      description: "Affordable comfort with Ashok Leyland's reliable and spacious buses.",
+      codes: ["#NP-601", "#NP-602", "#NP-603"]
     }
   ];
 
@@ -108,6 +114,17 @@ export default function BusesPage() {
               <div className="p-6 text-center">
                 <h3 className="text-2xl font-bold text-gray-800 mb-2">{bus.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{bus.description}</p>
+
+                {/* Bus Codes for first 3 buses */}
+                {bus.codes && (
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    {bus.codes.map(code => (
+                      <span key={code} className="inline-block bg-slate-800 text-white px-2 py-1 rounded text-xs font-mono font-bold shadow">
+                        {code}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Capacity */}
                 <div className="flex items-center justify-center gap-2 mb-4 text-indigo-600">
