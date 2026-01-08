@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -169,6 +170,7 @@ interface BusRoute {
 }
 
 function TimetableContent() {
+    const router = useRouter();
   const searchParams = useSearchParams();
   const [origin, setOrigin] = useState(searchParams.get('from') || "");
   const [destination, setDestination] = useState(searchParams.get('to') || "");
@@ -425,8 +427,11 @@ function TimetableContent() {
                         <div className="text-right">
                             <span className="block text-xl font-extrabold text-emerald-600">৳{route.price}</span>
                         </div>
-                        <button className="px-6 py-2.5 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg transition-all shadow-md hover:shadow-emerald-200">
-                            Book
+                        <button
+                          className="px-6 py-2.5 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg transition-all shadow-md hover:shadow-emerald-200"
+                          onClick={() => router.push(`/booking/${route.busNumber}`)}
+                        >
+                          Book
                         </button>
                     </div>
                     </div>
