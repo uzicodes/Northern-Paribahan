@@ -7,7 +7,8 @@
         "start": "NODE_ENV=production tsx server.ts",
         "lint": "next lint",
         "prisma:generate": "prisma generate",
-        "prisma:push": "prisma db push"
+        "prisma:push": "prisma db push",
+        "prisma:seed": "prisma db seed"
     },
     "dependencies": {
         "@prisma/client": "^5.0.0",
@@ -22,6 +23,9 @@
         "lucide-react": "^0.344.0",
         "clsx": "^2.0.0",
         "tailwind-merge": "^2.0.0"
+    },
+    "prisma": {
+        "seed": "tsx prisma/seed.ts"
     },
     "devDependencies": {
         "@types/bcryptjs": "^2.4.6",
