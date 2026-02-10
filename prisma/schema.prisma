@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(cuid())
+  name     String
+  email    String    @unique
+  password String
+  role     String    @default("USER") // USER, ADMIN
+  bookings Booking[]
+}
+
+model Bus {
+  id          String   @id @default(cuid())
+  name        String
+  plateNumber String   @unique
+  type        String // AC, Non-AC
+  price       Float
+  seats       Seat[]
+  createdAt   DateTime @default(now())
+}
+
+model Seat {
+  id         String    @id @default(cuid())
+  seatNumber String
+  isBooked   Boolean   @default(false)
+  busId      String
+  bus        Bus       @relation(fields: [busId], references: [id])
+  booking    Booking?
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  seatId    String   @unique
+  seat      Seat     @relation(fields: [seatId], references: [id])
+  status    String   @default("CONFIRMED")
+  createdAt DateTime @default(now())
+}

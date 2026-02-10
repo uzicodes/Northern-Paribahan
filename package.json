@@ -1,25 +1,39 @@
 {
-  "name": "northern-paribahan",
-  "private": true,
-  "version": "0.1.0",
-  "workspaces": [
-    "backend",
-    "frontend",
-    "packages/*"
-  ],
-  "scripts": {
-    "dev:backend": "npm --workspace backend run dev",
-    "dev:frontend": "npm --workspace frontend-next run dev",
-    "build:backend": "npm --workspace backend run build",
-    "start:backend": "npm --workspace backend run start",
-    "seed": "npm --workspace backend run seed"
-  },
-  "dependencies": {
-    "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.89.0",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.23.26",
-    "lucide-react": "^0.562.0",
-    "tailwind-merge": "^3.4.0"
-  }
+    "name": "northern-paribahan",
+    "version": "1.0.0",
+    "scripts": {
+        "dev": "tsx server.ts",
+        "build": "next build",
+        "start": "NODE_ENV=production tsx server.ts",
+        "lint": "next lint",
+        "prisma:generate": "prisma generate",
+        "prisma:push": "prisma db push"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0",
+        "axios": "^1.6.0",
+        "bcryptjs": "^2.4.3",
+        "jsonwebtoken": "^9.0.0",
+        "next": "^14.2.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "socket.io": "^4.7.0",
+        "socket.io-client": "^4.7.0",
+        "lucide-react": "^0.344.0",
+        "clsx": "^2.0.0",
+        "tailwind-merge": "^2.0.0"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.6",
+        "@types/jsonwebtoken": "^9.0.5",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "autoprefixer": "^10.0.1",
+        "postcss": "^8",
+        "prisma": "^5.0.0",
+        "tailwindcss": "^3.3.0",
+        "tsx": "^4.0.0",
+        "typescript": "^5"
+    }
 }
