@@ -1,36 +1,35 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
 
 export async function POST(request: Request) {
     const supabase = createClient()
-    const { email, password, name } = await request.json()
+    const { email, password, name, phoneNumber } = await request.json()
 
-    // 1. Create the user in Supabase Auth (This handles the password)
+    // 1. Sign up user (Pass extra data in 'options' so the Trigger can see it)
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+            data: {
+                name: name,
+                phone_number: phoneNumber, // Passing this to the database trigger
+            },
+        },
     })
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-
-    // 2. Sync to your Prisma table (We don't send the password here anymore)
-    if (data.user) {
-        try {
-            await prisma.user.create({
-                data: {
-                    id: data.user.id, // Links to Supabase Auth UUID
-                    email: email,
-                    name: name,
-                    role: 'PASSENGER',
-                    // password is now omitted because it's optional in schema
-                }
-            })
-        } catch (dbError) {
-            console.error("Prisma Sync Error:", dbError)
-            // Optional: Delete the Supabase auth user if Prisma sync fails
-        }
+    if (error) {
+        // Log the FULL error for debugging
+        console.error('--- SUPABASE SIGNUP ERROR ---')
+        console.error('Message:', error.message)
+        console.error('Status:', error.status)
+        console.error('Name:', error.name)
+        console.error('Cause:', error.cause)
+        console.error('Full Error:', JSON.stringify(error, null, 2))
+        console.error('--- END ERROR ---')
+        return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
+    // Success! We don't need to manually insert into Prisma anymore.
+    // The SQL Trigger handles the sync automatically.
     return NextResponse.json({ message: 'Registration successful!' })
 }

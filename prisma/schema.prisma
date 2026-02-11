@@ -9,12 +9,15 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
-  name     String?
-  email    String    @unique
-  password String?
-  role     String    @default("USER") // USER, ADMIN
-  bookings Booking[]
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String?
+  email       String    @unique
+  password    String?
+  phoneNumber String?   @map("phone_number")
+  role        String    @default("USER") // USER, ADMIN
+  bookings    Booking[]
+
+  @@map("User")
 }
 
 model Bus {
@@ -38,7 +41,7 @@ model Seat {
 
 model Booking {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
   seatId    String   @unique
   seat      Seat     @relation(fields: [seatId], references: [id])
