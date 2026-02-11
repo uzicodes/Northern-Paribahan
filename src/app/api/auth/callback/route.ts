@@ -4,7 +4,6 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
-    // Default to '/profile' if no 'next' param is found
     const next = searchParams.get('next') ?? '/profile'
 
     if (code) {
@@ -12,14 +11,14 @@ export async function GET(request: Request) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            // 1. Check if Render (or Vercel) sent us the real domain header
+            // Check if Render sent to real domain header
             const forwardedHost = request.headers.get('x-forwarded-host') // e.g., northern-paribahan.onrender.com
 
             if (forwardedHost) {
-                // 2. Force HTTPS and use the real public domain
+                // Force use the real public domain
                 return NextResponse.redirect(`https://${forwardedHost}${next}`)
             } else {
-                // 3. Fallback for Localhost development (no forwarded host)
+                // Fallback for Localhost development (no forwarded host)
                 return NextResponse.redirect(`${origin}${next}`)
             }
         }
