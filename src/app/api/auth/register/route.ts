@@ -5,14 +5,14 @@ export async function POST(request: Request) {
     const supabase = createClient()
     const { email, password, name, phoneNumber } = await request.json()
 
-    // 1. Sign up user (Pass extra data in 'options' so the Trigger can see it)
+    // Sign up user 
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
             data: {
                 name: name,
-                phone_number: phoneNumber, // Passing this to the database trigger
+                phone_number: phoneNumber,
             },
         },
     })
@@ -29,7 +29,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // Success! We don't need to manually insert into Prisma anymore.
-    // The SQL Trigger handles the sync automatically.
+    // Success! 
     return NextResponse.json({ message: 'Registration successful!' })
 }
