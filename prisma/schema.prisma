@@ -10,9 +10,9 @@ datasource db {
 
 model User {
   id       String    @id @default(cuid())
-  name     String
+  name     String?
   email    String    @unique
-  password String
+  password String?
   role     String    @default("USER") // USER, ADMIN
   bookings Booking[]
 }
