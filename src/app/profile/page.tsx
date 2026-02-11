@@ -156,7 +156,7 @@ export default function ProfilePage() {
     const userInitial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
 
     return (
-        <div className="min-h-screen font-sans text-slate-600 flex justify-center p-4 md:p-8" style={{ backgroundColor: '#C9CBA3' }}>
+        <div className="min-h-screen text-slate-600 flex justify-center p-4 md:p-8" style={{ backgroundColor: '#C9CBA3' }}>
             <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                 {/* ===== LEFT SIDEBAR ===== */}
