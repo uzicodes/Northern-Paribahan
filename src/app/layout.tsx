@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Satisfy } from 'next/font/google';
 import NavbarClient from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SessionManager from '@/components/SessionManager';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <link rel="icon" href="/favicon.ico" />
             </head>
             <body className="min-h-screen flex flex-col" style={{ backgroundColor: '#C9CBA3' }}>
+                <SessionManager />
                 <header className="border-b" style={{ backgroundColor: '#172144' }}>
                     <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
                         <Link href="/" className="font-semibold text-lg flex items-center gap-2">
