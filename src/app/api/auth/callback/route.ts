@@ -4,6 +4,7 @@ import { createClient } from '@/utils/supabase/server'
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
     const code = searchParams.get('code')
+    // Default to '/profile' if no 'next' param is found
     const next = searchParams.get('next') ?? '/profile'
 
     if (code) {
@@ -11,14 +12,17 @@ export async function GET(request: Request) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            // Check if Render sent to real domain header
-            const forwardedHost = request.headers.get('x-forwarded-host') // e.g., northern-paribahan.onrender.com
+            const forwardedHost = request.headers.get('x-forwarded-host') // e.g. northern-paribahan.onrender.com
+            const isLocal = origin.includes('localhost')
 
-            if (forwardedHost) {
-                // Force use the real public domain
+            if (isLocal) {
+                // FORCE HTTP for Localhost (This fixes your error!)
+                return NextResponse.redirect(`http://localhost:3000${next}`)
+            } else if (forwardedHost) {
+                // FORCE HTTPS for Render/Live
                 return NextResponse.redirect(`https://${forwardedHost}${next}`)
             } else {
-                // Fallback for Localhost development (no forwarded host)
+                // Fallback
                 return NextResponse.redirect(`${origin}${next}`)
             }
         }
