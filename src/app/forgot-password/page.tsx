@@ -25,9 +25,10 @@ export default function ForgotPasswordPage() {
 
         try {
             const supabase = createClient();
-            const protocol = window.location.protocol;
-            const host = window.location.host;
-            const redirectUrl = `${protocol}//${host}/api/auth/callback?next=/auth/update-password`;
+
+            //Use window.location.origin to automatically get http://localhost or https://your-site
+            const redirectUrl = `${window.location.origin}/api/auth/callback?next=/auth/update-password`;
+
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectUrl,
             });
@@ -134,7 +135,7 @@ export default function ForgotPasswordPage() {
                                 </button>
 
                                 <p className="text-sm text-center text-gray-600">
-                                    Remember your password? <a href="/login" className="font-semibold text-indigo-600 hover:underline">Log In</a>
+                                    Remember your password? <Link href="/login" className="font-semibold text-indigo-600 hover:underline">Log In</Link>
                                 </p>
                             </form>
                         )}
