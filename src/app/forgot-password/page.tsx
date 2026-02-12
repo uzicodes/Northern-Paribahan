@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
             const supabase = createClient();
 
             //Use window.location.origin to automatically get http://localhost or https://your-site
-            const redirectUrl = `${window.location.origin}/api/auth/callback?next=/auth/update-password`;
+            const redirectUrl = `${window.location.origin}/api/auth/callback?next=/update-password`;
 
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: redirectUrl,
