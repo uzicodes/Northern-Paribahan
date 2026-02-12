@@ -72,7 +72,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#BBE092' }}>
+        <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#C9CBA3' }}>
             <div className="w-full max-w-5xl flex rounded-3xl shadow-2xl overflow-hidden bg-white h-auto">
 
                 {/* Left Side - Branding (Hidden on mobile) */}

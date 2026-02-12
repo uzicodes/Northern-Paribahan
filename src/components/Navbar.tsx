@@ -1,8 +1,9 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Menu, Github, Mail } from 'lucide-react';
+import { toast } from 'sonner';
 
 type JwtPayload = { role?: string };
 
@@ -19,6 +20,7 @@ function decodeRole(token: string | null): string | null {
 
 export default function NavbarClient() {
     const pathname = usePathname();
+    const router = useRouter();
     const [token, setToken] = useState<string | null>(null);
     const [showContactPopup, setShowContactPopup] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -71,7 +73,7 @@ export default function NavbarClient() {
                         Admin
                     </Link>
                 )}
-                {!token ? (
+                {!token && (
                     <>
                         <Link
                             href="/login"
@@ -85,23 +87,31 @@ export default function NavbarClient() {
                         >
                             Register
                         </Link>
-                        <Link
-                            href="/profile"
-                            className={isActive('/profile') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                        </Link>
-                        <button
-                            onClick={() => setShowContactPopup(true)}
-                            className="text-white hover:text-[#FCA311]"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                            </svg>
-                        </button>
                     </>
+                )}
+                <button
+                    onClick={() => {
+                        if (token) {
+                            router.push('/profile');
+                        } else {
+                            toast.error('Please Login First');
+                        }
+                    }}
+                    className={isActive('/profile') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </button>
+                {!token ? (
+                    <button
+                        onClick={() => setShowContactPopup(true)}
+                        className="text-white hover:text-[#FCA311]"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </button>
                 ) : (
                     <button onClick={logout} className="text-white hover:text-[#FCA311]">Logout</button>
                 )}
@@ -153,7 +163,7 @@ export default function NavbarClient() {
                             Admin
                         </Link>
                     )}
-                    {!token ? (
+                    {!token && (
                         <>
                             <Link
                                 href="/login"
@@ -169,29 +179,37 @@ export default function NavbarClient() {
                             >
                                 Register
                             </Link>
-                            <Link
-                                href="/profile"
-                                className={`px-4 py-2 flex items-center gap-2 ${isActive('/profile') ? 'text-[#FCA311] bg-slate-800' : 'text-white hover:bg-slate-800 hover:text-[#FCA311]'}`}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                Profile
-                            </Link>
-                            <button
-                                onClick={() => {
-                                    setShowContactPopup(true);
-                                    setIsMobileMenuOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-2 flex items-center gap-2 text-white hover:bg-slate-800 hover:text-[#FCA311]"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                Contact
-                            </button>
                         </>
+                    )}
+                    <button
+                        onClick={() => {
+                            if (token) {
+                                router.push('/profile');
+                            } else {
+                                toast.error('Please Login First');
+                            }
+                            setIsMobileMenuOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 flex items-center gap-2 ${isActive('/profile') ? 'text-[#FCA311] bg-slate-800' : 'text-white hover:bg-slate-800 hover:text-[#FCA311]'}`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Profile
+                    </button>
+                    {!token ? (
+                        <button
+                            onClick={() => {
+                                setShowContactPopup(true);
+                                setIsMobileMenuOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-2 flex items-center gap-2 text-white hover:bg-slate-800 hover:text-[#FCA311]"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            Contact
+                        </button>
                     ) : (
                         <button
                             onClick={() => {
@@ -252,5 +270,3 @@ export default function NavbarClient() {
         </nav>
     );
 }
-
-
