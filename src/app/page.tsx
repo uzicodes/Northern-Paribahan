@@ -2,6 +2,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import HeroDatePicker from '@/components/HeroDatePicker';
+import { ShieldCheck, Ban, Clock, CalendarRange } from 'lucide-react';
 
 export default function Page() {
     const router = useRouter();
@@ -87,7 +88,7 @@ export default function Page() {
                             )}
                         </div>
                         {/* To input */}
-                        <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 pl-4 py-2 sm:py-0 relative">
+                        <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 sm:pl-4 py-2 sm:py-0 relative">
                             <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/get-off-bus.png" alt="get-off-bus" className="mr-2" />
                             <input
                                 type="text"
@@ -118,7 +119,7 @@ export default function Page() {
                             )}
                         </div>
                         {/* Date of Journey */}
-                        <div className="flex items-center border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 pl-4 py-2 sm:py-0">
+                        <div className="flex items-center border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 sm:pl-4 py-2 sm:py-0">
                             <div className="text-xs text-gray-500 mr-2">Date of Journey</div>
                             <div className="font-semibold text-base">
                                 {dateOfJourney.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -208,30 +209,47 @@ export default function Page() {
                     <h2 className="text-2xl font-bold mb-4">What's new</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                         {/* Card 1 */}
-                        <div className="rounded-2xl bg-[#2B2D42] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
-                            <div className="flex items-center gap-2 mb-2">
-
+                        <div className="rounded-2xl bg-[#2B2D42] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative overflow-hidden group">
+                            <ShieldCheck className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="relative z-10">
+                                <div className="mb-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                                    <ShieldCheck className="w-6 h-6" />
+                                </div>
+                                <div className="font-bold text-base mb-1">Maximum savings on Cashless payments.</div>
                             </div>
-                            <div className="font-bold text-base mb-1">Maximum savings on car insurance. Cashless claims everywhere.</div>
-
                         </div>
                         {/* Card 2 */}
-                        <div className="rounded-2xl bg-[#8B1E3F] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative">
-                            <div className="font-bold text-base mb-1">Free Cancellation</div>
-                            <div className="text-sm mb-2">Get 100% refund on cancellation</div>
-
-                            {/* Removed image from last row card */}
+                        <div className="rounded-2xl bg-[#8B1E3F] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-white relative overflow-hidden group">
+                            <Ban className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="relative z-10">
+                                <div className="mb-2 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                                    <Ban className="w-6 h-6" />
+                                </div>
+                                <div className="font-bold text-base mb-1">Free Cancellation</div>
+                                <div className="text-sm mb-2 opacity-90">Get 100% refund on cancellation</div>
+                            </div>
                         </div>
                         {/* Card 3 */}
-                        <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-black relative">
-                            <div className="font-bold text-base mb-1">Introducing Bus timetable</div>
-                            <div className="text-sm mb-2">Get local bus timings between cities in your state</div>
-
+                        <div className="rounded-2xl bg-[#F8E7E7] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-black relative overflow-hidden group">
+                            <Clock className="absolute -right-4 -bottom-4 w-24 h-24 text-black/5 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="relative z-10">
+                                <div className="mb-2 w-10 h-10 rounded-full bg-black/5 flex items-center justify-center backdrop-blur-sm">
+                                    <Clock className="w-6 h-6 text-[#2B2D42]" />
+                                </div>
+                                <div className="font-bold text-base mb-1 text-[#2B2D42]">Introducing Bus timetable</div>
+                                <div className="text-sm mb-2 text-gray-600">Get local bus timings between cities in your state</div>
+                            </div>
                         </div>
                         {/* Card 4 */}
-                        <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-[#2B2D42] relative">
-                            <div className="font-bold text-base mb-1">Flexible Ticketing</div>
-                            <div className="text-sm mb-2">Get amazing benefits on Date Change & Cancellation</div>
+                        <div className="rounded-2xl bg-[#F1F6FB] p-6 flex flex-col justify-between min-h-[90px] shadow-md text-[#2B2D42] relative overflow-hidden group">
+                            <CalendarRange className="absolute -right-4 -bottom-4 w-24 h-24 text-black/5 group-hover:scale-110 transition-transform duration-300" />
+                            <div className="relative z-10">
+                                <div className="mb-2 w-10 h-10 rounded-full bg-white/60 flex items-center justify-center backdrop-blur-sm shadow-sm">
+                                    <CalendarRange className="w-6 h-6 text-[#2B2D42]" />
+                                </div>
+                                <div className="font-bold text-base mb-1">Flexible Ticketing</div>
+                                <div className="text-sm mb-2 text-gray-600">Get amazing benefits on Date Change & Cancellation</div>
+                            </div>
                         </div>
                     </div>
                 </div>
