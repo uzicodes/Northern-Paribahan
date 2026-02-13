@@ -12,19 +12,18 @@ export async function GET(request: Request) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // e.g. northern-paribahan.onrender.com
-            const isLocal = origin.includes('localhost')
+            const forwardedHost = request.headers.get('x-forwarded-host')
 
-            if (isLocal) {
-                // FORCE HTTP for Localhost (This fixes your error!)
-                return NextResponse.redirect(`http://localhost:3000${next}`)
-            } else if (forwardedHost) {
-                // FORCE HTTPS for Render/Live
-                return NextResponse.redirect(`https://${forwardedHost}${next}`)
+            let redirectBase: string
+            if (forwardedHost) {
+                // Use http for localhost, https for production
+                const protocol = forwardedHost.includes('localhost') ? 'http' : 'https'
+                redirectBase = `${protocol}://${forwardedHost}`
             } else {
-                // Fallback
-                return NextResponse.redirect(`${origin}${next}`)
+                redirectBase = origin
             }
+
+            return NextResponse.redirect(`${redirectBase}${next}`)
         }
     }
 
