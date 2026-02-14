@@ -144,7 +144,7 @@ export default function Page() {
                                 alert('Please select both From and To locations');
                             }
                         }}
-                        className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-12 py-3 shadow flex items-center gap-3"
+                        className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-6 py-3 shadow flex items-center gap-3"
                         style={{ fontSize: 22 }}
                     >
                         <img width="28" height="28" src="https://img.icons8.com/sf-black/64/search.png" alt="search" className="mr-2" /> Search Buses
