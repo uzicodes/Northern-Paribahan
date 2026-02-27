@@ -10,7 +10,6 @@ import {
     Bus,
     MapPinned,
     Users,
-    Settings,
     LogOut,
     PanelLeftClose,
     PanelLeft,
@@ -22,7 +21,6 @@ const sidebarLinks = [
     { label: "Buses", href: "/admin/buses", icon: Bus },
     { label: "Routes", href: "/admin/routes", icon: MapPinned },
     { label: "Users", href: "/admin/users", icon: Users },
-    { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
