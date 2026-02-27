@@ -29,7 +29,8 @@ export default function RegisterPage() {
         setError('');
 
         // 1. Validation check
-        if (!emailPattern.test(email) || phoneNumber.length !== 11) {
+        const isSingleAt = email.split('@').length === 2;
+        if (!emailPattern.test(email) || !isSingleAt || phoneNumber.length !== 10) {
             return;
         }
 
@@ -117,13 +118,18 @@ export default function RegisterPage() {
                                 <input
                                     type="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if ((val.split('@').length - 1) <= 1) {
+                                            setEmail(val);
+                                        }
+                                    }}
                                     placeholder="email@example.com"
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
                                 />
-                                {submitted && !emailPattern.test(email) && (
-                                    <p className="text-xs text-red-500 mt-1">Please use a valid email address.</p>
+                                {submitted && (!emailPattern.test(email) || email.split('@').length !== 2) && (
+                                    <p className="text-xs text-red-500 mt-1">Please use a valid email address with exactly one '@'.</p>
                                 )}
                             </div>
 
@@ -134,14 +140,14 @@ export default function RegisterPage() {
                                     <input
                                         type="tel"
                                         value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 11))}
-                                        placeholder="17XXXXXXXXX"
+                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                        placeholder="1XXXXXXXXX"
                                         required
                                         className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
                                     />
                                 </div>
-                                {submitted && phoneNumber.length !== 11 && (
-                                    <p className="text-xs text-red-500 mt-1">Number must be exactly 11 digits.</p>
+                                {submitted && phoneNumber.length !== 10 && (
+                                    <p className="text-xs text-red-500 mt-1">Number must be exactly 10 digits after +880.</p>
                                 )}
                             </div>
 
