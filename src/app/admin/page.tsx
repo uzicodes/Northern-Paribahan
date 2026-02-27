@@ -121,10 +121,6 @@ export default function AdminDashboardPage() {
                     </h1>
                     <p className="text-gray-500 text-sm mt-1">{today}</p>
                 </div>
-                <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm self-start sm:self-auto">
-                    <ArrowUpRight size={16} />
-                    View Reports
-                </button>
             </div>
 
             {/* Stats Grid */}
