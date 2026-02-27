@@ -17,7 +17,7 @@ model User {
   role        String    @default("USER") // USER, ADMIN
   bookings    Booking[]
 
-  @@map("User")
+  @@map("Users")
 }
 
 model Bus {
@@ -28,6 +28,8 @@ model Bus {
   price       Float
   seats       Seat[]
   createdAt   DateTime @default(now())
+
+  @@map("Our Buses")
 }
 
 model Seat {
@@ -47,4 +49,6 @@ model Booking {
   seat      Seat     @relation(fields: [seatId], references: [id])
   status    String   @default("CONFIRMED")
   createdAt DateTime @default(now())
+
+  @@map("Bookings")
 }
