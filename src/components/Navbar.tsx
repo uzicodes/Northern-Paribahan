@@ -34,10 +34,11 @@ export default function NavbarClient() {
 
     useEffect(() => {
         setToken(localStorage.getItem('token'));
+
         const onStorage = () => setToken(localStorage.getItem('token'));
         window.addEventListener('storage', onStorage);
         return () => window.removeEventListener('storage', onStorage);
-    }, []);
+    }, [pathname]);
 
     function logout() {
         localStorage.removeItem('token');
@@ -103,7 +104,7 @@ export default function NavbarClient() {
                             toast.error('Please Login First');
                         }
                     }}
-                    className={isActive('/profile') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                    className={(token || isActive('/profile')) ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -260,7 +261,7 @@ export default function NavbarClient() {
                                             router.push('/profile');
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/profile') ? 'bg-[#FCA311] text-[#172144] font-bold' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${(token || isActive('/profile')) ? 'bg-[#FCA311] text-[#172144] font-bold shadow-lg shadow-[#FCA311]/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
                                     >
                                         <div className="p-2 rounded-lg bg-slate-800">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
