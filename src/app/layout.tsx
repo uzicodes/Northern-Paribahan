@@ -6,6 +6,7 @@ import { Satisfy } from 'next/font/google';
 import NavbarClient from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import SessionManager from '@/components/SessionManager';
+import PageLoader from '@/components/PageLoader';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -40,7 +41,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                         <div style={{ color: '#F1F604' }}><NavbarClient /></div>
                     </div>
                 </header>
-                <main className="flex-grow">{children}</main>
+                <main className="flex-grow">
+                    <PageLoader>{children}</PageLoader>
+                </main>
                 <Footer />
             </body>
         </html>

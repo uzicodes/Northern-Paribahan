@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bus, Users, Wifi, Wind, Shield, Loader2 } from 'lucide-react';
+import { Bus, Users, Wifi, Wind, Shield } from 'lucide-react';
 
 // Static bus data
 const busShowcase = [
@@ -78,7 +78,6 @@ interface ApiBus {
 
 export default function BusesPage() {
     const [apiBuses, setApiBuses] = useState<ApiBus[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchBuses = async () => {
@@ -89,8 +88,6 @@ export default function BusesPage() {
                     setApiBuses(data);
                 }
             } catch {
-            } finally {
-                setLoading(false);
             }
         };
         fetchBuses();
@@ -135,14 +132,8 @@ export default function BusesPage() {
 
             {/* Bus Cards Grid */}
             <div className="max-w-6xl mx-auto px-4 py-12">
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
-                        <p className="text-slate-600 font-medium">Loading buses...</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {cards.map((bus, index) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {cards.map((bus, index) => (
                             <div
                                 key={index}
                                 className="group bg-slate-800 rounded-3xl overflow-hidden shadow-sm border border-slate-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
@@ -197,7 +188,6 @@ export default function BusesPage() {
                             </div>
                         ))}
                     </div>
-                )}
 
                 {/* Bottom Info */}
                 <div className="mt-12 text-center">
