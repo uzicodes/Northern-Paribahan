@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Menu, Github, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { Satisfy } from 'next/font/google';
+import { createClient } from '@/utils/supabase/client';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -27,22 +28,38 @@ function decodeRole(token: string | null): string | null {
 export default function NavbarClient() {
     const pathname = usePathname();
     const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [token, setToken] = useState<string | null>(null);
     const [showContactPopup, setShowContactPopup] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const role = useMemo(() => decodeRole(token), [token]);
 
     useEffect(() => {
-        setToken(localStorage.getItem('token'));
+        const supabase = createClient();
 
-        const onStorage = () => setToken(localStorage.getItem('token'));
-        window.addEventListener('storage', onStorage);
-        return () => window.removeEventListener('storage', onStorage);
+        // Check initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setIsLoggedIn(!!session?.user);
+            setToken(session?.access_token ?? null);
+        });
+
+        // Listen for auth state changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setIsLoggedIn(!!session?.user);
+            setToken(session?.access_token ?? null);
+        });
+
+        return () => subscription.unsubscribe();
     }, [pathname]);
 
-    function logout() {
-        localStorage.removeItem('token');
+    async function logout() {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        await fetch('/api/auth/logout', { method: 'POST' });
+        setIsLoggedIn(false);
         setToken(null);
+        router.push('/');
+        router.refresh();
     }
 
     const isActive = (path: string) => pathname === path;
@@ -64,14 +81,7 @@ export default function NavbarClient() {
                 >
                     Buses
                 </Link>
-                {token && (
-                    <Link
-                        href="/my-bookings"
-                        className={isActive('/my-bookings') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
-                    >
-                        My Bookings
-                    </Link>
-                )}
+
                 {role === 'ADMIN' && (
                     <Link
                         href="/admin"
@@ -80,7 +90,7 @@ export default function NavbarClient() {
                         Admin
                     </Link>
                 )}
-                {!token && (
+                {!isLoggedIn && (
                     <>
                         <Link
                             href="/login"
@@ -98,19 +108,19 @@ export default function NavbarClient() {
                 )}
                 <button
                     onClick={() => {
-                        if (token) {
+                        if (isLoggedIn) {
                             router.push('/profile');
                         } else {
                             toast.error('Please Login First');
                         }
                     }}
-                    className={(token || isActive('/profile')) ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                    className={(isLoggedIn || isActive('/profile')) ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </button>
-                {!token ? (
+                {!isLoggedIn ? (
                     <button
                         onClick={() => setShowContactPopup(true)}
                         className="text-white hover:text-[#FCA311]"
@@ -194,20 +204,7 @@ export default function NavbarClient() {
                             <span>Buses</span>
                         </Link>
 
-                        {token && (
-                            <Link
-                                href="/my-bookings"
-                                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/my-bookings') ? 'bg-[#FCA311] text-[#172144] font-bold shadow-lg shadow-[#FCA311]/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <div className={`p-2 rounded-lg ${isActive('/my-bookings') ? 'bg-white/20' : 'bg-slate-800'}`}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                                    </svg>
-                                </div>
-                                <span>My Bookings</span>
-                            </Link>
-                        )}
+
 
                         {role === 'ADMIN' && (
                             <Link
@@ -227,7 +224,7 @@ export default function NavbarClient() {
                         <div className="pt-4 border-t border-slate-700/50 my-2">
                             <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Account</p>
 
-                            {!token ? (
+                            {!isLoggedIn ? (
                                 <>
                                     <Link
                                         href="/login"
@@ -261,7 +258,7 @@ export default function NavbarClient() {
                                             router.push('/profile');
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${(token || isActive('/profile')) ? 'bg-[#FCA311] text-[#172144] font-bold shadow-lg shadow-[#FCA311]/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
+                                        className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${(isLoggedIn || isActive('/profile')) ? 'bg-[#FCA311] text-[#172144] font-bold shadow-lg shadow-[#FCA311]/20' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
                                     >
                                         <div className="p-2 rounded-lg bg-slate-800">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
