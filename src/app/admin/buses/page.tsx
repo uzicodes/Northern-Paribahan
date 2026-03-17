@@ -52,10 +52,6 @@ export default function AdminBusesPage() {
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Buses</h1>
                     <p className="text-sm text-gray-500 mt-1">Manage your fleet of {busesData.length} buses</p>
                 </div>
-                <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm self-start">
-                    <Plus size={16} />
-                    Add Bus
-                </button>
             </div>
 
             {/* Search */}

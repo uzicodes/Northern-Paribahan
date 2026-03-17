@@ -50,10 +50,6 @@ export default function AdminBookingsPage() {
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Bookings</h1>
                     <p className="text-sm text-gray-500 mt-1">{bookingsData.length} total bookings</p>
                 </div>
-                <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm self-start">
-                    <Download size={16} />
-                    Export CSV
-                </button>
             </div>
 
             {/* Search & Filter Bar */}
