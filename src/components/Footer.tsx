@@ -8,7 +8,7 @@ const satisfy = Satisfy({
 
 export default function Footer() {
     return (
-        <footer className="border-t mt-auto" style={{ backgroundColor: '#172144' }}>
+        <footer className="border-t mt-auto rounded-3xl mx-4 my-3" style={{ backgroundColor: '#172144' }}>
             <div className="max-w-6xl mx-auto px-4 py-6">
                 {/* Main Footer Content */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
