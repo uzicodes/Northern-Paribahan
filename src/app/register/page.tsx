@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -52,7 +53,7 @@ export default function RegisterPage() {
             const data = await response.json();
 
             if (response.ok) {
-                alert('Account created successfully! Please login.');
+                toast.success('Account created successfully! Please login.');
                 router.push('/login');
             } else {
                 setError(data.error || 'Registration failed. Please try again.');

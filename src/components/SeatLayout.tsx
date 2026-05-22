@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
+import { toast } from "sonner";
 
 interface Seat {
     id: string;
@@ -35,7 +36,7 @@ export default function SeatLayout({ busId, initialSeats }: SeatLayoutProps) {
                 // Deselect if the selected seat was just booked by someone else
                 if (selectedSeat === data.seatId) {
                     setSelectedSeat(null);
-                    alert("This seat was just booked by someone else!");
+                    toast.error("This seat was just booked by someone else!");
                 }
             }
         });
@@ -70,16 +71,16 @@ export default function SeatLayout({ busId, initialSeats }: SeatLayoutProps) {
             });
 
             if (res.ok) {
-                alert("Booking successful!");
+                toast.success("Booking successful!");
                 setSelectedSeat(null);
                 // Optimistic update or wait for socket? Socket will update it effectively.
             } else {
                 const data = await res.json();
-                alert(data.error || "Booking failed");
+                toast.error(data.error || "Booking failed");
             }
         } catch (error) {
             console.error(error);
-            alert("An error occurred");
+            toast.error("An error occurred");
         }
     };
 

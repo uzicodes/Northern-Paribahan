@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation';
 import HeroDatePicker from '@/components/HeroDatePicker';
 import { ShieldCheck, Ban, Clock, CalendarRange } from 'lucide-react';
 
+import { toast } from 'sonner';
+
 export default function Page() {
     const router = useRouter();
     const [dateOfJourney, setDateOfJourney] = React.useState<Date>(new Date());
@@ -141,7 +143,7 @@ export default function Page() {
                                 params.set('date', dateOfJourney.toISOString());
                                 router.push(`/timetable?${params.toString()}`);
                             } else {
-                                alert('Please select both From and To locations');
+                                toast.error('Please select both From and To locations');
                             }
                         }}
                         className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-6 py-3 shadow flex items-center gap-3"
