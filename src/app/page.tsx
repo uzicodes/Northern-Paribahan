@@ -159,48 +159,52 @@ export default function Page() {
                 {/* Promo Cards */}
                 <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
                     {/* Card 1 */}
-                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{ backgroundColor: '#B4EDD0' }}>
+                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
                         <div className="font-bold text-lg mt-2 mb-1">Save up to Tk 500 on bkash payments</div>
                         <div className="text-sm text-gray-700 mb-2">Valid till 31 Dec</div>
                         <div className="flex items-center mt-auto">
-                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
+                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
                                 <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />BK500
                             </span>
                         </div>
-                        <img src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
+                        <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
+                        <img src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 2 */}
-                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{ backgroundColor: '#B4EDD0' }}>
+                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
                         <div className="font-bold text-lg mt-2 mb-1">Get upto 10% off on Return tickets</div>
                         <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
                         <div className="flex items-center mt-auto">
-                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
+                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
                                 <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />RETURN10
                             </span>
                         </div>
-                        <img src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
+                        <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
+                        <img src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 3 */}
-                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{ backgroundColor: '#B4EDD0' }}>
+                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
                         <div className="font-bold text-lg mt-2 mb-1">Save up to Tk 300 on selected hotels in Cox's Bazar</div>
                         <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
                         <div className="flex items-center mt-auto">
-                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
+                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
                                 <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />HOTEL300
                             </span>
                         </div>
-                        <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain" />
+                        <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
+                        <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 4 */}
-                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl" style={{ backgroundColor: '#B4EDD0' }}>
+                    <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
                         <div className="font-bold text-lg mt-2 mb-1">Save upto Tk 500 with BRAC Bank Cards</div>
                         <div className="text-sm text-gray-700 mb-2">Valid till 15 Dec</div>
                         <div className="flex items-center mt-auto">
-                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow">
+                            <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
                                 <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />BB500
                             </span>
                         </div>
-                        <img src="/brac_bank.png" alt="brac bank logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain" />
+                        <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
+                        <img src="/brac_bank.png" alt="brac bank logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                 </div>
 
