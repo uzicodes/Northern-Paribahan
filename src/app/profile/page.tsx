@@ -195,8 +195,8 @@ export default function ProfilePage() {
                                 disabled={loggingOut}
                                 className="flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-red-500 hover:bg-red-50"
                             >
-                                {loggingOut ? <Loader2 size={20} className="animate-spin" /> : <LogOut size={20} />}
-                                <span className="font-medium">{loggingOut ? 'Logging out...' : 'Log Out'}</span>
+                                <LogOut size={20} />
+                                <span className="font-medium">Log Out</span>
                             </button>
                         </div>
                     </nav>
@@ -390,8 +390,8 @@ export default function ProfilePage() {
                                             disabled={saving}
                                             className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 flex items-center justify-center gap-2"
                                         >
-                                            {saving ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
-                                            {saving ? 'Saving...' : 'Save Changes'}
+                                            <Check size={18} />
+                                            Save Changes
                                         </button>
                                         <button
                                             onClick={() => {
