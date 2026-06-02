@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import GlobalLoader from '@/components/GlobalLoader';
 import {
     Bus,
     Calendar,
@@ -13,7 +14,6 @@ import {
     Mail,
     Check,
     X,
-    Loader2,
     MapPin,
     Ticket,
     ChevronRight,
@@ -129,14 +129,7 @@ export default function ProfilePage() {
     const pastBookings = bookings.filter(b => b.status !== 'CONFIRMED');
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#C9CBA3' }}>
-                <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
-                    <p className="text-slate-600 font-medium">Loading your profile...</p>
-                </div>
-            </div>
-        );
+        return <GlobalLoader />;
     }
 
     if (!user) {
