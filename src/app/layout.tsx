@@ -3,14 +3,26 @@ import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
 import { Satisfy } from 'next/font/google';
+import localFont from 'next/font/local';
+import Image from 'next/image';
 import NavbarClient from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import SessionManager from '@/components/SessionManager';
 import PageLoader from '@/components/PageLoader';
+import dynamic from 'next/dynamic';
+
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
 
 const satisfy = Satisfy({
     weight: '400',
     subsets: ['latin'],
+});
+
+const satoshi = localFont({
+    src: [
+        { path: '../../public/fonts/Satoshi-Regular.woff2', weight: '400', style: 'normal' },
+        { path: '../../public/fonts/Satoshi-Medium.woff2', weight: '500', style: 'normal' },
+        { path: '../../public/fonts/Satoshi-Bold.woff2', weight: '700', style: 'normal' }
+    ]
 });
 
 export const metadata = {
@@ -22,20 +34,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html lang="en">
             <head>
-                <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
                 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
                 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
                 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
                 <link rel="manifest" href="/site.webmanifest" />
                 <link rel="icon" href="/favicon.ico" />
             </head>
-            <body className="min-h-screen flex flex-col" style={{ backgroundColor: '#C9CBA3' }}>
+            <body className={`min-h-screen flex flex-col ${satoshi.className}`} style={{ backgroundColor: '#C9CBA3' }}>
                 <SessionManager />
                 <Toaster richColors position="bottom-right" />
                 <header className="border-b" style={{ backgroundColor: '#172144' }}>
                     <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
                         <Link href="/" className="font-semibold text-lg flex items-center gap-2">
-                            <img src="/logo.png" alt="Northern Paribahan Logo" style={{ height: 32, width: 32, display: 'inline-block', verticalAlign: 'middle' }} />
+                            <Image src="/logo.png" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
                             <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '24px' }}>Northern Paribahan</span>
                         </Link>
                         <div style={{ color: '#F1F604' }}><NavbarClient /></div>

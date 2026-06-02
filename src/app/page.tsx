@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import HeroDatePicker from '@/components/HeroDatePicker';
 import { ShieldCheck, Ban, Clock, CalendarRange } from 'lucide-react';
 
@@ -37,9 +38,11 @@ export default function Page() {
     return (
         <section className="w-full flex flex-col items-center justify-end min-h-[340px] relative">
             {/* Lowest layer image */}
-            <img
+            <Image
                 src="/1.jpg"
                 alt="Hero Layer"
+                fill
+                priority
                 className="absolute inset-0 z-0 w-full h-full object-cover opacity-80"
                 style={{ pointerEvents: 'none', maxHeight: '340px' }}
             />
@@ -170,7 +173,7 @@ export default function Page() {
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
-                        <img src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
+                        <Image width={80} height={80} src="/bkash.png" alt="bKash logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 2 */}
                     <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
@@ -182,7 +185,7 @@ export default function Page() {
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
-                        <img src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
+                        <Image width={80} height={80} src="/return.jpg" alt="return" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 3 */}
                     <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
@@ -194,7 +197,7 @@ export default function Page() {
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
-                        <img src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain transition-transform duration-200 group-hover:translate-x-1" />
+                        <Image width={112} height={112} src="/hotels.jpg" alt="hotels" className="absolute bottom-0 right-4 w-28 h-28 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                     {/* Card 4 */}
                     <div className="p-6 flex flex-col justify-between min-h-[110px] shadow-md relative rounded-2xl group transition-transform transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg cursor-pointer" style={{ backgroundColor: '#B4EDD0' }}>
@@ -206,7 +209,7 @@ export default function Page() {
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
-                        <img src="/brac_bank.png" alt="brac bank logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
+                        <Image width={80} height={80} src="/brac_bank.png" alt="brac bank logo" className="absolute bottom-0 right-4 w-20 h-20 object-contain transition-transform duration-200 group-hover:translate-x-1" />
                     </div>
                 </div>
 
