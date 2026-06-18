@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
 export async function PUT(request: Request) {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {

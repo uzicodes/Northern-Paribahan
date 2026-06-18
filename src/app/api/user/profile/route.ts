@@ -2,8 +2,8 @@ import { createClient } from '@/utils/supabase/server'
 import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
-    const supabase = createClient()
+export async function GET(request: Request) {
+    const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
