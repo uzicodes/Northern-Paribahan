@@ -11,6 +11,10 @@ export async function GET(request: Request) {
         const supabase = createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
+        if (error) {
+            console.error('Auth code exchange error:', error)
+        }
+
         if (!error) {
             const forwardedHost = request.headers.get('x-forwarded-host')
 
