@@ -142,8 +142,8 @@ export default function BusesPage(): React.JSX.Element {
             {/* Cards */}
             <div className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {cards.map((bus, index) => (
-                    <div key={index} className="bg-slate-800 rounded-2xl p-4 text-white">
-                        <img src={bus.image} alt={bus.brand} className="h-40 mx-auto" />
+                    <div key={index} className="group bg-slate-800 rounded-2xl p-4 text-white transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-indigo-500/20 cursor-pointer">
+                        <img src={bus.image} alt={bus.brand} className="h-40 mx-auto drop-shadow-md group-hover:scale-105 transition-transform duration-300" />
                         <h3 className="text-lg font-bold text-center mt-2">{bus.brand}</h3>
                         <p className="text-sm text-center text-slate-400">{bus.tagline}</p>
 
@@ -160,32 +160,6 @@ export default function BusesPage(): React.JSX.Element {
                         </div>
                     </div>
                 ))}
-            </div>
-
-            {/* ✅ Responsive Bottom Info */}
-            <div className="mt-12 text-center px-4">
-                <div className="flex flex-col sm:flex-row items-center justify-center text-center sm:text-left gap-4 sm:gap-6 bg-white rounded-2xl px-6 py-4 shadow-sm border border-slate-100">
-                    
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Shield size={18} className="text-emerald-500" />
-                        <span className="font-medium">Safe & Secure</span>
-                    </div>
-
-                    <div className="hidden sm:block w-px h-6 bg-slate-200"></div>
-
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Wind size={18} className="text-blue-500" />
-                        <span className="font-medium">AC Available</span>
-                    </div>
-
-                    <div className="hidden sm:block w-px h-6 bg-slate-200"></div>
-
-                    <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Wifi size={18} className="text-purple-500" />
-                        <span className="font-medium">WiFi On Board</span>
-                    </div>
-
-                </div>
             </div>
         </div>
     );
