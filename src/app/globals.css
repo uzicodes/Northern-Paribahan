@@ -26,3 +26,14 @@ body {
  50%      {background-size:20%  20%}
  90%,100% {background-size:100% 20%}
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
