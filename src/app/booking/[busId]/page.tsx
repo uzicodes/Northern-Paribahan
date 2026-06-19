@@ -2,13 +2,14 @@ import { prisma } from "@/lib/db";
 import SeatLayout from "@/components/SeatLayout";
 
 interface PageProps {
-    params: {
+    params: Promise<{
         busId: string;
-    };
+    }>;
 }
 
 // Server Component
-export default async function BookingPage({ params }: PageProps) {
+export default async function BookingPage(props: PageProps) {
+    const params = await props.params;
     const bus = await prisma.bus.findUnique({
         where: { id: params.busId },
         include: {

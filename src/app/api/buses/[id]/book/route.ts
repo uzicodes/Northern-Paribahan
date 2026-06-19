@@ -4,9 +4,10 @@ import { socket } from "@/lib/socket"; // Wait, socket is client side. Can I use
 
 export async function POST(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const { seatId, userId } = await req.json();
 
         // Check availability
@@ -46,7 +47,7 @@ export async function POST(
         // Emit socket event if server instance available via global
         const io = (global as any).io;
         if (io) {
-            io.emit("seat-booked", { seatId, busId: params.id });
+            io.emit("seat-booked", { seatId, busId: id });
         }
 
         return NextResponse.json(booking);
