@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -13,20 +13,36 @@ const satisfy = Satisfy({
     subsets: ['latin'],
 });
 
+type LoginState = {
+    email: string;
+    password: string;
+    showPassword: boolean;
+    loading: boolean;
+    googleLoading: boolean;
+    error: string;
+};
+
+const initialState: LoginState = {
+    email: '',
+    password: '',
+    showPassword: false,
+    loading: false,
+    googleLoading: false,
+    error: '',
+};
+
+function loginReducer(state: LoginState, action: Partial<LoginState>): LoginState {
+    return { ...state, ...action };
+}
+
 export default function LoginPage() {
     const router = useRouter();
-
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [googleLoading, setGoogleLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
+    const [state, dispatch] = useReducer(loginReducer, initialState);
+    const { email, password, showPassword, loading, googleLoading, error } = state;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-        setError('');
+        dispatch({ loading: true, error: '' });
 
         try {
             const response = await fetch('/api/auth/login', {
@@ -45,15 +61,14 @@ export default function LoginPage() {
             router.push('/profile');
 
         } catch (err: any) {
-            setError(err.message);
+            dispatch({ error: err.message });
         } finally {
-            setLoading(false);
+            dispatch({ loading: false });
         }
     };
 
     const handleGoogleLogin = async () => {
-        setGoogleLoading(true);
-        setError('');
+        dispatch({ googleLoading: true, error: '' });
 
         try {
             const supabase = createClient();
@@ -68,8 +83,7 @@ export default function LoginPage() {
                 throw new Error(error.message);
             }
         } catch (err: any) {
-            setError(err.message);
-            setGoogleLoading(false);
+            dispatch({ error: err.message, googleLoading: false });
         }
     };
 
@@ -116,7 +130,7 @@ export default function LoginPage() {
                                 <input
                                     type="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => dispatch({ email: e.target.value })}
                                     placeholder="Enter your email"
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
@@ -129,14 +143,14 @@ export default function LoginPage() {
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) => dispatch({ password: e.target.value })}
                                         placeholder="Enter your password"
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
+                                        onClick={() => dispatch({ showPassword: !showPassword })}
                                         className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                     >
                                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

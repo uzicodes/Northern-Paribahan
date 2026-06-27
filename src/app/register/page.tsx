@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
@@ -15,21 +15,38 @@ const satisfy = Satisfy({
 // Move regex outside the component to fix ReferenceError
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+type RegisterState = {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    showPassword: boolean;
+    submitted: boolean;
+    loading: boolean;
+    error: string;
+};
+
+function registerReducer(state: RegisterState, action: Partial<RegisterState>): RegisterState {
+    return { ...state, ...action };
+}
+
 export default function RegisterPage() {
     const router = useRouter();
-    const [name, setName] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [submitted, setSubmitted] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
+    const [state, dispatch] = useReducer(registerReducer, {
+        name: '',
+        email: '',
+        phoneNumber: '',
+        password: '',
+        showPassword: false,
+        submitted: false,
+        loading: false,
+        error: '',
+    });
+    const { name, email, phoneNumber, password, showPassword, submitted, loading, error } = state;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSubmitted(true);
-        setError('');
+        dispatch({ submitted: true, error: '' });
 
         // 1. Validation check
         const isSingleAt = email.split('@').length === 2;
@@ -37,7 +54,7 @@ export default function RegisterPage() {
             return;
         }
 
-        setLoading(true);
+        dispatch({ loading: true });
 
         try {
             // 2. Call the Supabase registration API
@@ -58,12 +75,12 @@ export default function RegisterPage() {
                 toast.success('Account created successfully! Please login.');
                 router.push('/login');
             } else {
-                setError(data.error || 'Registration failed. Please try again.');
+                dispatch({ error: data.error || 'Registration failed. Please try again.' });
             }
         } catch (err: any) {
-            setError('A network error occurred. Please check your connection.');
+            dispatch({ error: 'A network error occurred. Please check your connection.' });
         } finally {
-            setLoading(false);
+            dispatch({ loading: false });
         }
     };
 
@@ -109,7 +126,7 @@ export default function RegisterPage() {
                                 <input
                                     type="text"
                                     value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    onChange={(e) => dispatch({ name: e.target.value })}
                                     placeholder="Enter your name"
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -124,7 +141,7 @@ export default function RegisterPage() {
                                     onChange={(e) => {
                                         const val = e.target.value;
                                         if ((val.split('@').length - 1) <= 1) {
-                                            setEmail(val);
+                                            dispatch({ email: val });
                                         }
                                     }}
                                     placeholder="email@example.com"
@@ -143,7 +160,7 @@ export default function RegisterPage() {
                                     <input
                                         type="tel"
                                         value={phoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                        onChange={(e) => dispatch({ phoneNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                                         placeholder="1XXXXXXXXX"
                                         required
                                         className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -160,14 +177,14 @@ export default function RegisterPage() {
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
+                                        onChange={(e) => dispatch({ password: e.target.value })}
                                         placeholder="Min 6 characters"
                                         required
                                         className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none"
                                     />
                                     <button
                                         type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
+                                        onClick={() => dispatch({ showPassword: !showPassword })}
                                         className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400"
                                     >
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

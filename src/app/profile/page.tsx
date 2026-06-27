@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import GlobalLoader from '@/components/GlobalLoader';
 import {
@@ -44,20 +44,38 @@ interface BookingItem {
 // --- Tab Type ---
 type ActiveTab = 'profile' | 'trips' | 'edit';
 
+type ProfileState = {
+    activeTab: ActiveTab;
+    user: UserProfile | null;
+    bookings: BookingItem[];
+    loading: boolean;
+    loggingOut: boolean;
+    error: string;
+    editName: string;
+    editPhone: string;
+    saving: boolean;
+    saveSuccess: boolean;
+};
+
+function profileReducer(state: ProfileState, action: Partial<ProfileState>): ProfileState {
+    return { ...state, ...action };
+}
+
 export default function ProfilePage() {
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<ActiveTab>('profile');
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [bookings, setBookings] = useState<BookingItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [loggingOut, setLoggingOut] = useState(false);
-    const [error, setError] = useState('');
-
-    // Edit form state
-    const [editName, setEditName] = useState('');
-    const [editPhone, setEditPhone] = useState('');
-    const [saving, setSaving] = useState(false);
-    const [saveSuccess, setSaveSuccess] = useState(false);
+    const [state, dispatch] = useReducer(profileReducer, {
+        activeTab: 'profile',
+        user: null,
+        bookings: [],
+        loading: true,
+        loggingOut: false,
+        error: '',
+        editName: '',
+        editPhone: '',
+        saving: false,
+        saveSuccess: false,
+    });
+    const { activeTab, user, bookings, loading, loggingOut, error, editName, editPhone, saving, saveSuccess } = state;
 
     // Fetch profile on mount
     useEffect(() => {
@@ -66,7 +84,7 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
         try {
-            setLoading(true);
+            dispatch({ loading: true });
             const res = await fetch('/api/user/profile');
             if (!res.ok) {
                 if (res.status === 401) {
@@ -76,21 +94,22 @@ export default function ProfilePage() {
                 throw new Error('Failed to fetch profile');
             }
             const data = await res.json();
-            setUser(data.user);
-            setBookings(data.bookings || []);
-            setEditName(data.user.name || '');
-            setEditPhone(data.user.phoneNumber || '');
+            dispatch({
+                user: data.user,
+                bookings: data.bookings || [],
+                editName: data.user.name || '',
+                editPhone: data.user.phoneNumber || '',
+            });
         } catch (err: any) {
-            setError(err.message);
+            dispatch({ error: err.message });
         } finally {
-            setLoading(false);
+            dispatch({ loading: false });
         }
     };
 
     const handleSaveProfile = async () => {
         if (!editName.trim()) return;
-        setSaving(true);
-        setSaveSuccess(false);
+        dispatch({ saving: true, saveSuccess: false });
         try {
             const res = await fetch('/api/user/update', {
                 method: 'PUT',
@@ -99,28 +118,25 @@ export default function ProfilePage() {
             });
             if (!res.ok) throw new Error('Failed to update');
             const data = await res.json();
-            setUser(data.user);
-            setSaveSuccess(true);
+            dispatch({ user: data.user, saveSuccess: true });
             setTimeout(() => {
-                setSaveSuccess(false);
-                setActiveTab('profile');
+                dispatch({ saveSuccess: false, activeTab: 'profile' });
             }, 1500);
         } catch (err: any) {
-            setError(err.message);
+            dispatch({ error: err.message });
         } finally {
-            setSaving(false);
+            dispatch({ saving: false });
         }
     };
 
     const handleLogout = async () => {
-        setLoggingOut(true);
+        dispatch({ loggingOut: true });
         try {
             await fetch('/api/auth/logout', { method: 'POST' });
             router.push('/login');
             router.refresh();
         } catch (err) {
-            setError('Failed to logout');
-            setLoggingOut(false);
+            dispatch({ error: 'Failed to logout', loggingOut: false });
         }
     };
 
@@ -175,19 +191,19 @@ export default function ProfilePage() {
                             icon={User}
                             label="My Profile"
                             active={activeTab === 'profile'}
-                            onClick={() => setActiveTab('profile')}
+                            onClick={() => dispatch({ activeTab: 'profile' })}
                         />
                         <SidebarButton
                             icon={Ticket}
                             label="My Trips"
                             active={activeTab === 'trips'}
-                            onClick={() => setActiveTab('trips')}
+                            onClick={() => dispatch({ activeTab: 'trips' })}
                         />
                         <SidebarButton
                             icon={Pencil}
                             label="Edit Profile"
                             active={activeTab === 'edit'}
-                            onClick={() => setActiveTab('edit')}
+                            onClick={() => dispatch({ activeTab: 'edit' })}
                         />
                         <div className="pt-4 mt-4 border-t border-slate-100">
                             <button
@@ -211,7 +227,7 @@ export default function ProfilePage() {
                         <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-2xl flex items-center gap-3">
                             <AlertCircle size={20} />
                             <span className="text-sm font-medium">{error}</span>
-                            <button type="button" onClick={() => setError('')} className="ml-auto"><X size={18} /></button>
+                            <button type="button" onClick={() => dispatch({ error: '' })} className="ml-auto"><X size={18} /></button>
                         </div>
                     )}
 
@@ -276,7 +292,7 @@ export default function ProfilePage() {
                                     </div>
                                     <button
                                         type="button"
-                                        onClick={() => setActiveTab('edit')}
+                                        onClick={() => dispatch({ activeTab: 'edit' })}
                                         className="mt-4 inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200"
                                     >
                                         <Pencil size={16} />
@@ -356,7 +372,7 @@ export default function ProfilePage() {
                                         <input
                                             type="text"
                                             value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
+                                            onChange={(e) => dispatch({ editName: e.target.value })}
                                             placeholder="Enter your name"
                                             className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white"
                                         />
@@ -380,7 +396,7 @@ export default function ProfilePage() {
                                             <input
                                                 type="tel"
                                                 value={editPhone}
-                                                onChange={(e) => setEditPhone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                                                onChange={(e) => dispatch({ editPhone: e.target.value.replace(/\D/g, '').slice(0, 11) })}
                                                 placeholder="17XXXXXXXXX"
                                                 className="w-full pl-14 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white"
                                             />
@@ -400,9 +416,11 @@ export default function ProfilePage() {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setEditName(user.name || '');
-                                                setEditPhone(user.phoneNumber || '');
-                                                setActiveTab('profile');
+                                                dispatch({
+                                                    editName: user.name || '',
+                                                    editPhone: user.phoneNumber || '',
+                                                    activeTab: 'profile',
+                                                });
                                             }}
                                             className="px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
                                         >

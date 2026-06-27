@@ -7,13 +7,28 @@ import { ShieldCheck, Ban, Clock, CalendarRange } from 'lucide-react';
 
 import { toast } from 'sonner';
 
+type SearchState = {
+    dateOfJourney: Date;
+    fromValue: string;
+    toValue: string;
+    showFromDropdown: boolean;
+    showToDropdown: boolean;
+};
+
+function searchReducer(state: SearchState, action: Partial<SearchState>): SearchState {
+    return { ...state, ...action };
+}
+
 export default function Page() {
     const router = useRouter();
-    const [dateOfJourney, setDateOfJourney] = React.useState<Date>(new Date());
-    const [fromValue, setFromValue] = React.useState<string>('');
-    const [toValue, setToValue] = React.useState<string>('');
-    const [showFromDropdown, setShowFromDropdown] = React.useState<boolean>(false);
-    const [showToDropdown, setShowToDropdown] = React.useState<boolean>(false);
+    const [state, dispatch] = React.useReducer(searchReducer, {
+        dateOfJourney: new Date(),
+        fromValue: '',
+        toValue: '',
+        showFromDropdown: false,
+        showToDropdown: false,
+    });
+    const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
 
     const locations = [
         'Dinajpur',
@@ -69,9 +84,9 @@ export default function Page() {
                                 type="text"
                                 placeholder="From"
                                 value={fromValue}
-                                onChange={(e) => setFromValue(e.target.value)}
-                                onFocus={() => setShowFromDropdown(true)}
-                                onBlur={() => setTimeout(() => setShowFromDropdown(false), 200)}
+                                onChange={(e) => dispatch({ fromValue: e.target.value })}
+                                onFocus={() => dispatch({ showFromDropdown: true })}
+                                onBlur={() => setTimeout(() => dispatch({ showFromDropdown: false }), 200)}
                                 className="border-2 border-[#c44d4d] outline-none text-base w-full bg-transparent rounded-lg px-3 py-2"
                                 style={{ fontSize: 18 }}
                             />
@@ -81,8 +96,7 @@ export default function Page() {
                                         <div
                                             key={location}
                                             onMouseDown={() => {
-                                                setFromValue(location);
-                                                setShowFromDropdown(false);
+                                                dispatch({ fromValue: location, showFromDropdown: false });
                                             }}
                                             className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
                                             style={{ fontSize: 16 }}
@@ -100,9 +114,9 @@ export default function Page() {
                                 type="text"
                                 placeholder="To"
                                 value={toValue}
-                                onChange={(e) => setToValue(e.target.value)}
-                                onFocus={() => setShowToDropdown(true)}
-                                onBlur={() => setTimeout(() => setShowToDropdown(false), 200)}
+                                onChange={(e) => dispatch({ toValue: e.target.value })}
+                                onFocus={() => dispatch({ showToDropdown: true })}
+                                onBlur={() => setTimeout(() => dispatch({ showToDropdown: false }), 200)}
                                 className="border-2 border-[#c44d4d] outline-none text-base w-full bg-transparent rounded-lg px-3 py-2"
                                 style={{ fontSize: 18 }}
                             />
@@ -112,8 +126,7 @@ export default function Page() {
                                         <div
                                             key={location}
                                             onMouseDown={() => {
-                                                setToValue(location);
-                                                setShowToDropdown(false);
+                                                dispatch({ toValue: location, showToDropdown: false });
                                             }}
                                             className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
                                             style={{ fontSize: 16 }}
@@ -131,7 +144,7 @@ export default function Page() {
                                 {dateOfJourney.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </div>
                             <div className="ml-2">
-                                <HeroDatePicker selectedDate={dateOfJourney} onDateChange={setDateOfJourney} />
+                                <HeroDatePicker selectedDate={dateOfJourney} onDateChange={(date) => dispatch({ dateOfJourney: date })} />
                             </div>
                         </div>
                     </div>

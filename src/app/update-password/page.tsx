@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2, Lock } from 'lucide-react';
@@ -12,31 +12,48 @@ const satisfy = Satisfy({
     subsets: ['latin'],
 });
 
+type UpdatePasswordState = {
+    password: string;
+    confirmPassword: string;
+    showPassword: boolean;
+    showConfirmPassword: boolean;
+    loading: boolean;
+    error: string;
+    success: boolean;
+};
+
+function updatePasswordReducer(state: UpdatePasswordState, action: Partial<UpdatePasswordState>): UpdatePasswordState {
+    return { ...state, ...action };
+}
+
 export default function UpdatePasswordPage() {
     const router = useRouter();
-    const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const [success, setSuccess] = useState<boolean>(false);
+    const [state, dispatch] = useReducer(updatePasswordReducer, {
+        password: '',
+        confirmPassword: '',
+        showPassword: false,
+        showConfirmPassword: false,
+        loading: false,
+        error: '',
+        success: false,
+    });
+    const { password, confirmPassword, showPassword, showConfirmPassword, loading, error, success } = state;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
+        dispatch({ error: '' });
 
         if (password.length < 6) {
-            setError('Password must be at least 6 characters long.');
+            dispatch({ error: 'Password must be at least 6 characters long.' });
             return;
         }
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match.');
+            dispatch({ error: 'Passwords do not match.' });
             return;
         }
 
-        setLoading(true);
+        dispatch({ loading: true });
 
         try {
             const supabase = createClient();
@@ -46,14 +63,14 @@ export default function UpdatePasswordPage() {
                 throw new Error(error.message);
             }
 
-            setSuccess(true);
+            dispatch({ success: true });
             setTimeout(() => {
                 router.push('/profile');
             }, 2000);
         } catch (err: any) {
-            setError(err.message || 'Failed to update password. Please try again.');
+            dispatch({ error: err.message || 'Failed to update password. Please try again.' });
         } finally {
-            setLoading(false);
+            dispatch({ loading: false });
         }
     };
 
@@ -118,14 +135,14 @@ export default function UpdatePasswordPage() {
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
+                                            onChange={(e) => dispatch({ password: e.target.value })}
                                             placeholder="Min 6 characters"
                                             required
                                             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            onClick={() => dispatch({ showPassword: !showPassword })}
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                         >
                                             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -139,14 +156,14 @@ export default function UpdatePasswordPage() {
                                         <input
                                             type={showConfirmPassword ? "text" : "password"}
                                             value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            onChange={(e) => dispatch({ confirmPassword: e.target.value })}
                                             placeholder="Re-enter your password"
                                             required
                                             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            onClick={() => dispatch({ showConfirmPassword: !showConfirmPassword })}
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                         >
                                             {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
