@@ -58,8 +58,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className={`fixed inset-0 z-[100] flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300`}>
                 {/* Mobile overlay */}
                 {mobileOpen && (
-                    <div
-                        className="fixed inset-0 z-[110] bg-black/50 lg:hidden"
+                    <button
+                        type="button"
+                        aria-label="Close mobile overlay"
+                        className="fixed inset-0 z-[110] bg-black/50 lg:hidden w-full h-full border-none cursor-default"
                         onClick={() => setMobileOpen(false)}
                     />
                 )}

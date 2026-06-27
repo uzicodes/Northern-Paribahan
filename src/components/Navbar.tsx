@@ -165,8 +165,10 @@ export default function NavbarClient() {
             {/* Mobile Menu Pop-up Overlay */}
             <div className={`fixed inset-0 z-[100] md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
                 {/* Backdrop */}
-                <div
-                    className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+                <button
+                    type="button"
+                    aria-label="Close mobile menu backdrop"
+                    className="absolute inset-0 bg-slate-950/80 backdrop-blur-md w-full h-full border-none cursor-default"
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
 
@@ -329,8 +331,14 @@ export default function NavbarClient() {
 
             {/* Contact Popup */}
             {showContactPopup && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm" onClick={() => setShowContactPopup(false)}>
-                    <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4 transform transition-all scale-100" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <button
+                        type="button"
+                        aria-label="Close contact popup backdrop"
+                        onClick={() => setShowContactPopup(false)}
+                        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm w-full h-full border-none cursor-default"
+                    />
+                    <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4 transform transition-all scale-100 relative z-10">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-slate-800">Contact Us</h3>
                             <button type="button" aria-label="Close contact popup" onClick={() => setShowContactPopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">

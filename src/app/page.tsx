@@ -94,16 +94,17 @@ export default function Page() {
                             {showFromDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
                                     {filteredFromLocations.map((location) => (
-                                        <div
+                                        <button
+                                            type="button"
                                             key={location}
                                             onMouseDown={() => {
                                                 dispatch({ fromValue: location, showFromDropdown: false });
                                             }}
-                                            className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
+                                            className="w-full text-left px-4 py-3 hover:bg-green-100 cursor-pointer text-base border-none bg-transparent block"
                                             style={{ fontSize: 16 }}
                                         >
                                             {location}
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             )}
@@ -125,16 +126,17 @@ export default function Page() {
                             {showToDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
                                     {filteredToLocations.map((location) => (
-                                        <div
+                                        <button
+                                            type="button"
                                             key={location}
                                             onMouseDown={() => {
                                                 dispatch({ toValue: location, showToDropdown: false });
                                             }}
-                                            className="px-4 py-3 hover:bg-green-100 cursor-pointer text-base"
+                                            className="w-full text-left px-4 py-3 hover:bg-green-100 cursor-pointer text-base border-none bg-transparent block"
                                             style={{ fontSize: 16 }}
                                         >
                                             {location}
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             )}

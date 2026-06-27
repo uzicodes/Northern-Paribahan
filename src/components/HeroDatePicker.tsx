@@ -143,16 +143,25 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
 
     return (
         <div className="relative inline-block" suppressHydrationWarning>
-            <div onClick={() => setOpen((v) => !v)} className="cursor-pointer">
-                {children ? children : (
-                    <button
-                        type="button"
-                        className="bg-[#C5E6CB] text-[#22543d] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center border-2 border-[#C5E6CB]"
-                    >
-                        <Image width={20} height={20} src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" unoptimized />
-                    </button>
-                )}
-            </div>
+            {children ? (
+                <button
+                    type="button"
+                    aria-label="Open date picker"
+                    onClick={() => setOpen((v) => !v)}
+                    className="cursor-pointer border-none bg-transparent p-0 inline-flex"
+                >
+                    {children}
+                </button>
+            ) : (
+                <button
+                    type="button"
+                    aria-label="Open date picker"
+                    onClick={() => setOpen((v) => !v)}
+                    className="bg-[#C5E6CB] text-[#22543d] rounded-xl px-4 py-1 font-semibold text-sm flex items-center justify-center border-2 border-[#C5E6CB] cursor-pointer"
+                >
+                    <Image width={20} height={20} src="https://img.icons8.com/ios-filled/50/calendar--v1.png" alt="calendar" unoptimized />
+                </button>
+            )}
             {open && (
                 <div className="datepicker-popover absolute right-0 mt-2 z-50 w-[240px]" suppressHydrationWarning>
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
