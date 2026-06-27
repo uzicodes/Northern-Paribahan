@@ -1,21 +1,25 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import GlobalLoader from './GlobalLoader';
 
 export default function PageLoader({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const [isLoading, setIsLoading] = useState(true);
+    const [loaderState, dispatch] = useReducer(
+        (_state: { isLoading: boolean }, nextLoading: boolean) => ({ isLoading: nextLoading }),
+        { isLoading: true }
+    );
+    const { isLoading } = loaderState;
 
     useEffect(() => {
-        setIsLoading(true);
+        dispatch(true);
 
         const timer = requestAnimationFrame(() => {
             const images = Array.from(document.querySelectorAll('main img')) as HTMLImageElement[];
 
             if (images.length === 0) {
-                setTimeout(() => setIsLoading(false), 300);
+                setTimeout(() => dispatch(false), 300);
                 return;
             }
 
@@ -25,7 +29,7 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
             const checkAllLoaded = () => {
                 loadedCount++;
                 if (loadedCount >= totalImages) {
-                    setIsLoading(false);
+                    dispatch(false);
                 }
             };
 
@@ -38,7 +42,7 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
                 }
             });
 
-            setTimeout(() => setIsLoading(false), 5000);
+            setTimeout(() => dispatch(false), 5000);
         });
 
         return () => cancelAnimationFrame(timer);

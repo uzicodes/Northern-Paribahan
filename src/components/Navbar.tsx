@@ -28,8 +28,11 @@ function decodeRole(token: string | null): string | null {
 export default function NavbarClient() {
     const pathname = usePathname();
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [token, setToken] = useState<string | null>(null);
+    const [authState, setAuthState] = useState<{ isLoggedIn: boolean; token: string | null }>({
+        isLoggedIn: false,
+        token: null,
+    });
+    const { isLoggedIn, token } = authState;
     const [showContactPopup, setShowContactPopup] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const role = useMemo(() => decodeRole(token), [token]);
@@ -39,14 +42,18 @@ export default function NavbarClient() {
 
         // Check initial session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setIsLoggedIn(!!session?.user);
-            setToken(session?.access_token ?? null);
+            setAuthState({
+                isLoggedIn: !!session?.user,
+                token: session?.access_token ?? null,
+            });
         });
 
         // Listen for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setIsLoggedIn(!!session?.user);
-            setToken(session?.access_token ?? null);
+            setAuthState({
+                isLoggedIn: !!session?.user,
+                token: session?.access_token ?? null,
+            });
         });
 
         return () => subscription.unsubscribe();
@@ -56,8 +63,7 @@ export default function NavbarClient() {
         const supabase = createClient();
         await supabase.auth.signOut();
         await fetch('/api/auth/logout', { method: 'POST' });
-        setIsLoggedIn(false);
-        setToken(null);
+        setAuthState({ isLoggedIn: false, token: null });
         router.push('/');
         router.refresh();
     }
