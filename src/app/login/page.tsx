@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import Image from 'next/image';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -82,7 +83,7 @@ export default function LoginPage() {
 
                     <div className="relative z-10">
                         <div className="inline-flex items-center gap-3 mb-8">
-                            <img src="/logo.png" alt="Brand Logo" className="h-12 w-auto" />
+                            <Image src="/logo.png" alt="Brand Logo" width={48} height={48} className="h-12 w-auto" />
                             <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '28px' }}>Northern Paribahan</span>
                         </div>
                         <h2 className="text-4xl font-bold text-white mb-4 text-balance">Travel With Comfort</h2>

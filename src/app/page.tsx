@@ -63,7 +63,7 @@ export default function Page() {
                     >
                         {/* From input */}
                         <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 py-2 sm:py-0 relative">
-                            <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/get-on-bus.png" alt="get-on-bus" className="mr-2" />
+                            <Image width={20} height={20} src="https://img.icons8.com/ios-filled/50/get-on-bus.png" alt="get-on-bus" className="mr-2" unoptimized />
                             <input
                                 type="text"
                                 placeholder="From"
@@ -94,7 +94,7 @@ export default function Page() {
                         </div>
                         {/* To input */}
                         <div className="flex items-center flex-1 border-b sm:border-b-0 sm:border-r border-gray-200 pr-4 sm:pl-4 py-2 sm:py-0 relative">
-                            <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/get-off-bus.png" alt="get-off-bus" className="mr-2" />
+                            <Image width={20} height={20} src="https://img.icons8.com/ios-filled/50/get-off-bus.png" alt="get-off-bus" className="mr-2" unoptimized />
                             <input
                                 type="text"
                                 placeholder="To"
@@ -153,7 +153,7 @@ export default function Page() {
                         className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-6 py-3 shadow flex items-center gap-3"
                         style={{ fontSize: 22 }}
                     >
-                        <img width="28" height="28" src="https://img.icons8.com/sf-black/64/search.png" alt="search" className="mr-2" /> Search Buses
+                        <Image width={28} height={28} src="https://img.icons8.com/sf-black/64/search.png" alt="search" className="mr-2" unoptimized /> Search Buses
                     </button>
                 </div>
             </div>
@@ -170,7 +170,7 @@ export default function Page() {
                         <div className="text-sm text-gray-700 mb-2">Valid till 31 Dec</div>
                         <div className="flex items-center mt-auto">
                             <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
-                                <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />BK500
+                                <Image width={20} height={20} src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" unoptimized />BK500
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
@@ -182,7 +182,7 @@ export default function Page() {
                         <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
                         <div className="flex items-center mt-auto">
                             <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
-                                <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />RETURN10
+                                <Image width={20} height={20} src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" unoptimized />RETURN10
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
@@ -194,7 +194,7 @@ export default function Page() {
                         <div className="text-sm text-gray-700 mb-2">Valid till 30 Nov</div>
                         <div className="flex items-center mt-auto">
                             <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
-                                <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />HOTEL300
+                                <Image width={20} height={20} src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" unoptimized />HOTEL300
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>
@@ -206,7 +206,7 @@ export default function Page() {
                         <div className="text-sm text-gray-700 mb-2">Valid till 15 Dec</div>
                         <div className="flex items-center mt-auto">
                             <span className="bg-white px-4 py-2 rounded-full font-semibold flex items-center gap-2 text-sm shadow transition-transform duration-200 group-hover:scale-105">
-                                <img width="20" height="20" src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" />BB500
+                                <Image width={20} height={20} src="https://img.icons8.com/color-glass/48/discount--v1.png" alt="discount" className="inline-block" unoptimized />BB500
                             </span>
                         </div>
                         <div className="absolute bottom-2 left-4 text-[8px] italic text-gray-700">*conditions apply</div>

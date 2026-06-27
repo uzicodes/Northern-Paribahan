@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Satisfy } from 'next/font/google';
 
 const satisfy = Satisfy({
@@ -15,7 +16,7 @@ export default function Footer() {
                     {/* Company Info */}
                     <div className="col-span-1 md:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-3">
-                            <img src="/logo.png" alt="Northern Paribahan Logo" className="h-9 w-9" />
+                            <Image src="/logo.png" alt="Northern Paribahan Logo" width={36} height={36} className="h-9 w-9" />
                             <span className={`font-bold text-lg ${satisfy.className}`} style={{ color: '#FCA311', fontSize: '22px' }}>
                                 Northern Paribahan
                             </span>

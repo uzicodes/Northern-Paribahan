@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import {
@@ -75,7 +76,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                     {/* Sidebar Header */}
                     <div className={`flex items-center gap-3 px-5 py-5 border-b border-white/10 ${collapsed ? "justify-center" : ""}`}>
-                        <img src="/logo.png" alt="Logo" className="h-8 w-8 shrink-0" />
+                        <Image src="/logo.png" alt="Logo" width={32} height={32} className="h-8 w-8 shrink-0" />
                         {!collapsed && (
                             <span className="text-lg font-bold tracking-tight" style={{ color: "#FCA311" }}>
                                 Admin Panel
