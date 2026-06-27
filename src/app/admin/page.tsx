@@ -155,7 +155,7 @@ export default function AdminDashboardPage() {
                         <h2 className="text-lg font-bold text-gray-900">Recent Bookings</h2>
                         <p className="text-sm text-gray-500">Latest ticket purchases</p>
                     </div>
-                    <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                    <button type="button" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
                         View All →
                     </button>
                 </div>

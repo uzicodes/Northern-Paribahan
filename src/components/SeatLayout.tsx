@@ -89,6 +89,7 @@ export default function SeatLayout({ busId, initialSeats }: SeatLayoutProps) {
             <div className="grid grid-cols-4 gap-4 mb-8">
                 {seats.map((seat) => (
                     <button
+                        type="button"
                         key={seat.id}
                         onClick={() => handleSeatClick(seat)}
                         disabled={seat.isBooked}
@@ -123,6 +124,7 @@ export default function SeatLayout({ busId, initialSeats }: SeatLayoutProps) {
             </div>
 
             <button
+                type="button"
                 onClick={handleBooking}
                 disabled={!selectedSeat}
                 className="px-6 py-2 bg-primary text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-600 transition"

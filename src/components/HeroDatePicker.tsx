@@ -159,6 +159,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                             {/* Month Navigation */}
                             <div className="flex items-center justify-between mb-6">
                                 <button
+                                    type="button"
                                     onClick={handlePrevMonth}
                                     className="p-2 hover:bg-purple-50 rounded-xl transition-all duration-300 hover:scale-110"
                                 >
@@ -168,6 +169,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                                     {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                                 </h3>
                                 <button
+                                    type="button"
                                     onClick={handleNextMonth}
                                     className="p-2 hover:bg-purple-50 rounded-xl transition-all duration-300 hover:scale-110"
                                 >
@@ -198,6 +200,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
 
                                     return (
                                         <button
+                                            type="button"
                                             key={index}
                                             onClick={() => !isDisabled && handleDateClick(dayObj.date)}
                                             disabled={isDisabled}

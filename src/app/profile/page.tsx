@@ -138,7 +138,7 @@ export default function ProfilePage() {
                 <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
                     <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
                     <p className="text-slate-700 font-semibold">Could not load profile.</p>
-                    <button onClick={() => router.push('/login')} className="mt-4 text-indigo-600 font-medium hover:underline">
+                    <button type="button" onClick={() => router.push('/login')} className="mt-4 text-indigo-600 font-medium hover:underline">
                         Go to Login
                     </button>
                 </div>
@@ -191,6 +191,7 @@ export default function ProfilePage() {
                         />
                         <div className="pt-4 mt-4 border-t border-slate-100">
                             <button
+                                type="button"
                                 onClick={handleLogout}
                                 disabled={loggingOut}
                                 className="flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-red-500 hover:bg-red-50"
@@ -210,7 +211,7 @@ export default function ProfilePage() {
                         <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-2xl flex items-center gap-3">
                             <AlertCircle size={20} />
                             <span className="text-sm font-medium">{error}</span>
-                            <button onClick={() => setError('')} className="ml-auto"><X size={18} /></button>
+                            <button type="button" onClick={() => setError('')} className="ml-auto"><X size={18} /></button>
                         </div>
                     )}
 
@@ -274,6 +275,7 @@ export default function ProfilePage() {
                                         <ProfileField icon={Bus} label="Account Type" value={user.role} />
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => setActiveTab('edit')}
                                         className="mt-4 inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200"
                                     >
@@ -293,6 +295,7 @@ export default function ProfilePage() {
                                         <p className="text-lg font-semibold text-slate-500">No trips yet</p>
                                         <p className="text-sm">Your bookings will appear here once you book a trip.</p>
                                         <button
+                                            type="button"
                                             onClick={() => router.push('/')}
                                             className="mt-6 bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
                                         >
@@ -386,6 +389,7 @@ export default function ProfilePage() {
 
                                     <div className="flex gap-3 pt-4">
                                         <button
+                                            type="button"
                                             onClick={handleSaveProfile}
                                             disabled={saving}
                                             className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 flex items-center justify-center gap-2"
@@ -394,6 +398,7 @@ export default function ProfilePage() {
                                             Save Changes
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={() => {
                                                 setEditName(user.name || '');
                                                 setEditPhone(user.phoneNumber || '');
@@ -421,6 +426,7 @@ function SidebarButton({ icon: Icon, label, active, onClick }: {
 }) {
     return (
         <button
+            type="button"
             onClick={onClick}
             className={`flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'

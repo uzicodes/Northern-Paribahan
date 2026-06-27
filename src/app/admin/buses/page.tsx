@@ -82,7 +82,7 @@ export default function AdminBusesPage() {
                                     <p className="text-xs text-gray-400 font-mono">{bus.id}</p>
                                 </div>
                             </div>
-                            <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+                            <button type="button" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
                                 <MoreVertical size={16} />
                             </button>
                         </div>

@@ -138,6 +138,7 @@ export default function Page() {
 
                 <div className="w-full flex justify-center mt-20 mb-12">
                     <button
+                        type="button"
                         onClick={() => {
                             if (fromValue && toValue) {
                                 const params = new URLSearchParams();

@@ -105,6 +105,7 @@ export default function ForgotPasswordPage() {
                                 <p className="text-sm text-gray-500">
                                     Didn&apos;t receive the email?{' '}
                                     <button
+                                        type="button"
                                         onClick={() => setSuccess(false)}
                                         className="font-semibold text-indigo-600 hover:underline"
                                     >

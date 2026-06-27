@@ -107,6 +107,7 @@ export default function NavbarClient() {
                     </>
                 )}
                 <button
+                    type="button"
                     onClick={() => {
                         if (isLoggedIn) {
                             router.push('/profile');
@@ -122,6 +123,7 @@ export default function NavbarClient() {
                 </button>
                 {!isLoggedIn ? (
                     <button
+                        type="button"
                         onClick={() => setShowContactPopup(true)}
                         className="text-white hover:text-[#FCA311]"
                     >
@@ -130,13 +132,14 @@ export default function NavbarClient() {
                         </svg>
                     </button>
                 ) : (
-                    <button onClick={logout} className="text-white hover:text-[#FCA311]">Logout</button>
+                    <button type="button" onClick={logout} className="text-white hover:text-[#FCA311]">Logout</button>
                 )}
             </div>
 
             {/* Mobile Navigation Toggle */}
             <div className="md:hidden flex items-center">
                 <button
+                    type="button"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="text-white hover:text-[#FCA311] p-2 transition-all duration-300 transform hover:scale-110"
                     aria-label="Toggle Menu"
@@ -167,6 +170,7 @@ export default function NavbarClient() {
                             <span className={`${satisfy.className} text-[#FCA311] text-xl`}>Northern Paribahan</span>
                         </Link>
                         <button
+                            type="button"
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="text-slate-400 hover:text-white transition-colors p-2 rounded-full hover:bg-slate-700/50"
                         >
@@ -254,6 +258,7 @@ export default function NavbarClient() {
                             ) : (
                                 <>
                                     <button
+                                        type="button"
                                         onClick={() => {
                                             router.push('/profile');
                                             setIsMobileMenuOpen(false);
@@ -268,6 +273,7 @@ export default function NavbarClient() {
                                         <span>Profile</span>
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={() => {
                                             logout();
                                             setIsMobileMenuOpen(false);
@@ -285,6 +291,7 @@ export default function NavbarClient() {
                             )}
 
                             <button
+                                type="button"
                                 onClick={() => {
                                     setShowContactPopup(true);
                                     setIsMobileMenuOpen(false);
@@ -317,7 +324,7 @@ export default function NavbarClient() {
                     <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full mx-4 transform transition-all scale-100" onClick={e => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold text-slate-800">Contact Us</h3>
-                            <button onClick={() => setShowContactPopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                            <button type="button" onClick={() => setShowContactPopup(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>

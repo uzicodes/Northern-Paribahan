@@ -113,6 +113,7 @@ export default function TimetablePage() {
                                 { key: "night", label: "Night", icon: <Moon size={14} /> },
                             ].map((p) => (
                                 <button
+                                    type="button"
                                     key={p.key}
                                     onClick={() => setSelectedPeriod(p.key)}
                                     className={`flex-1 flex items-center justify-center gap-1 py-3 rounded-xl text-xs font-semibold transition-all ${selectedPeriod === p.key

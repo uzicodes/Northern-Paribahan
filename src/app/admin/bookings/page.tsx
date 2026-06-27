@@ -123,7 +123,7 @@ export default function AdminBookingsPage() {
                                     <td className="px-6 py-4 text-gray-600">{b.payment}</td>
                                     <td className="px-6 py-4 text-right font-semibold text-gray-900">{b.amount}</td>
                                     <td className="px-6 py-4">
-                                        <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors">
+                                        <button type="button" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors">
                                             <Eye size={16} />
                                         </button>
                                     </td>
@@ -162,11 +162,11 @@ export default function AdminBookingsPage() {
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
                     <span>Showing 1-{filtered.length} of {filtered.length}</span>
                     <div className="flex items-center gap-2">
-                        <button className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
+                        <button type="button" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
                             <ChevronLeft size={16} />
                         </button>
-                        <button className="px-3 py-1 rounded-lg bg-indigo-600 text-white text-sm font-medium">1</button>
-                        <button className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
+                        <button type="button" className="px-3 py-1 rounded-lg bg-indigo-600 text-white text-sm font-medium">1</button>
+                        <button type="button" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
                             <ChevronRight size={16} />
                         </button>
                     </div>

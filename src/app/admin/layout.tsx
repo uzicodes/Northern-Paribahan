@@ -114,6 +114,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Collapse Toggle (desktop only) */}
                     <div className="hidden lg:block px-3 pb-2">
                         <button
+                            type="button"
                             onClick={() => setCollapsed(!collapsed)}
                             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-all w-full"
                         >
@@ -125,6 +126,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Logout */}
                     <div className="px-3 pb-5 border-t border-white/10 pt-3">
                         <button
+                            type="button"
                             onClick={handleLogout}
                             className={`
                             flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
@@ -144,6 +146,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Theme Toggle Button */}
                     <div className="absolute top-4 right-6 z-[101]">
                         <button
+                            type="button"
                             onClick={toggleTheme}
                             className="p-2.5 rounded-xl bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200"
                             title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
