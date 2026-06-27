@@ -61,6 +61,7 @@ export default function AdminBusesPage() {
                     <input
                         type="text"
                         placeholder="Search by name, ID, or route..."
+                        aria-label="Search buses by name, ID, or route"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
@@ -82,7 +83,7 @@ export default function AdminBusesPage() {
                                     <p className="text-xs text-gray-400 font-mono">{bus.id}</p>
                                 </div>
                             </div>
-                            <button type="button" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
+                            <button type="button" aria-label={`More options for bus ${bus.name}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
                                 <MoreVertical size={16} />
                             </button>
                         </div>

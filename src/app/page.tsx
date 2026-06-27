@@ -83,6 +83,7 @@ export default function Page() {
                             <input
                                 type="text"
                                 placeholder="From"
+                                aria-label="Departure location (From)"
                                 value={fromValue}
                                 onChange={(e) => dispatch({ fromValue: e.target.value })}
                                 onFocus={() => dispatch({ showFromDropdown: true })}
@@ -113,6 +114,7 @@ export default function Page() {
                             <input
                                 type="text"
                                 placeholder="To"
+                                aria-label="Destination location (To)"
                                 value={toValue}
                                 onChange={(e) => dispatch({ toValue: e.target.value })}
                                 onFocus={() => dispatch({ showToDropdown: true })}

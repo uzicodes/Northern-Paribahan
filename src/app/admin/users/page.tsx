@@ -66,6 +66,7 @@ export default async function AdminUsersPage({
                         type="text"
                         name="q"
                         placeholder="Search by name or email..."
+                        aria-label="Search users by name or email"
                         defaultValue={searchQuery}
                         className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                     />
@@ -74,6 +75,7 @@ export default async function AdminUsersPage({
                     <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <select
                         name="role"
+                        aria-label="Filter users by role"
                         defaultValue={filterRole}
                         className="pl-9 pr-8 py-2.5 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none appearance-none bg-white cursor-pointer"
                     >
@@ -101,7 +103,7 @@ export default async function AdminUsersPage({
                                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bookings</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-3"></th>
+                                <th className="px-6 py-3"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -139,7 +141,7 @@ export default async function AdminUsersPage({
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <button type="button" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors">
+                                            <button type="button" aria-label={`More actions for user ${displayName}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors">
                                                 <MoreVertical size={16} />
                                             </button>
                                         </td>
@@ -197,11 +199,11 @@ export default async function AdminUsersPage({
                 <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
                     <span>Showing 1-{filtered.length} of {filtered.length}</span>
                     <div className="flex items-center gap-2">
-                        <button type="button" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
+                        <button type="button" aria-label="Previous page" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
                             <ChevronLeft size={16} />
                         </button>
-                        <button type="button" className="px-3 py-1 rounded-lg bg-indigo-600 text-white text-sm font-medium">1</button>
-                        <button type="button" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
+                        <button type="button" aria-label="Page 1" className="px-3 py-1 rounded-lg bg-indigo-600 text-white text-sm font-medium">1</button>
+                        <button type="button" aria-label="Next page" className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-40" disabled>
                             <ChevronRight size={16} />
                         </button>
                     </div>

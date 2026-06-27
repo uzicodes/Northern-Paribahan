@@ -122,8 +122,9 @@ export default function RegisterPage() {
 
                         <form onSubmit={handleSubmit} noValidate className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+                                <label htmlFor="reg-name" className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
                                 <input
+                                    id="reg-name"
                                     type="text"
                                     value={name}
                                     onChange={(e) => dispatch({ name: e.target.value })}
@@ -134,8 +135,9 @@ export default function RegisterPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+                                <label htmlFor="reg-email" className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
                                 <input
+                                    id="reg-email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => {
@@ -154,10 +156,11 @@ export default function RegisterPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
+                                <label htmlFor="reg-phone" className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
                                 <div className="relative">
                                     <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm font-medium">+880</span>
                                     <input
+                                        id="reg-phone"
                                         type="tel"
                                         value={phoneNumber}
                                         onChange={(e) => dispatch({ phoneNumber: e.target.value.replace(/\D/g, '').slice(0, 10) })}
@@ -172,9 +175,10 @@ export default function RegisterPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                                <label htmlFor="reg-password" className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
                                 <div className="relative">
                                     <input
+                                        id="reg-password"
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => dispatch({ password: e.target.value })}
@@ -184,6 +188,7 @@ export default function RegisterPage() {
                                     />
                                     <button
                                         type="button"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
                                         onClick={() => dispatch({ showPassword: !showPassword })}
                                         className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400"
                                     >

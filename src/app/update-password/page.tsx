@@ -130,9 +130,10 @@ export default function UpdatePasswordPage() {
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+                                    <label htmlFor="up-password" className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
                                     <div className="relative">
                                         <input
+                                            id="up-password"
                                             type={showPassword ? "text" : "password"}
                                             value={password}
                                             onChange={(e) => dispatch({ password: e.target.value })}
@@ -142,6 +143,7 @@ export default function UpdatePasswordPage() {
                                         />
                                         <button
                                             type="button"
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
                                             onClick={() => dispatch({ showPassword: !showPassword })}
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                         >
@@ -151,9 +153,10 @@ export default function UpdatePasswordPage() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                                    <label htmlFor="up-confirm-password" className="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
                                     <div className="relative">
                                         <input
+                                            id="up-confirm-password"
                                             type={showConfirmPassword ? "text" : "password"}
                                             value={confirmPassword}
                                             onChange={(e) => dispatch({ confirmPassword: e.target.value })}
@@ -163,6 +166,7 @@ export default function UpdatePasswordPage() {
                                         />
                                         <button
                                             type="button"
+                                            aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                                             onClick={() => dispatch({ showConfirmPassword: !showConfirmPassword })}
                                             className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                         >

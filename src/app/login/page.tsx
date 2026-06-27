@@ -126,8 +126,9 @@ export default function LoginPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+                                <label htmlFor="login-email" className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                                 <input
+                                    id="login-email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => dispatch({ email: e.target.value })}
@@ -138,9 +139,10 @@ export default function LoginPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                                <label htmlFor="login-password" className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
                                 <div className="relative">
                                     <input
+                                        id="login-password"
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => dispatch({ password: e.target.value })}
@@ -150,6 +152,7 @@ export default function LoginPage() {
                                     />
                                     <button
                                         type="button"
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
                                         onClick={() => dispatch({ showPassword: !showPassword })}
                                         className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                                     >

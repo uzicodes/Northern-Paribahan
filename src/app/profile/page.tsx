@@ -368,8 +368,9 @@ export default function ProfilePage() {
 
                                 <div className="space-y-5">
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                                        <label htmlFor="profile-name" className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
                                         <input
+                                            id="profile-name"
                                             type="text"
                                             value={editName}
                                             onChange={(e) => dispatch({ editName: e.target.value })}
@@ -379,8 +380,9 @@ export default function ProfilePage() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+                                        <label htmlFor="profile-email" className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                                         <input
+                                            id="profile-email"
                                             type="email"
                                             value={user?.email || ''}
                                             disabled
@@ -391,10 +393,11 @@ export default function ProfilePage() {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
+                                        <label htmlFor="profile-phone" className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
                                         <div className="relative">
                                             <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 text-sm font-medium">+880</span>
                                             <input
+                                                id="profile-phone"
                                                 type="tel"
                                                 value={editPhone}
                                                 onChange={(e) => dispatch({ editPhone: e.target.value.replace(/\D/g, '').slice(0, 11) })}
