@@ -7,8 +7,7 @@ export async function POST(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params;
-        const { seatId, userId } = await req.json();
+        const [{ id }, { seatId, userId }] = await Promise.all([params, req.json()]);
 
         // Check availability
         const seat = await prisma.seat.findUnique({
@@ -29,20 +28,20 @@ export async function POST(
             );
         }
 
-        // Create Booking
-        const booking = await prisma.booking.create({
-            data: {
-                userId,
-                seatId,
-                status: "CONFIRMED",
-            },
-        });
-
-        // Update Seat status
-        await prisma.seat.update({
-            where: { id: seatId },
-            data: { isBooked: true },
-        });
+        // Create Booking and Update Seat status concurrently
+        const [booking] = await Promise.all([
+            prisma.booking.create({
+                data: {
+                    userId,
+                    seatId,
+                    status: "CONFIRMED",
+                },
+            }),
+            prisma.seat.update({
+                where: { id: seatId },
+                data: { isBooked: true },
+            }),
+        ]);
 
         // Emit socket event if server instance available via global
         const io = (global as any).io;

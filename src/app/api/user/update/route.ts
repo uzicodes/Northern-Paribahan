@@ -3,32 +3,33 @@ import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
 export async function PUT(request: Request) {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-    }
-
     try {
-        const { name, phoneNumber } = await request.json()
+        const supabase = await createClient()
+        const [{ data: { user }, error: authError }, { name, phoneNumber }] = await Promise.all([
+            supabase.auth.getUser(),
+            request.json()
+        ])
 
-        // Update in Prisma database
-        const updatedUser = await prisma.user.update({
-            where: { id: user.id },
-            data: {
-                name: name,
-                phoneNumber: phoneNumber,
-            }
-        })
+        if (authError || !user) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+        }
 
-        // Also update Supabase Auth metadata for consistency
-        await supabase.auth.updateUser({
-            data: {
-                name: name,
-                phone_number: phoneNumber,
-            }
-        })
+        // Update in Prisma database and Supabase Auth concurrently
+        const [updatedUser] = await Promise.all([
+            prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    name: name,
+                    phoneNumber: phoneNumber,
+                }
+            }),
+            supabase.auth.updateUser({
+                data: {
+                    name: name,
+                    phone_number: phoneNumber,
+                }
+            })
+        ])
 
         return NextResponse.json({
             user: {

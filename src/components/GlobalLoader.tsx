@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { LazyMotion, domAnimation, m, useReducedMotion } from 'framer-motion';
 
 export default function GlobalLoader() {
     const shouldReduceMotion = useReducedMotion();
@@ -10,13 +10,15 @@ export default function GlobalLoader() {
             <div className="loader"></div>
 
             {/* Loading text below */}
-            <motion.p
-                className="mt-8 text-sm font-medium text-black tracking-wider"
-                animate={{ opacity: shouldReduceMotion ? 1 : [0.3, 1, 0.3] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            >
-                NORTHERN PARIBAHAN
-            </motion.p>
+            <LazyMotion features={domAnimation}>
+                <m.p
+                    className="mt-8 text-sm font-medium text-black tracking-wider"
+                    animate={{ opacity: shouldReduceMotion ? 1 : [0.3, 1, 0.3] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                    NORTHERN PARIBAHAN
+                </m.p>
+            </LazyMotion>
         </div>
     );
 }
