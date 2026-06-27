@@ -42,6 +42,7 @@ export default function Page() {
                 src="/1.jpg"
                 alt="Hero Layer"
                 fill
+                sizes="100vw"
                 priority
                 className="absolute inset-0 z-0 w-full h-full object-cover opacity-80"
                 style={{ pointerEvents: 'none', maxHeight: '340px' }}

@@ -5,6 +5,7 @@ import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -183,7 +184,7 @@ export default function RegisterPage() {
                             </button>
 
                             <p className="text-sm text-center text-gray-600">
-                                Already have an account? <a href="/login" className="font-semibold text-indigo-600 hover:underline">Log In</a>
+                                Already have an account? <Link href="/login" className="font-semibold text-indigo-600 hover:underline">Log In</Link>
                             </p>
                         </form>
                     </div>

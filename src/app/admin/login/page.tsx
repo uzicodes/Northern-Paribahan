@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Loader2, ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
@@ -120,12 +121,12 @@ export default function AdminLoginPage() {
 
                             {/* Back Link */}
                             <div className="text-center pt-2">
-                                <a
+                                <Link
                                     href="/login"
                                     className="text-sm font-medium text-indigo-600 hover:text-indigo-500 hover:underline transition-colors"
                                 >
                                     ← Back to User Login
-                                </a>
+                                </Link>
                             </div>
                         </form>
                     </div>

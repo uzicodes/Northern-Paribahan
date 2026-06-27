@@ -6,6 +6,7 @@ import { Satisfy } from 'next/font/google';
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const satisfy = Satisfy({
     weight: '400',
@@ -144,9 +145,9 @@ export default function LoginPage() {
                             </div>
 
                             <div className="flex justify-end">
-                                <a href="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 hover:underline transition-colors">
+                                <Link href="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500 hover:underline transition-colors">
                                     Forgot Password?
-                                </a>
+                                </Link>
                             </div>
 
                             <button
