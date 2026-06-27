@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import GlobalLoader from '@/components/GlobalLoader';
 import {
@@ -77,12 +77,7 @@ export default function ProfilePage() {
     });
     const { activeTab, user, bookings, loading, loggingOut, error, editName, editPhone, saving, saveSuccess } = state;
 
-    // Fetch profile on mount
-    useEffect(() => {
-        fetchProfile();
-    }, []);
-
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
         try {
             dispatch({ loading: true });
             const res = await fetch('/api/user/profile');
@@ -105,7 +100,12 @@ export default function ProfilePage() {
         } finally {
             dispatch({ loading: false });
         }
-    };
+    }, [router]);
+
+    // Fetch profile on mount
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     const handleSaveProfile = async () => {
         if (!editName.trim()) return;
@@ -382,8 +382,9 @@ export default function ProfilePage() {
                                         <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
                                         <input
                                             type="email"
-                                            value={user.email}
+                                            value={user?.email || ''}
                                             disabled
+                                            readOnly
                                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-100 text-slate-400 cursor-not-allowed"
                                         />
                                         <p className="text-xs text-slate-400 mt-1">Email cannot be changed.</p>

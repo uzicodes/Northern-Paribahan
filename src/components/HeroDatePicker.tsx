@@ -142,7 +142,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
     const days = getDaysInMonth(currentMonth);
 
     return (
-        <div className="relative inline-block">
+        <div className="relative inline-block" suppressHydrationWarning>
             <div onClick={() => setOpen((v) => !v)} className="cursor-pointer">
                 {children ? children : (
                     <button
@@ -154,7 +154,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                 )}
             </div>
             {open && (
-                <div className="datepicker-popover absolute right-0 mt-2 z-50 w-[240px]">
+                <div className="datepicker-popover absolute right-0 mt-2 z-50 w-[240px]" suppressHydrationWarning>
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                         <div className="p-4">
                             {/* Month Navigation */}
@@ -186,7 +186,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                                 ))}
                             </div>
                             {/* Calendar Days */}
-                            <div className="grid grid-cols-7 gap-2">
+                            <div className="grid grid-cols-7 gap-2" suppressHydrationWarning>
                                 {days.map((dayObj) => {
                                     const today = new Date();
                                     today.setHours(0, 0, 0, 0);

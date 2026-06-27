@@ -181,7 +181,7 @@ export default function SessionManager() {
                 window.removeEventListener(evt, handleActivity)
             );
         };
-    }, [resetInactivityTimer, startSessionTimer]);
+    }, [resetInactivityTimer, startSessionTimer, inactivityTimer, sessionTimer, isLoggedIn]);
 
 
     return null;
