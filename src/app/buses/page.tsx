@@ -1,8 +1,9 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { Bus, Users, Wifi, Wind, Shield } from 'lucide-react';
+import { prisma } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 // Static bus data
 type ShowcaseBus = {
@@ -98,24 +99,18 @@ type MergedBus = ShowcaseBus & {
     availableSeats: number;
 };
 
-export default function BusesPage(): React.JSX.Element {
-    const [apiBuses, setApiBuses] = useState<ApiBus[]>([]);
-
-    useEffect(() => {
-        const fetchBuses = async (): Promise<void> => {
-            try {
-                const res = await fetch('/api/buses');
-                if (res.ok) {
-                    const data: ApiBus[] = await res.json();
-                    setApiBuses(data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch buses:', error);
-            }
-        };
-
-        fetchBuses();
-    }, []);
+export default async function BusesPage() {
+    let apiBuses: ApiBus[] = [];
+    try {
+        const buses = await prisma.bus.findMany({
+            include: {
+                seats: true,
+            },
+        });
+        apiBuses = buses as unknown as ApiBus[];
+    } catch (error) {
+        console.error('Failed to fetch buses:', error);
+    }
 
     const cards: MergedBus[] = busShowcase.map((showcase, index) => {
         const matched = apiBuses[index];
