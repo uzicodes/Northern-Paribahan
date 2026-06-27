@@ -187,7 +187,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                             </div>
                             {/* Calendar Days */}
                             <div className="grid grid-cols-7 gap-2">
-                                {days.map((dayObj, index) => {
+                                {days.map((dayObj) => {
                                     const today = new Date();
                                     today.setHours(0, 0, 0, 0);
                                     const maxDate = new Date(today);
@@ -202,7 +202,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                                     return (
                                         <button
                                             type="button"
-                                            key={index}
+                                            key={dayObj.date.toISOString()}
                                             onClick={() => !isDisabled && handleDateClick(dayObj.date)}
                                             disabled={isDisabled}
                                             className={`

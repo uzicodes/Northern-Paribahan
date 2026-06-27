@@ -137,15 +137,15 @@ export default async function BusesPage() {
 
             {/* Cards */}
             <div className="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {cards.map((bus, index) => (
-                    <div key={index} className="group bg-slate-800 rounded-2xl p-4 text-white transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-indigo-500/20 cursor-pointer">
+                {cards.map((bus) => (
+                    <div key={bus.id || bus.brand} className="group bg-slate-800 rounded-2xl p-4 text-white transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-indigo-500/20 cursor-pointer">
                         <Image src={bus.image} alt={bus.brand} width={300} height={160} className="h-40 w-auto mx-auto drop-shadow-md group-hover:scale-105 transition-transform duration-300" />
                         <h3 className="text-lg font-bold text-center mt-2">{bus.brand}</h3>
                         <p className="text-sm text-center text-slate-400">{bus.tagline}</p>
 
                         <div className="flex flex-wrap justify-center gap-2 mt-2">
-                            {bus.features.map((f, i) => (
-                                <span key={i} className="text-xs bg-green-100 text-red-600 px-2 py-1 rounded">
+                            {bus.features.map((f) => (
+                                <span key={f} className="text-xs bg-green-100 text-red-600 px-2 py-1 rounded">
                                     {f}
                                 </span>
                             ))}

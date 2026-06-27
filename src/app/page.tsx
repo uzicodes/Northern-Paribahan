@@ -77,9 +77,9 @@ export default function Page() {
                             />
                             {showFromDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
-                                    {filteredFromLocations.map((location, index) => (
+                                    {filteredFromLocations.map((location) => (
                                         <div
-                                            key={index}
+                                            key={location}
                                             onMouseDown={() => {
                                                 setFromValue(location);
                                                 setShowFromDropdown(false);
@@ -108,9 +108,9 @@ export default function Page() {
                             />
                             {showToDropdown && (
                                 <div className="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
-                                    {filteredToLocations.map((location, index) => (
+                                    {filteredToLocations.map((location) => (
                                         <div
-                                            key={index}
+                                            key={location}
                                             onMouseDown={() => {
                                                 setToValue(location);
                                                 setShowToDropdown(false);
