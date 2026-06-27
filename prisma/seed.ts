@@ -21,23 +21,28 @@ async function main() {
         },
     ];
 
-    for (const busData of buses) {
-        const bus = await prisma.bus.create({
-            data: busData,
-        });
+    await Promise.all(
+        buses.map(async (busData) => {
+            const bus = await prisma.bus.create({
+                data: busData,
+            });
 
-        // Create 40 seats for each bus
-        for (let i = 1; i <= 40; i++) {
-            await prisma.seat.create({
-                data: {
-                    seatNumber: `${String.fromCharCode(65 + Math.floor((i - 1) / 4))}${((i - 1) % 4) + 1}`, // A1, A2, ... J4
-                    busId: bus.id,
-                }
-            })
-        }
+            // Create 40 seats for each bus
+            const seatPromises = Array.from({ length: 40 }, (_, index) => {
+                const i = index + 1;
+                return prisma.seat.create({
+                    data: {
+                        seatNumber: `${String.fromCharCode(65 + Math.floor((i - 1) / 4))}${((i - 1) % 4) + 1}`, // A1, A2, ... J4
+                        busId: bus.id,
+                    },
+                });
+            });
 
-        console.log(`Created bus: ${bus.name} with seats`);
-    }
+            await Promise.all(seatPromises);
+
+            console.log(`Created bus: ${bus.name} with seats`);
+        })
+    );
 }
 
 main()
