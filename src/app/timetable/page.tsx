@@ -85,10 +85,11 @@ export default function TimetablePage() {
                 <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row gap-4">
                     {/* Route Filter */}
                     <div className="flex-1">
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Route</label>
+                        <label htmlFor="route-filter" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Route</label>
                         <div className="relative">
                             <MapPin size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <select
+                                id="route-filter"
                                 value={selectedRoute}
                                 onChange={(e) => setSelectedRoute(e.target.value)}
                                 className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none appearance-none bg-white cursor-pointer"
@@ -103,8 +104,8 @@ export default function TimetablePage() {
 
                     {/* Time Period Filter */}
                     <div className="sm:w-72">
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Time of Day</label>
-                        <div className="flex gap-1.5">
+                        <div id="time-period-label" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Time of Day</div>
+                        <div role="group" aria-labelledby="time-period-label" className="flex gap-1.5">
                             {[
                                 { key: "all", label: "All", icon: <Filter size={14} /> },
                                 { key: "morning", label: "AM", icon: <Sunrise size={14} /> },
