@@ -170,18 +170,21 @@ export default function SessionManager() {
             }
         });
 
+        const currentInactivityTimer = inactivityTimer.current;
+        const currentSessionTimer = sessionTimer.current;
+
         // Cleanup on unmount
         return () => {
             subscription.unsubscribe();
 
-            if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
-            if (sessionTimer.current) clearTimeout(sessionTimer.current);
+            if (currentInactivityTimer) clearTimeout(currentInactivityTimer);
+            if (currentSessionTimer) clearTimeout(currentSessionTimer);
 
             activityEvents.forEach((evt) =>
                 window.removeEventListener(evt, handleActivity)
             );
         };
-    }, [resetInactivityTimer, startSessionTimer, inactivityTimer, sessionTimer, isLoggedIn]);
+    }, [resetInactivityTimer, startSessionTimer]);
 
 
     return null;
