@@ -30,16 +30,8 @@ interface UserProfile {
     role: string;
 }
 
-interface BookingItem {
-    id: string;
-    status: string;
-    createdAt: string;
-    seatNumber: string;
-    busName: string;
-    busType: string;
-    busPlate: string;
-    price: number;
-}
+import { BookingItem, SidebarButton } from '@/components/ProfileSubcomponents';
+import { ProfileOverviewTab, TripsTab, EditProfileTab } from '@/components/ProfileTabs';
 
 // --- Tab Type ---
 type ActiveTab = 'profile' | 'trips' | 'edit';
@@ -250,189 +242,43 @@ export default function ProfilePage() {
                     {/* ===== TAB CONTENT ===== */}
                     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[500px]">
 
-                        {/* --- MY PROFILE TAB --- */}
                         {activeTab === 'profile' && (
-                            <div className="p-6 md:p-8 space-y-8">
-                                {/* Stats Row */}
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <StatCard
-                                        icon={Ticket}
-                                        label="Total Bookings"
-                                        value={bookings.length}
-                                        colorClass="text-indigo-500"
-                                        bgClass="bg-indigo-50"
-                                    />
-                                    <StatCard
-                                        icon={Clock}
-                                        label="Upcoming"
-                                        value={upcomingBookings.length}
-                                        colorClass="text-emerald-500"
-                                        bgClass="bg-emerald-50"
-                                    />
-                                    <StatCard
-                                        icon={Calendar}
-                                        label="Completed"
-                                        value={pastBookings.length}
-                                        colorClass="text-amber-500"
-                                        bgClass="bg-amber-50"
-                                    />
-                                </div>
-
-                                {/* Profile Details Card */}
-                                <div className="bg-slate-50 rounded-2xl p-6 space-y-5">
-                                    <h3 className="font-bold text-slate-800 text-lg flex items-center gap-2">
-                                        <UserCircle size={22} className="text-indigo-500" />
-                                        Personal Information
-                                    </h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <ProfileField icon={User} label="Full Name" value={user.name || 'Not set'} />
-                                        <ProfileField icon={Mail} label="Email Address" value={user.email} />
-                                        <ProfileField icon={Phone} label="Phone Number" value={user.phoneNumber ? `+880 ${user.phoneNumber}` : 'Not set'} />
-                                        <ProfileField icon={Bus} label="Account Type" value={user.role} />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => dispatch({ activeTab: 'edit' })}
-                                        className="mt-4 inline-flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200"
-                                    >
-                                        <Pencil size={16} />
-                                        Edit Profile
-                                    </button>
-                                </div>
-                            </div>
+                            <ProfileOverviewTab
+                                user={user}
+                                bookings={bookings}
+                                upcomingBookings={upcomingBookings}
+                                pastBookings={pastBookings}
+                                onEditClick={() => dispatch({ activeTab: 'edit' })}
+                            />
                         )}
 
-                        {/* --- MY TRIPS TAB --- */}
                         {activeTab === 'trips' && (
-                            <div className="p-6 md:p-8 space-y-8">
-                                {bookings.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center py-20 text-slate-400">
-                                        <Bus size={56} className="mb-4 opacity-20" />
-                                        <p className="text-lg font-semibold text-slate-500">No trips yet</p>
-                                        <p className="text-sm">Your bookings will appear here once you book a trip.</p>
-                                        <button
-                                            type="button"
-                                            onClick={() => router.push('/')}
-                                            className="mt-6 bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
-                                        >
-                                            Book a Trip
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <>
-                                        {/* Upcoming */}
-                                        {upcomingBookings.length > 0 && (
-                                            <div>
-                                                <h3 className="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                                                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                                                    Upcoming Trips
-                                                </h3>
-                                                <div className="space-y-4">
-                                                    {upcomingBookings.map(booking => (
-                                                        <BookingCard key={booking.id} booking={booking} isUpcoming />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Past */}
-                                        {pastBookings.length > 0 && (
-                                            <div>
-                                                <h3 className="font-bold text-slate-800 text-lg mb-4">Past Trips</h3>
-                                                <div className="space-y-4">
-                                                    {pastBookings.map(booking => (
-                                                        <BookingCard key={booking.id} booking={booking} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                            </div>
+                            <TripsTab
+                                bookings={bookings}
+                                upcomingBookings={upcomingBookings}
+                                pastBookings={pastBookings}
+                                onBookClick={() => router.push('/')}
+                            />
                         )}
 
-                        {/* --- EDIT PROFILE TAB --- */}
                         {activeTab === 'edit' && (
-                            <div className="p-6 md:p-8 max-w-lg">
-                                <h3 className="font-bold text-slate-800 text-lg mb-6 flex items-center gap-2">
-                                    <Pencil size={20} className="text-indigo-500" />
-                                    Update Your Information
-                                </h3>
-
-                                {saveSuccess && (
-                                    <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm flex items-center gap-2 animate-in">
-                                        <Check size={18} />
-                                        Profile updated successfully!
-                                    </div>
-                                )}
-
-                                <div className="space-y-5">
-                                    <div>
-                                        <label htmlFor="profile-name" className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
-                                        <input
-                                            id="profile-name"
-                                            type="text"
-                                            value={editName}
-                                            onChange={(e) => dispatch({ editName: e.target.value })}
-                                            placeholder="Enter your name"
-                                            className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="profile-email" className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
-                                        <input
-                                            id="profile-email"
-                                            type="email"
-                                            value={user?.email || ''}
-                                            disabled
-                                            readOnly
-                                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-100 text-slate-400 cursor-not-allowed"
-                                        />
-                                        <p className="text-xs text-slate-400 mt-1">Email cannot be changed.</p>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="profile-phone" className="block text-sm font-semibold text-slate-700 mb-2">Phone Number</label>
-                                        <div className="relative">
-                                            <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 text-sm font-medium">+880</span>
-                                            <input
-                                                id="profile-phone"
-                                                type="tel"
-                                                value={editPhone}
-                                                onChange={(e) => dispatch({ editPhone: e.target.value.replace(/\D/g, '').slice(0, 11) })}
-                                                placeholder="17XXXXXXXXX"
-                                                className="w-full pl-14 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all bg-slate-50 focus:bg-white"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex gap-3 pt-4">
-                                        <button
-                                            type="button"
-                                            onClick={handleSaveProfile}
-                                            disabled={saving}
-                                            className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 flex items-center justify-center gap-2"
-                                        >
-                                            <Check size={18} />
-                                            Save Changes
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                dispatch({
-                                                    editName: user.name || '',
-                                                    editPhone: user.phoneNumber || '',
-                                                    activeTab: 'profile',
-                                                });
-                                            }}
-                                            className="px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <EditProfileTab
+                                user={user}
+                                editName={editName}
+                                editPhone={editPhone}
+                                saving={saving}
+                                saveSuccess={saveSuccess}
+                                onNameChange={(val) => dispatch({ editName: val })}
+                                onPhoneChange={(val) => dispatch({ editPhone: val.replace(/\D/g, '').slice(0, 11) })}
+                                onSave={handleSaveProfile}
+                                onCancel={() => {
+                                    dispatch({
+                                        editName: user.name || '',
+                                        editPhone: user.phoneNumber || '',
+                                        activeTab: 'profile',
+                                    });
+                                }}
+                            />
                         )}
                     </div>
                 </div>
@@ -440,98 +286,4 @@ export default function ProfilePage() {
         </div>
     );
 }
-
-// --- Sub-Components ---
-
-function SidebarButton({ icon: Icon, label, active, onClick }: {
-    icon: any; label: string; active: boolean; onClick: () => void;
-}) {
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={`flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                : 'text-slate-500 hover:bg-slate-50'
-                }`}
-        >
-            <Icon size={20} />
-            <span className="font-medium">{label}</span>
-            {active && <ChevronRight size={16} className="ml-auto" />}
-        </button>
-    );
-}
-
-function StatCard({ icon: Icon, label, value, colorClass, bgClass }: {
-    icon: any; label: string; value: string | number; colorClass: string; bgClass: string;
-}) {
-    return (
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div className={`p-3 rounded-full ${bgClass}`}>
-                <Icon className={colorClass} size={24} />
-            </div>
-            <div>
-                <p className="text-sm text-slate-400 font-medium">{label}</p>
-                <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
-            </div>
-        </div>
-    );
-}
-
-function ProfileField({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
-    return (
-        <div className="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-100">
-            <div className="p-2.5 rounded-full bg-indigo-50">
-                <Icon size={18} className="text-indigo-500" />
-            </div>
-            <div>
-                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{label}</p>
-                <p className="text-sm font-semibold text-slate-700">{value}</p>
-            </div>
-        </div>
-    );
-}
-
-function BookingCard({ booking, isUpcoming = false }: { booking: BookingItem; isUpcoming?: boolean }) {
-    const date = new Date(booking.createdAt);
-    const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-    return (
-        <div className="group relative bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition-all duration-300">
-            {/* Status stripe */}
-            <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${isUpcoming ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-
-            <div className="p-5 pl-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                {/* Bus icon */}
-                <div className={`p-3 rounded-xl ${isUpcoming ? 'bg-emerald-50' : 'bg-slate-50'}`}>
-                    <Bus size={24} className={isUpcoming ? 'text-emerald-600' : 'text-slate-400'} />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-slate-800">{booking.busName}</h4>
-                    <p className="text-sm text-slate-400">{booking.busType} • Plate: {booking.busPlate}</p>
-                    <div className="flex flex-wrap gap-3 mt-2">
-                        <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-                            <Calendar size={12} /> {formattedDate}
-                        </span>
-                        <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-                            <MapPin size={12} /> Seat {booking.seatNumber}
-                        </span>
-                    </div>
-                </div>
-
-                {/* Price & Status */}
-                <div className="flex flex-col items-end gap-2">
-                    <span className="text-lg font-bold text-slate-800">৳{booking.price}</span>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${isUpcoming
-                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                        : 'bg-slate-50 text-slate-500 border-slate-200'
-                        }`}>
-                        {booking.status}
-                    </span>
-                </div>
-            </div>
-        </div>
-    );
-}
+

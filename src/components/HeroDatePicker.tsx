@@ -45,6 +45,67 @@ const MONTH_NAMES = [
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days: { day: number; isCurrentMonth: boolean; date: Date }[] = [];
+
+    // Previous month days
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+        days.push({
+            day: prevMonthLastDay - i,
+            isCurrentMonth: false,
+            date: new Date(year, month - 1, prevMonthLastDay - i)
+        });
+    }
+
+    // Current month days
+    for (let i = 1; i <= daysInMonth; i++) {
+        days.push({
+            day: i,
+            isCurrentMonth: true,
+            date: new Date(year, month, i)
+        });
+    }
+
+    // Next month days
+    const remainingDays = 42 - days.length;
+    for (let i = 1; i <= remainingDays; i++) {
+        days.push({
+            day: i,
+            isCurrentMonth: false,
+            date: new Date(year, month + 1, i)
+        });
+    }
+
+    return days;
+};
+
+const isSameDay = (date1: Date, date2: Date): boolean => {
+    return date1.getDate() === date2.getDate() &&
+        date1.getMonth() === date2.getMonth() &&
+        date1.getFullYear() === date2.getFullYear();
+};
+
+const isToday = (date: Date): boolean => {
+    return isSameDay(date, new Date());
+};
+
+const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+};
+
 const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateChange, children }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
     const [open, setOpen] = useState(false);
@@ -62,57 +123,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
         return () => document.removeEventListener('mousedown', handleClick);
     }, [open]);
 
-    const getDaysInMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay();
 
-        const days: { day: number; isCurrentMonth: boolean; date: Date }[] = [];
-
-        // Previous month days
-        const prevMonthLastDay = new Date(year, month, 0).getDate();
-        for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-            days.push({
-                day: prevMonthLastDay - i,
-                isCurrentMonth: false,
-                date: new Date(year, month - 1, prevMonthLastDay - i)
-            });
-        }
-
-        // Current month days
-        for (let i = 1; i <= daysInMonth; i++) {
-            days.push({
-                day: i,
-                isCurrentMonth: true,
-                date: new Date(year, month, i)
-            });
-        }
-
-        // Next month days
-        const remainingDays = 42 - days.length;
-        for (let i = 1; i <= remainingDays; i++) {
-            days.push({
-                day: i,
-                isCurrentMonth: false,
-                date: new Date(year, month + 1, i)
-            });
-        }
-
-        return days;
-    };
-
-    const isSameDay = (date1: Date, date2: Date): boolean => {
-        return date1.getDate() === date2.getDate() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getFullYear() === date2.getFullYear();
-    };
-
-    const isToday = (date: Date): boolean => {
-        return isSameDay(date, new Date());
-    };
 
     const handlePrevMonth = () => {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
@@ -130,14 +141,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
 
     // Remove handleToday (no longer needed)
 
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        });
-    };
+
 
     const days = getDaysInMonth(currentMonth);
 
