@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import type { SeedScript } from "../../prisma/seed";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 

@@ -54,3 +54,5 @@ main()
         await prisma.$disconnect();
         process.exit(1);
     });
+
+export type SeedScript = typeof main;

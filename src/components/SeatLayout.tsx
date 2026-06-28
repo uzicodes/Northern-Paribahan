@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { toast } from "sonner";
 
-interface Seat {
-    id: string;
-    seatNumber: string;
-    isBooked: boolean;
-}
+import { Seat } from "@/types";
 
 interface SeatLayoutProps {
     busId: string;

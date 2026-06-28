@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { socket } from "@/lib/socket"; // Wait, socket is client side. Can I use server-side io?
+import { sendTicketEmail } from "@/utils/sendTicketEmail";
 
 export async function POST(
     req: Request,
@@ -48,6 +49,13 @@ export async function POST(
         if (io) {
             io.emit("seat-booked", { seatId, busId: id });
         }
+
+        // Send ticket email asynchronously without blocking the response
+        sendTicketEmail(
+            "passenger@example.com",
+            "Valued Passenger",
+            Buffer.from(`Northern Paribahan E-Ticket\nBooking ID: ${booking.id}\nSeat: ${seat.seatNumber}`)
+        ).catch((err) => console.error("Error sending ticket email:", err));
 
         return NextResponse.json(booking);
     } catch (error) {

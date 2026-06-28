@@ -80,14 +80,7 @@ const busShowcase: ShowcaseBus[] = [
     },
 ];
 
-interface ApiBus {
-    id: string;
-    name: string;
-    plateNumber: string;
-    type: string;
-    price: number;
-    seats: { id: string; seatNumber: string; isBooked: boolean }[];
-}
+import { Bus as ApiBus } from "@/types";
 
 type MergedBus = ShowcaseBus & {
     id?: string;
