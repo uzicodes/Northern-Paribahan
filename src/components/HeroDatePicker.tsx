@@ -38,6 +38,13 @@ interface HeroDatePickerProps {
     children?: React.ReactNode;
 }
 
+const MONTH_NAMES = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
 const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateChange, children }) => {
     const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
     const [open, setOpen] = useState(false);
@@ -54,13 +61,6 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
         document.addEventListener('mousedown', handleClick);
         return () => document.removeEventListener('mousedown', handleClick);
     }, [open]);
-
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
@@ -176,7 +176,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                                     <ChevronLeft className="w-5 h-5 text-purple-600" />
                                 </button>
                                 <h3 className="text-lg font-bold text-gray-800">
-                                    {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                                    {MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                                 </h3>
                                 <button
                                     type="button"
@@ -188,7 +188,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                             </div>
                             {/* Days of Week */}
                             <div className="grid grid-cols-7 gap-2 mb-2">
-                                {daysOfWeek.map((day) => (
+                                {DAYS_OF_WEEK.map((day) => (
                                     <div key={day} className="text-center text-xs font-semibold text-gray-500 py-2">
                                         {day}
                                     </div>

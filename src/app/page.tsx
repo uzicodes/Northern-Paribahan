@@ -19,6 +19,18 @@ function searchReducer(state: SearchState, action: Partial<SearchState>): Search
     return { ...state, ...action };
 }
 
+const LOCATIONS = [
+    'Dinajpur',
+    'Bogura',
+    'Dhaka',
+    'Sylhet',
+    'Khulna',
+    'Barisal',
+    'Rajshahi',
+    'Chittagong',
+    "Cox's Bazar"
+];
+
 export default function Page() {
     const router = useRouter();
     const [state, dispatch] = React.useReducer(searchReducer, {
@@ -30,23 +42,11 @@ export default function Page() {
     });
     const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
 
-    const locations = [
-        'Dinajpur',
-        'Bogura',
-        'Dhaka',
-        'Sylhet',
-        'Khulna',
-        'Barisal',
-        'Rajshahi',
-        'Chittagong',
-        "Cox's Bazar"
-    ];
-
-    const filteredFromLocations = locations.filter(location =>
+    const filteredFromLocations = LOCATIONS.filter(location =>
         location.toLowerCase().includes(fromValue.toLowerCase()) && location !== toValue
     );
 
-    const filteredToLocations = locations.filter(location =>
+    const filteredToLocations = LOCATIONS.filter(location =>
         location.toLowerCase().includes(toValue.toLowerCase()) && location !== fromValue
     );
 
