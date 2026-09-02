@@ -1,4 +1,5 @@
 import './globals.css';
+import 'lenis/dist/lenis.css';
 import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import Image from 'next/image';
 import NavbarClient from '@/components/Navbar';
 import SessionManager from '@/components/SessionManager';
 import PageLoader from '@/components/PageLoader';
+import SmoothScroll from '@/components/SmoothScroll';
 import dynamic from 'next/dynamic';
 
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
@@ -41,21 +43,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <link rel="icon" href="/favicon.ico" />
             </head>
             <body className={`min-h-screen flex flex-col ${satoshi.className}`} style={{ backgroundColor: '#C9CBA3' }}>
-                <SessionManager />
-                <Toaster richColors position="bottom-right" />
-                <header className="border-b" style={{ backgroundColor: '#172144' }}>
-                    <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
-                        <Link href="/" className="font-semibold text-lg flex items-center gap-2">
-                            <Image src="/logo.png" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
-                            <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '24px' }}>Northern Paribahan</span>
-                        </Link>
-                        <div style={{ color: '#F1F604' }}><NavbarClient /></div>
-                    </div>
-                </header>
-                <main className="flex-grow">
-                    <PageLoader>{children}</PageLoader>
-                </main>
-                <Footer />
+                <SmoothScroll>
+                    <SessionManager />
+                    <Toaster richColors position="bottom-right" />
+                    <header className="border-b" style={{ backgroundColor: '#172144' }}>
+                        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
+                            <Link href="/" className="font-semibold text-lg flex items-center gap-2">
+                                <Image src="/logo.png" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+                                <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '24px' }}>Northern Paribahan</span>
+                            </Link>
+                            <div style={{ color: '#F1F604' }}><NavbarClient /></div>
+                        </div>
+                    </header>
+                    <main className="flex-grow">
+                        <PageLoader>{children}</PageLoader>
+                    </main>
+                    <Footer />
+                </SmoothScroll>
             </body>
         </html>
     );
