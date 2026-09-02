@@ -6,7 +6,7 @@ export default function GlobalLoader() {
     const shouldReduceMotion = useReducedMotion();
 
     return (
-        <div className="h-screen w-full flex flex-col items-center justify-center bg-transparent">
+        <div className="h-full w-full min-h-[calc(100vh-57px)] flex flex-col items-center justify-center bg-transparent">
             <div className="loader"></div>
 
             {/* Loading text below */}

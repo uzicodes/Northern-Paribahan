@@ -29,9 +29,12 @@ function decodeRole(token: string | null): string | null {
 export default function NavbarClient() {
     const pathname = usePathname();
     const router = useRouter();
-    const [authState, setAuthState] = useState<{ isLoggedIn: boolean; token: string | null }>({
-        isLoggedIn: false,
-        token: null,
+    const [authState, setAuthState] = useState<{ isLoggedIn: boolean; token: string | null }>(() => {
+        if (typeof document !== 'undefined') {
+            const hasAuthCookie = document.cookie.split(';').some((c) => c.trim().startsWith('sb-'));
+            return { isLoggedIn: hasAuthCookie, token: null };
+        }
+        return { isLoggedIn: false, token: null };
     });
     const { isLoggedIn, token } = authState;
     const [showContactPopup, setShowContactPopup] = useState(false);
@@ -58,7 +61,7 @@ export default function NavbarClient() {
         });
 
         return () => subscription.unsubscribe();
-    }, [pathname]);
+    }, []);
 
     async function logout() {
         const supabase = createClient();

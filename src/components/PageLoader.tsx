@@ -51,7 +51,7 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
     return (
         <>
             {isLoading && (
-                <div className="fixed inset-0 z-[9999]" style={{ backgroundColor: '#C9CBA3' }}>
+                <div className="fixed inset-x-0 bottom-0 top-[57px] z-30" style={{ backgroundColor: '#C9CBA3' }}>
                     <GlobalLoader />
                 </div>
             )}

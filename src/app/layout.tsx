@@ -46,10 +46,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <SmoothScroll>
                     <SessionManager />
                     <Toaster richColors position="bottom-right" />
-                    <header className="border-b" style={{ backgroundColor: '#172144' }}>
-                        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between" style={{ color: '#F1F604' }}>
+                    <header className="sticky top-0 z-40 border-b border-[#223062] shadow-sm" style={{ backgroundColor: '#172144' }}>
+                        <div className="max-w-6xl mx-auto px-4 h-[57px] flex items-center justify-between" style={{ color: '#F1F604' }}>
                             <Link href="/" className="font-semibold text-lg flex items-center gap-2">
-                                <Image src="/logo.png" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+                                <Image src="/logo.png" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: 'inline-block', verticalAlign: 'middle' }} priority />
                                 <span className={satisfy.className} style={{ color: '#FCA311', fontSize: '24px' }}>Northern Paribahan</span>
                             </Link>
                             <div style={{ color: '#F1F604' }}><NavbarClient /></div>

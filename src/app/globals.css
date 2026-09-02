@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: 'Satoshi', sans-serif;
   background-color: #f3f4f6;
