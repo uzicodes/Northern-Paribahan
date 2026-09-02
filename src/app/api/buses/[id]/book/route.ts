@@ -3,9 +3,10 @@ import { prisma } from '@/lib/db';
 
 export async function POST(
     request: Request,
-    { params }: { params: Promise<{ id: string }> | { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: busId } = await params;
         const body = await request.json();
         const { userId, scheduleId, seatNumbers } = body;
         // Normalise seatNumbers if single string or array
