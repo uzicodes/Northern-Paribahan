@@ -1,17 +1,16 @@
 export interface Bus {
     id: string;
     name: string;
-    plateNumber: string;
+    registrationNumber: string;
     type: string;
-    price: number;
-    seats: Seat[];
+    capacity: number;
 }
 
-export interface Seat {
+export interface Ticket {
     id: string;
     seatNumber: string;
-    isBooked: boolean;
-    busId: string;
+    scheduleId: string;
+    bookingId: string | null;
 }
 
 export interface User {

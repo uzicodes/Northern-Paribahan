@@ -8,7 +8,6 @@ import {
     Users,
     TrendingUp,
     TrendingDown,
-    ArrowUpRight,
 } from "lucide-react";
 
 const stats = [
@@ -34,8 +33,8 @@ const stats = [
     },
     {
         label: "Active Buses",
-        value: "24 / 28",
-        change: "85.7%",
+        value: "18 / 18",
+        change: "100%",
         trend: "up" as const,
         icon: Bus,
         color: "bg-amber-500",
@@ -113,7 +112,6 @@ export default function AdminDashboardPage() {
 
     return (
         <div className="space-y-8">
-            {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -123,7 +121,6 @@ export default function AdminDashboardPage() {
                 </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 {stats.map((stat) => {
                     const Icon = stat.icon;
@@ -148,7 +145,6 @@ export default function AdminDashboardPage() {
                 })}
             </div>
 
-            {/* Recent Bookings Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                     <div>
@@ -160,7 +156,6 @@ export default function AdminDashboardPage() {
                     </button>
                 </div>
 
-                {/* Desktop Table */}
                 <div className="hidden sm:block overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
@@ -192,7 +187,6 @@ export default function AdminDashboardPage() {
                     </table>
                 </div>
 
-                {/* Mobile Cards */}
                 <div className="sm:hidden divide-y divide-gray-100">
                     {recentBookings.map((booking) => (
                         <div key={booking.id} className="p-4 space-y-2">
