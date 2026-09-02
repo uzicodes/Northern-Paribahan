@@ -1,68 +1,79 @@
-import { prisma } from "@/lib/db";
-import { NextResponse } from "next/server";
-import { socket } from "@/lib/socket"; // Wait, socket is client side. Can I use server-side io?
-import { sendTicketEmail } from "@/utils/sendTicketEmail";
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export async function POST(
-    req: Request,
-    { params }: { params: Promise<{ id: string }> }
+    request: Request,
+    { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
     try {
-        const [{ id }, { seatId, userId }] = await Promise.all([params, req.json()]);
+        const body = await request.json();
+        const { userId, scheduleId, seatNumbers } = body;
+        // Normalise seatNumbers if single string or array
+        const normalizedSeatNumbers = Array.isArray(seatNumbers)
+            ? seatNumbers
+            : typeof seatNumbers === 'string'
+            ? [seatNumbers]
+            : [];
 
-        // Check availability
-        const seat = await prisma.seat.findUnique({
-            where: { id: seatId },
-        });
-
-        if (!seat) {
+        if (!userId || !scheduleId || normalizedSeatNumbers.length === 0) {
             return NextResponse.json(
-                { error: "Seat not found" },
-                { status: 404 }
-            );
-        }
-
-        if (seat.isBooked) {
-            return NextResponse.json(
-                { error: "Seat already booked" },
+                { error: 'Missing required booking fields' },
                 { status: 400 }
             );
         }
 
-        // Create Booking and Update Seat status concurrently
-        const [booking] = await Promise.all([
-            prisma.booking.create({
-                data: {
-                    userId,
-                    seatId,
-                    status: "CONFIRMED",
-                },
-            }),
-            prisma.seat.update({
-                where: { id: seatId },
-                data: { isBooked: true },
-            }),
-        ]);
+        // Fetch schedule to get the fare
+        const schedule = await prisma.schedule.findUnique({
+            where: { id: scheduleId },
+        });
 
-        // Emit socket event if server instance available via global
-        const io = (global as any).io;
-        if (io) {
-            io.emit("seat-booked", { seatId, busId: id });
+        if (!schedule) {
+            return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
         }
 
-        // Send ticket email asynchronously without blocking the response
-        sendTicketEmail(
-            "passenger@example.com",
-            "Valued Passenger",
-            Buffer.from(`Northern Paribahan E-Ticket\nBooking ID: ${booking.id}\nSeat: ${seat.seatNumber}`)
-        ).catch((err) => console.error("Error sending ticket email:", err));
+        const totalFare = schedule.fare * normalizedSeatNumbers.length;
 
-        return NextResponse.json(booking);
-    } catch (error) {
-        console.error(error);
+        // Use a transaction to ensure booking and tickets are created atomically
+        const result = await prisma.$transaction(async (tx) => {
+            // 1. Create the Booking record
+            const booking = await tx.booking.create({
+                data: {
+                    userId,
+                    scheduleId,
+                    totalFare,
+                    status: 'PENDING',
+                },
+            });
+
+            // 2. Create the Tickets (Supabase unique constraint [scheduleId, seatNumber] will block double bookings)
+            const tickets = await Promise.all(
+                normalizedSeatNumbers.map((seatNumber: string) =>
+                    tx.ticket.create({
+                        data: {
+                            seatNumber,
+                            scheduleId,
+                            bookingId: booking.id,
+                        },
+                    })
+                )
+            );
+
+            return { booking, tickets };
+        });
+
         return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
+            { message: 'Booking initialized successfully', result },
+            { status: 201 }
         );
+    } catch (error: any) {
+        // Handle unique constraint violation (Seat already booked for this schedule)
+        if (error.code === 'P2002') {
+            return NextResponse.json(
+                { error: 'One or more selected seats are already booked for this trip.' },
+                { status: 400 }
+            );
+        }
+        console.error('Booking error:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
