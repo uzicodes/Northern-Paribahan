@@ -1,6 +1,15 @@
+import 'dotenv/config'; // Required so the seed script can read your .env file
 import { PrismaClient, BusType } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+// Set up the Prisma 7 Postgres adapter
+const connectionString = `${process.env.DATABASE_URL}`;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
+// Instantiate the client with the adapter
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
     // Clear existing data to prevent duplicates 
@@ -12,7 +21,7 @@ async function main() {
 
     console.log('Cleared existing database records.');
 
-    // 18 buses (3 of each model)
+    // 18 buses (3 of each type)
     const busesData = [
         // Volvo B9R (AC, 40 seats)
         { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1001", type: BusType.AC, capacity: 40 },
@@ -45,7 +54,7 @@ async function main() {
         { name: "Ashok Leyland Eagle", registrationNumber: "DHAKA METRO-BA 15-6003", type: BusType.NON_AC, capacity: 45 },
     ];
 
-    // Insert in DB
+    // 3. Insert into the database
     for (const bus of busesData) {
         await prisma.bus.create({
             data: bus
@@ -62,5 +71,4 @@ main()
     .catch(async (e) => {
         console.error(e);
         await prisma.$disconnect();
-        process.exit(1);
     });
