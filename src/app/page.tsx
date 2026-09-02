@@ -1,9 +1,15 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import HeroDatePicker from '@/components/HeroDatePicker';
-import { ShieldCheck, Ban, Clock, CalendarRange } from 'lucide-react';
+import {
+    ShieldCheck, Ban, Clock, CalendarRange,
+    MapPin, ArrowRight, Star, ChevronDown,
+    Headphones, CheckCircle2, Zap,
+    Navigation, Bus, PhoneCall, MessageSquare, Sparkles, Shield,
+    HelpCircle, Users
+} from 'lucide-react';
 
 import { toast } from 'sonner';
 
@@ -31,6 +37,164 @@ const LOCATIONS = [
     "Cox's Bazar"
 ];
 
+const POPULAR_ROUTES = [
+    {
+        from: 'Dhaka',
+        to: 'Bogura',
+        duration: '5h 30m',
+        fare: 850,
+        type: 'AC & Non-AC',
+        departures: '18 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: 'Rangpur',
+        duration: '7h 00m',
+        fare: 1100,
+        type: 'AC Sleeper / Luxury',
+        departures: '12 Daily Departures',
+    },
+    {
+        from: 'Rajshahi',
+        to: 'Dhaka',
+        duration: '6h 00m',
+        fare: 750,
+        type: 'Express Coach',
+        departures: '14 Daily Departures',
+    },
+    {
+        from: 'Bogura',
+        to: 'Dhaka',
+        duration: '5h 30m',
+        fare: 900,
+        type: 'Multi-Axle Volvo',
+        departures: '16 Daily Departures',
+    },
+    {
+        from: 'Bogura',
+        to: 'Rangpur',
+        duration: '3h 30m',
+        fare: 600,
+        type: 'Intercity Express',
+        departures: '10 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: "Cox's Bazar",
+        duration: '8h 30m',
+        fare: 1400,
+        type: 'Ultra Luxury Sleeper',
+        departures: '8 Daily Departures',
+    },
+];
+
+const WHY_CHOOSE_US = [
+    {
+        icon: Navigation,
+        title: 'Live GPS Fleet Tracking',
+        desc: 'Real-time vehicle tracking lets you and your family monitor bus location, speed, and exact estimated arrival.',
+        tag: 'Live Tracking',
+        bgColor: 'bg-blue-50',
+        textColor: 'text-blue-600',
+        borderColor: 'border-blue-100',
+    },
+    {
+        icon: Zap,
+        title: 'Interactive Seat Selection',
+        desc: 'Choose your desired window, aisle, or sleeper seat directly from our real-time interactive seat grid with instant lock.',
+        tag: 'Live Grid',
+        bgColor: 'bg-emerald-50',
+        textColor: 'text-emerald-600',
+        borderColor: 'border-emerald-100',
+    },
+    {
+        icon: Shield,
+        title: 'Certified & Sanitized Coaches',
+        desc: 'Multi-axle Volvo & Scania buses sanitized prior to every journey, driven by background-checked highway captains.',
+        tag: 'Safety First',
+        bgColor: 'bg-purple-50',
+        textColor: 'text-purple-600',
+        borderColor: 'border-purple-100',
+    },
+    {
+        icon: Headphones,
+        title: '24/7 Dedicated Support',
+        desc: 'Our customer care team is available around the clock to assist with booking changes, baggage, and route enquiries.',
+        tag: 'Always Here',
+        bgColor: 'bg-amber-50',
+        textColor: 'text-amber-600',
+        borderColor: 'border-amber-100',
+    },
+];
+
+const BOOKING_STEPS = [
+    {
+        step: '01',
+        title: 'Search Routes',
+        desc: 'Pick your departure city, destination, and journey date to instantly view available bus schedules.',
+        icon: MapPin,
+    },
+    {
+        step: '02',
+        title: 'Pick Your Seat',
+        desc: 'Browse bus coach models, view seat layouts, and pick your favorite seats in real-time.',
+        icon: Bus,
+    },
+    {
+        step: '03',
+        title: 'Instant Confirmation',
+        desc: 'Pay securely via bKash, Nagad, or Cards and receive your digital e-ticket immediately via SMS & email.',
+        icon: CheckCircle2,
+    },
+];
+
+const TESTIMONIALS = [
+    {
+        name: 'Tanvir Hossain',
+        route: 'Dhaka to Bogura',
+        rating: 5,
+        comment: 'The smoothest ride I have had on the northern highway. The Volvo coach departed on the dot, AC was perfect, and the seats were plush.',
+        date: 'Travelled Feb 2026',
+    },
+    {
+        name: 'Dr. Nusrat Jahan',
+        route: 'Dhaka to Rangpur',
+        rating: 5,
+        comment: 'Booked the AC Sleeper with my family. Spotlessly clean bedding, quiet cabin, and courteous staff. The online seat booking was effortless!',
+        date: 'Travelled Jan 2026',
+    },
+    {
+        name: 'Mahmudur Rahman',
+        route: 'Rajshahi to Dhaka',
+        rating: 5,
+        comment: 'Northern Paribahan is my trusted operator for business trips. Never delayed, smooth driving through the highway, and reliable booking.',
+        date: 'Travelled Feb 2026',
+    },
+];
+
+const FAQS = [
+    {
+        q: 'How do I receive my ticket after online booking?',
+        a: 'Immediately after successful payment, your digital ticket (PDF) will be displayed on screen and sent to your registered email address and phone number via SMS. You can also view and download it anytime from your Profile page.',
+    },
+    {
+        q: 'Can I cancel or reschedule my ticket online?',
+        a: 'Yes! Tickets can be cancelled or rescheduled up to 6 hours before departure from your Profile dashboard or by reaching out to our 24/7 passenger helpline.',
+    },
+    {
+        q: 'What luggage allowance is permitted per passenger?',
+        a: 'Each ticket includes up to 20kg of standard luggage in the secure undercarriage luggage hold, plus one small personal handbag or laptop bag inside the passenger cabin.',
+    },
+    {
+        q: 'How early should I arrive at the boarding terminal?',
+        a: 'We strongly advise passengers to report to the boarding counter at least 20–30 minutes prior to the scheduled departure time for baggage tagging and verification.',
+    },
+    {
+        q: 'Which payment methods can I use to book?',
+        a: 'We accept all major mobile wallets (bKash, Nagad, Rocket, Upay) as well as Visa, Mastercard, and internet banking via SSL encrypted payment gateway.',
+    },
+];
+
 export default function Page() {
     const router = useRouter();
     const [state, dispatch] = React.useReducer(searchReducer, {
@@ -41,6 +205,16 @@ export default function Page() {
         showToDropdown: false,
     });
     const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
+    const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+    const handleQuickRouteSelect = (from: string, to: string) => {
+        dispatch({ fromValue: from, toValue: to });
+        const params = new URLSearchParams();
+        params.set('from', from);
+        params.set('to', to);
+        params.set('date', dateOfJourney.toISOString());
+        router.push(`/timetable?${params.toString()}`);
+    };
 
     const filteredFromLocations = LOCATIONS.filter(location =>
         location.toLowerCase().includes(fromValue.toLowerCase()) && location !== toValue
@@ -279,6 +453,249 @@ export default function Page() {
                                 <div className="text-sm mb-2 text-gray-600">Get amazing benefits on Date Change & Cancellation</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* 1. Popular Bus Routes Section */}
+                <div className="w-full max-w-7xl mt-14">
+                    <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
+                        <div>
+                            <span className="text-xs font-bold uppercase tracking-widest text-[#c44d4d] bg-red-100/60 px-3 py-1 rounded-full inline-block mb-2">
+                                Top Destinations
+                            </span>
+                            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Popular Bus Routes</h2>
+                            <p className="text-slate-600 text-sm mt-1">Guaranteed daily departures on our premier highway corridors</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => router.push('/timetable')}
+                            className="text-sm font-semibold text-slate-800 hover:text-[#c44d4d] flex items-center gap-1 transition-colors self-start sm:self-auto"
+                        >
+                            View All Schedules <ArrowRight size={16} />
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {POPULAR_ROUTES.map((route, idx) => (
+                            <div
+                                key={idx}
+                                className="bg-gradient-to-br from-[#172144] to-[#212c58] rounded-2xl p-5 shadow-lg border border-[#2c3a72] hover:border-[#FCA311]/60 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group text-white"
+                            >
+                                <div>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FCA311]/15 text-[#FCA311] border border-[#FCA311]/30">
+                                            {route.type}
+                                        </span>
+                                        <span className="text-xs text-slate-300 flex items-center gap-1.5 font-medium">
+                                            <Clock size={13} className="text-[#FCA311]" /> {route.duration}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-lg font-bold text-white">{route.from}</span>
+                                        <ArrowRight size={16} className="text-[#FCA311] group-hover:translate-x-1 transition-transform" />
+                                        <span className="text-lg font-bold text-white">{route.to}</span>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mb-4">{route.departures}</p>
+                                </div>
+
+                                <div className="pt-4 border-t border-white/10 flex items-center justify-between mt-2">
+                                    <div>
+                                        <span className="text-[11px] text-slate-400 uppercase font-medium">Starts from</span>
+                                        <p className="text-2xl font-black text-[#FCA311]">৳{route.fare}</p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleQuickRouteSelect(route.from, route.to)}
+                                        className="bg-[#c44d4d] hover:bg-[#a93b3b] text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-1.5"
+                                    >
+                                        Book Seat <ArrowRight size={13} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 2. Why Choose Northern Paribahan */}
+                <div className="w-full max-w-7xl mt-14">
+                    <div className="text-center max-w-2xl mx-auto mb-10">
+                        <span className="text-xs font-bold uppercase tracking-widest text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full inline-block mb-2">
+                            The Northern Standard
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Why Travel With Northern Paribahan?</h2>
+                        <p className="text-slate-600 text-sm sm:text-base mt-2">
+                            Engineered for uncompromising safety, absolute punctuality, and passenger convenience at every step.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {WHY_CHOOSE_US.map((item, idx) => {
+                            const IconComponent = item.icon;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-all flex flex-col justify-between"
+                                >
+                                    <div>
+                                        <div className={`w-12 h-12 rounded-2xl ${item.bgColor} ${item.textColor} flex items-center justify-center mb-5`}>
+                                            <IconComponent size={24} />
+                                        </div>
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${item.bgColor} ${item.textColor} inline-block mb-2`}>
+                                            {item.tag}
+                                        </span>
+                                        <h3 className="text-lg font-bold text-slate-800 mb-2">{item.title}</h3>
+                                        <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* 3. Easy 3-Step Booking Guide */}
+                <div className="w-full max-w-7xl mt-14 bg-gradient-to-br from-[#172144] to-[#1E2952] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
+                    <div className="relative z-10">
+                        <div className="text-center max-w-2xl mx-auto mb-10">
+                            <span className="text-xs font-bold uppercase tracking-widest text-[#FCA311] bg-white/10 px-3 py-1 rounded-full inline-block mb-2">
+                                Simple & Frictionless
+                            </span>
+                            <h2 className="text-2xl sm:text-3xl font-bold">How to Book Your Ticket in 3 Steps</h2>
+                            <p className="text-slate-300 text-sm sm:text-base mt-2">
+                                Your next highway journey is just a few clicks away.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {BOOKING_STEPS.map((step, idx) => {
+                                const StepIcon = step.icon;
+                                return (
+                                    <div
+                                        key={idx}
+                                        className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/15 relative flex flex-col justify-between"
+                                    >
+                                        <span className="text-4xl font-black text-white/20 absolute top-4 right-6 select-none font-mono">
+                                            {step.step}
+                                        </span>
+                                        <div>
+                                            <div className="w-12 h-12 rounded-xl bg-[#FCA311] text-[#172144] flex items-center justify-center mb-5 font-bold shadow-lg">
+                                                <StepIcon size={24} />
+                                            </div>
+                                            <h3 className="text-lg font-bold mb-2">{step.title}</h3>
+                                            <p className="text-sm text-slate-300 leading-relaxed">{step.desc}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. Passenger Testimonials */}
+                <div className="w-full max-w-7xl mt-14">
+                    <div className="text-center max-w-2xl mx-auto mb-10">
+                        <span className="text-xs font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full inline-block mb-2">
+                            Verified Travelers
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">What Our Passengers Say</h2>
+                        <p className="text-slate-600 text-sm sm:text-base mt-2">
+                            Trusted by thousands of intercity commuters and travelers every day.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {TESTIMONIALS.map((review, idx) => (
+                            <div
+                                key={idx}
+                                className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-all flex flex-col justify-between"
+                            >
+                                <div>
+                                    <div className="flex items-center gap-1 mb-3 text-amber-400">
+                                        {[...Array(review.rating)].map((_, i) => (
+                                            <Star key={i} size={16} fill="currentColor" />
+                                        ))}
+                                    </div>
+                                    <p className="text-sm text-slate-700 italic leading-relaxed mb-6">
+                                        &ldquo;{review.comment}&rdquo;
+                                    </p>
+                                </div>
+                                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                                    <div>
+                                        <h4 className="font-bold text-slate-900 text-sm">{review.name}</h4>
+                                        <p className="text-xs text-slate-500">{review.route}</p>
+                                    </div>
+                                    <span className="text-[11px] text-slate-400">{review.date}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 5. Frequently Asked Questions (FAQ) Accordion */}
+                <div className="w-full max-w-4xl mt-14">
+                    <div className="text-center mb-8">
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-700 bg-slate-200 px-3 py-1 rounded-full inline-block mb-2">
+                            Got Questions?
+                        </span>
+                        <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                        <p className="text-slate-600 text-sm mt-1">Everything you need to know about booking, cancellation, and boarding.</p>
+                    </div>
+
+                    <div className="space-y-3">
+                        {FAQS.map((faq, idx) => {
+                            const isOpen = openFaq === idx;
+                            return (
+                                <div
+                                    key={idx}
+                                    className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-all"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() => setOpenFaq(isOpen ? null : idx)}
+                                        className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-[#c44d4d] transition-colors"
+                                    >
+                                        <span className="text-base">{faq.q}</span>
+                                        <ChevronDown
+                                            size={20}
+                                            className={`text-slate-400 shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#c44d4d]' : ''}`}
+                                        />
+                                    </button>
+                                    {isOpen && (
+                                        <div className="px-5 pb-5 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                                            {faq.a}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* 6. Support & Contact Help Banner */}
+                <div className="w-full max-w-7xl mt-14 bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-5">
+                        <div className="w-16 h-16 rounded-2xl bg-red-100 text-[#c44d4d] flex items-center justify-center shrink-0">
+                            <Headphones size={32} />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-900">Need Assistance With Your Booking?</h3>
+                            <p className="text-sm text-slate-600 mt-1">Our customer experience agents are available 24/7 across all districts.</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <a
+                            href="tel:+8801700000000"
+                            className="bg-[#172144] text-white px-5 py-3 rounded-xl font-bold text-sm hover:bg-[#c44d4d] transition-all flex items-center gap-2 shadow"
+                        >
+                            <PhoneCall size={16} /> Hotline: 16423
+                        </a>
+                        <button
+                            type="button"
+                            onClick={() => router.push('/timetable')}
+                            className="bg-slate-100 hover:bg-slate-200 text-slate-800 px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2"
+                        >
+                            Browse All Buses <ArrowRight size={16} />
+                        </button>
                     </div>
                 </div>
             </div>
