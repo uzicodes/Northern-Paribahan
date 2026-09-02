@@ -1,23 +1,33 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET() {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
     try {
-        const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
-
-        if (!userId) {
-            return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-        }
-
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
+        // Auto-upsert: if user exists in Supabase Auth but not in Prisma (e.g. after DB reset),
+        // create the Prisma record on the fly so the profile page works seamlessly.
+        const profile = await prisma.user.upsert({
+            where: { id: user.id },
+            update: {}, // Don't overwrite existing data on every profile fetch
+            create: {
+                id: user.id,
+                email: user.email!,
+                name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
+                phoneNumber: user.user_metadata?.phone_number || null,
+            },
             include: {
                 bookings: {
                     include: {
-                        tickets: true, 
+                        tickets: true,
                         schedule: {
                             include: {
                                 bus: true,
@@ -32,11 +42,29 @@ export async function GET(request: Request) {
             },
         });
 
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        return NextResponse.json(user);
+        // Return the shape the frontend expects: { user, bookings }
+        return NextResponse.json({
+            user: {
+                id: profile.id,
+                name: profile.name || user.user_metadata?.name || 'User',
+                email: profile.email,
+                phoneNumber: profile.phoneNumber || user.user_metadata?.phone_number || '',
+                role: profile.role,
+            },
+            bookings: profile.bookings.map(booking => ({
+                id: booking.id,
+                status: booking.status,
+                createdAt: booking.createdAt,
+                totalFare: booking.totalFare,
+                seatNumbers: booking.tickets.map(t => t.seatNumber),
+                busName: booking.schedule?.bus?.name || 'Unknown Bus',
+                busType: booking.schedule?.bus?.type || 'Unknown',
+                registrationNumber: booking.schedule?.bus?.registrationNumber || 'N/A',
+                route: booking.schedule?.route
+                    ? `${booking.schedule.route.origin} → ${booking.schedule.route.destination}`
+                    : '',
+            })),
+        });
     } catch (error) {
         console.error('Profile fetch error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
