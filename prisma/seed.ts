@@ -1,48 +1,58 @@
-import { prisma } from "@/lib/db";
-import { Prisma } from "@prisma/client";
+import { PrismaClient, BusType } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 async function main() {
-    // Create admin user
-    // Password should be hashed in production
+    // Clear existing data to prevent duplicates 
+    await prisma.ticket.deleteMany({});
+    await prisma.booking.deleteMany({});
+    await prisma.schedule.deleteMany({});
+    await prisma.route.deleteMany({});
+    await prisma.bus.deleteMany({});
 
-    // Create Buses
-    const buses = [
-        {
-            name: "Northern Express",
-            plateNumber: "DHAKA-METRO-KA-1234",
-            type: "AC",
-            price: 1200,
-        },
-        {
-            name: "Paribahan Deluxe",
-            plateNumber: "CHITTAGONG-ZA-5678",
-            type: "Non-AC",
-            price: 800,
-        },
+    console.log('Cleared existing database records.');
+
+    // 18 buses (3 of each model)
+    const busesData = [
+        // Volvo B9R (AC, 40 seats)
+        { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1001", type: BusType.AC, capacity: 40 },
+        { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1002", type: BusType.AC, capacity: 40 },
+        { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1003", type: BusType.AC, capacity: 40 },
+
+        // Mercedes-Benz OM 906 (AC, 41 seats)
+        { name: "Mercedes-Benz OM 906", registrationNumber: "DHAKA METRO-BA 15-2001", type: BusType.AC, capacity: 41 },
+        { name: "Mercedes-Benz OM 906", registrationNumber: "DHAKA METRO-BA 15-2002", type: BusType.AC, capacity: 41 },
+        { name: "Mercedes-Benz OM 906", registrationNumber: "DHAKA METRO-BA 15-2003", type: BusType.AC, capacity: 41 },
+
+        // Scania Legacy SR2 (AC, 46 seats)
+        { name: "Scania Legacy SR2", registrationNumber: "DHAKA METRO-BA 15-3001", type: BusType.AC, capacity: 46 },
+        { name: "Scania Legacy SR2", registrationNumber: "DHAKA METRO-BA 15-3002", type: BusType.AC, capacity: 46 },
+        { name: "Scania Legacy SR2", registrationNumber: "DHAKA METRO-BA 15-3003", type: BusType.AC, capacity: 46 },
+
+        // Hino RN8J (AC, 36 seats)
+        { name: "Hino RN8J", registrationNumber: "DHAKA METRO-BA 15-4001", type: BusType.AC, capacity: 36 },
+        { name: "Hino RN8J", registrationNumber: "DHAKA METRO-BA 15-4002", type: BusType.AC, capacity: 36 },
+        { name: "Hino RN8J", registrationNumber: "DHAKA METRO-BA 15-4003", type: BusType.AC, capacity: 36 },
+
+        // MAN 24.460 (Sleeper, 40 seats)
+        { name: "MAN 24.460", registrationNumber: "DHAKA METRO-BA 15-5001", type: BusType.SLEEPER, capacity: 40 },
+        { name: "MAN 24.460", registrationNumber: "DHAKA METRO-BA 15-5002", type: BusType.SLEEPER, capacity: 40 },
+        { name: "MAN 24.460", registrationNumber: "DHAKA METRO-BA 15-5003", type: BusType.SLEEPER, capacity: 40 },
+
+        // Ashok Leyland Eagle (Non-AC, 45 seats)
+        { name: "Ashok Leyland Eagle", registrationNumber: "DHAKA METRO-BA 15-6001", type: BusType.NON_AC, capacity: 45 },
+        { name: "Ashok Leyland Eagle", registrationNumber: "DHAKA METRO-BA 15-6002", type: BusType.NON_AC, capacity: 45 },
+        { name: "Ashok Leyland Eagle", registrationNumber: "DHAKA METRO-BA 15-6003", type: BusType.NON_AC, capacity: 45 },
     ];
 
-    await Promise.all(
-        buses.map(async (busData) => {
-            const bus = await prisma.bus.create({
-                data: busData,
-            });
+    // Insert in DB
+    for (const bus of busesData) {
+        await prisma.bus.create({
+            data: bus
+        });
+    }
 
-            // Create 40 seats for each bus
-            const seatPromises = Array.from({ length: 40 }, (_, index) => {
-                const i = index + 1;
-                return prisma.seat.create({
-                    data: {
-                        seatNumber: `${String.fromCharCode(65 + Math.floor((i - 1) / 4))}${((i - 1) % 4) + 1}`, // A1, A2, ... J4
-                        busId: bus.id,
-                    },
-                });
-            });
-
-            await Promise.all(seatPromises);
-
-            console.log(`Created bus: ${bus.name} with seats`);
-        })
-    );
+    console.log(`Successfully seeded ${busesData.length} buses into the fleet!`);
 }
 
 main()
@@ -54,5 +64,3 @@ main()
         await prisma.$disconnect();
         process.exit(1);
     });
-
-export type SeedScript = typeof main;

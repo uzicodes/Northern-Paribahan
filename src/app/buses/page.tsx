@@ -80,26 +80,27 @@ const busShowcase: ShowcaseBus[] = [
     },
 ];
 
-import { Bus as ApiBus } from "@/types";
+type ApiBus = {
+    id: string;
+    name: string;
+    registrationNumber: string;
+    type: string;
+    capacity: number;
+};
 
 type MergedBus = ShowcaseBus & {
     id?: string;
     name: string;
-    plateNumber: string;
+    registrationNumber: string;
     type: string;
     price: number;
-    totalSeats: number;
-    availableSeats: number;
+    capacity: number;
 };
 
 export default async function BusesPage() {
     let apiBuses: ApiBus[] = [];
     try {
-        const buses = await prisma.bus.findMany({
-            include: {
-                seats: true,
-            },
-        });
+        const buses = await prisma.bus.findMany();
         apiBuses = buses as unknown as ApiBus[];
     } catch (error) {
         console.error('Failed to fetch buses:', error);
@@ -112,12 +113,10 @@ export default async function BusesPage() {
             ...showcase,
             id: matched?.id,
             name: matched?.name || showcase.brand,
-            plateNumber: matched?.plateNumber || 'N/A',
+            registrationNumber: matched?.registrationNumber || 'N/A',
             type: matched?.type || showcase.features[0],
-            price: matched?.price || 0,
-            totalSeats: matched?.seats?.length || showcase.seats || 0,
-            availableSeats:
-                matched?.seats?.filter((s) => !s.isBooked).length || 0,
+            price: 0,
+            capacity: matched?.capacity || showcase.seats || 0,
         };
     });
 
@@ -144,7 +143,7 @@ export default async function BusesPage() {
                             ))}
                             <span className="text-xs bg-green-100 text-red-600 px-2 py-1 rounded flex items-center gap-1">
                                 <Users size={12} />
-                                {bus.totalSeats}
+                                {bus.capacity}
                             </span>
                         </div>
                     </div>
