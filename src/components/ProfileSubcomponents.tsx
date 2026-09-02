@@ -6,11 +6,12 @@ export interface BookingItem {
     id: string;
     status: string;
     createdAt: string;
-    seatNumber: string;
+    totalFare: number;
+    seatNumbers: string[];  // derived from tickets
     busName: string;
     busType: string;
-    busPlate: string;
-    price: number;
+    registrationNumber: string;
+    route: string;          // e.g. "Dhaka → Bogura"
 }
 
 export function SidebarButton({ icon: Icon, label, active, onClick }: {
@@ -80,20 +81,23 @@ export function BookingCard({ booking, isUpcoming = false }: { booking: BookingI
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-slate-800">{booking.busName}</h4>
-                    <p className="text-sm text-slate-400">{booking.busType} • Plate: {booking.busPlate}</p>
+                    <p className="text-sm text-slate-400">{booking.busType} • {booking.registrationNumber}</p>
+                    {booking.route && (
+                        <p className="text-sm text-slate-500 mt-0.5">{booking.route}</p>
+                    )}
                     <div className="flex flex-wrap gap-3 mt-2">
                         <span className="inline-flex items-center gap-1 text-xs text-slate-500">
                             <Calendar size={12} /> {formattedDate}
                         </span>
                         <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-                            <MapPin size={12} /> Seat {booking.seatNumber}
+                            <MapPin size={12} /> Seat{booking.seatNumbers.length > 1 ? 's' : ''} {booking.seatNumbers.join(', ')}
                         </span>
                     </div>
                 </div>
 
                 {/* Price & Status */}
                 <div className="flex flex-col items-end gap-2">
-                    <span className="text-lg font-bold text-slate-800">৳{booking.price}</span>
+                    <span className="text-lg font-bold text-slate-800">৳{booking.totalFare}</span>
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${isUpcoming
                         ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
                         : 'bg-slate-50 text-slate-500 border-slate-200'
