@@ -30,8 +30,9 @@ export async function GET() {
                         tickets: true,
                         schedule: {
                             include: {
-                                bus: true,
-                                route: true,
+                                bus: {
+                                    select: { type: true },
+                                },
                             },
                         },
                     },
@@ -57,11 +58,11 @@ export async function GET() {
                 createdAt: booking.createdAt,
                 totalFare: booking.totalFare,
                 seatNumbers: booking.tickets.map(t => t.seatNumber),
-                busName: booking.schedule?.bus?.name || 'Unknown Bus',
-                busType: booking.schedule?.bus?.type || 'Unknown',
-                registrationNumber: booking.schedule?.bus?.registrationNumber || 'N/A',
-                route: booking.schedule?.route
-                    ? `${booking.schedule.route.origin} → ${booking.schedule.route.destination}`
+                busName: booking.schedule?.busName || 'Unknown Bus',
+                busType: booking.schedule?.bus?.type || 'Standard',
+                registrationNumber: booking.schedule?.registrationNumber || 'N/A',
+                route: booking.schedule
+                    ? `${booking.schedule.origin} → ${booking.schedule.destination}`
                     : '',
             })),
         });

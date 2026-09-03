@@ -1,16 +1,11 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Satisfy } from 'next/font/google';
+import { satisfy } from '@/lib/fonts';
 import { Loader2, AlertCircle, CheckCircle2, Mail, ArrowLeft } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import Image from 'next/image';
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState<string>('');

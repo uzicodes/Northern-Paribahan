@@ -137,6 +137,10 @@ async function main() {
     const schedulesData: {
         busId: string;
         routeId: string;
+        origin: string;
+        destination: string;
+        busName: string;
+        registrationNumber: string;
         departureTime: Date;
         arrivalTime: Date;
         fare: number;
@@ -208,6 +212,10 @@ async function main() {
             schedulesData.push({
                 busId: outboundBus.id,
                 routeId: routeInfo.outboundId,
+                origin: "Dinajpur",
+                destination: config.destination,
+                busName: outboundBus.name,
+                registrationNumber: outboundBus.registrationNumber,
                 departureTime: outboundDep,
                 arrivalTime: outboundArr,
                 fare: config.fare,
@@ -221,6 +229,10 @@ async function main() {
             schedulesData.push({
                 busId: inboundBus.id,
                 routeId: routeInfo.inboundId,
+                origin: config.destination,
+                destination: "Dinajpur",
+                busName: inboundBus.name,
+                registrationNumber: inboundBus.registrationNumber,
                 departureTime: inboundDep,
                 arrivalTime: inboundArr,
                 fare: config.fare,
@@ -293,6 +305,10 @@ async function main() {
             schedulesData.push({
                 busId: mainOutboundBus.id,
                 routeId: mainRouteInfo.outboundId,
+                origin: "Dinajpur",
+                destination: config.destination,
+                busName: mainOutboundBus.name,
+                registrationNumber: mainOutboundBus.registrationNumber,
                 departureTime: mainOutDep,
                 arrivalTime: mainOutArr,
                 fare: config.mainFare,
@@ -306,6 +322,10 @@ async function main() {
             schedulesData.push({
                 busId: mainInboundBus.id,
                 routeId: mainRouteInfo.inboundId,
+                origin: config.destination,
+                destination: "Dinajpur",
+                busName: mainInboundBus.name,
+                registrationNumber: mainInboundBus.registrationNumber,
                 departureTime: mainInDep,
                 arrivalTime: mainInArr,
                 fare: config.mainFare,
@@ -319,6 +339,10 @@ async function main() {
             schedulesData.push({
                 busId: dhakaExpressBus.id,
                 routeId: dhakaRouteInfo.outboundId,
+                origin: "Dinajpur",
+                destination: "Dhaka",
+                busName: dhakaExpressBus.name,
+                registrationNumber: dhakaExpressBus.registrationNumber,
                 departureTime: dhakaOutDep,
                 arrivalTime: dhakaOutArr,
                 fare: config.dhakaFare,
@@ -332,6 +356,10 @@ async function main() {
             schedulesData.push({
                 busId: dhakaExpressBus.id,
                 routeId: dhakaRouteInfo.inboundId,
+                origin: "Dhaka",
+                destination: "Dinajpur",
+                busName: dhakaExpressBus.name,
+                registrationNumber: dhakaExpressBus.registrationNumber,
                 departureTime: dhakaInDep,
                 arrivalTime: dhakaInArr,
                 fare: config.dhakaFare,

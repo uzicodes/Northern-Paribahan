@@ -2,16 +2,11 @@
 
 import React, { useReducer } from 'react';
 import { useRouter } from 'next/navigation';
-import { Satisfy } from 'next/font/google';
+import { satisfy } from '@/lib/fonts';
 import { Loader2, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
 
 type LoginState = {
     email: string;

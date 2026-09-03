@@ -18,6 +18,10 @@ export interface Schedule {
     departureTime: string;
     arrivalTime: string;
     fare: number;
+    origin: string;
+    destination: string;
+    busName: string;
+    registrationNumber: string;
     busId: string;
     routeId: string;
     bus?: Bus;

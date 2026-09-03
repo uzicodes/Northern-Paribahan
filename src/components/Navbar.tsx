@@ -5,13 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { MobileMenu, ContactPopup } from './NavbarModals';
 import { toast } from 'sonner';
-import { Satisfy } from 'next/font/google';
+import { satisfy } from '@/lib/fonts';
 import { createClient } from '@/utils/supabase/client';
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
 
 type JwtPayload = { role?: string };
 

@@ -3,7 +3,7 @@ import 'lenis/dist/lenis.css';
 import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import Link from 'next/link';
-import { Satisfy } from 'next/font/google';
+import { satisfy } from '@/lib/fonts';
 import localFont from 'next/font/local';
 import Image from 'next/image';
 import NavbarClient from '@/components/Navbar';
@@ -13,11 +13,6 @@ import SmoothScroll from '@/components/SmoothScroll';
 import dynamic from 'next/dynamic';
 
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
 
 const satoshi = localFont({
     src: [

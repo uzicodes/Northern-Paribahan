@@ -63,19 +63,25 @@ model Route {
 }
 
 model Schedule {
-  id            String    @id @default(cuid())
-  departureTime DateTime  @map("departure_time")
-  arrivalTime   DateTime  @map("arrival_time")
-  fare          Float     // Price belongs to the schedule, not the bus
+  id                 String    @id @default(cuid())
+  departureTime      DateTime  @map("departure_time")
+  arrivalTime        DateTime  @map("arrival_time")
+  fare               Float     // Price belongs to the schedule, not the bus
   
+  // Snapshot fields for fast reads and Supabase Studio inspection
+  origin             String
+  destination        String
+  busName            String    @map("bus_name")
+  registrationNumber String    @map("registration_number")
+
   // Relationships
-  busId         String    @map("bus_id")
-  bus           Bus       @relation(fields: [busId], references: [id])
-  routeId       String    @map("route_id")
-  route         Route     @relation(fields: [routeId], references: [id])
+  busId              String    @map("bus_id")
+  bus                Bus       @relation(fields: [busId], references: [id])
+  routeId            String    @map("route_id")
+  route              Route     @relation(fields: [routeId], references: [id])
   
-  bookings      Booking[]
-  tickets       Ticket[]  // To quickly check which seats are taken for this specific trip
+  bookings           Booking[]
+  tickets            Ticket[]  // To quickly check which seats are taken for this specific trip
 
   @@map("schedules")
 }

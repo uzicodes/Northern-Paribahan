@@ -1,11 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Satisfy } from 'next/font/google';
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
+import { satisfy } from '@/lib/fonts';
 
 export default function Footer() {
     return (

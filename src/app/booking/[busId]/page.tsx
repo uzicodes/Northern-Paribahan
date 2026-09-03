@@ -50,7 +50,6 @@ export default async function BookingPage(props: PageProps) {
             where: { id: scheduleId },
             include: {
                 tickets: true,
-                route: true,
             },
         }),
     ]);
@@ -80,9 +79,9 @@ export default async function BookingPage(props: PageProps) {
             <p className="text-gray-600 mb-2">
                 {bus.type} • {bus.registrationNumber} • ৳{schedule.fare}/seat
             </p>
-            {schedule.route && (
+            {schedule.origin && schedule.destination && (
                 <p className="text-gray-500 mb-8">
-                    {schedule.route.origin} → {schedule.route.destination}
+                    {schedule.origin} → {schedule.destination}
                 </p>
             )}
 

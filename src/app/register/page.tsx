@@ -1,16 +1,11 @@
 "use client";
 import React, { useReducer } from 'react';
 import { useRouter } from 'next/navigation';
-import { Satisfy } from 'next/font/google';
+import { satisfy } from '@/lib/fonts';
 import { Loader2, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import Link from 'next/link';
-
-const satisfy = Satisfy({
-    weight: '400',
-    subsets: ['latin'],
-});
 
 // Move regex outside the component to fix ReferenceError
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
