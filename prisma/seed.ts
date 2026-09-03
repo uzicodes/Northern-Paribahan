@@ -130,9 +130,11 @@ async function main() {
 
     console.log(`3. Created 16 point-to-point routes (8 outbound + 8 return).`);
 
-    // 4. Generate 3-Day Timetable with Strict Departure Times & Rotations
-    const baseDate = new Date();
-    baseDate.setHours(0, 0, 0, 0);
+    // 4. Generate 30-Day Rolling Timetable (Day 0 through Day 30) with Strict Rotation & Snapshots
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const TOTAL_DAYS = 31; // Days 0 through 30 (31 days total)
 
     const schedulesData: {
         busId: string;
@@ -148,10 +150,10 @@ async function main() {
 
     // -------------------------------------------------------------
     // A. Standard 3-Bus Rotation (Sylhet, Khulna, Dhaka Regular, Rajshahi, Bogura)
-    // Daily Cycle:
-    // - Bus 1: Outbound (Dinajpur -> Destination)
-    // - Bus 2: Inbound (Destination -> Dinajpur)
-    // - Bus 3: Rests
+    // Daily Rotation (modulo 3):
+    // - Bus (dayOffset % 3): Outbound (Dinajpur -> Destination)
+    // - Bus ((dayOffset + 1) % 3): Inbound (Destination -> Dinajpur)
+    // - Bus ((dayOffset + 2) % 3): Resting
     // -------------------------------------------------------------
     const standard3BusConfigs = [
         // 1. Sylhet (Volvo AC, 11.5h) - Depart 19:30 (7:30 PM)
@@ -205,14 +207,14 @@ async function main() {
         const buses = busesByModel[config.modelName];
         const routeInfo = routesMap[config.destination];
 
-        for (let day = 0; day < 3; day++) {
-            const currentDay = new Date(baseDate);
-            currentDay.setDate(baseDate.getDate() + day);
+        for (let dayOffset = 0; dayOffset < TOTAL_DAYS; dayOffset++) {
+            const currentDay = new Date(today);
+            currentDay.setDate(today.getDate() + dayOffset);
 
             // 3-Bus Rotation Cycle
-            const outboundBus = buses[day % 3];
-            const inboundBus  = buses[(day + 1) % 3];
-            // Resting Bus: buses[(day + 2) % 3]
+            const outboundBus = buses[dayOffset % 3];
+            const inboundBus  = buses[(dayOffset + 1) % 3];
+            // Resting Bus: buses[(dayOffset + 2) % 3]
 
             // 1. Outbound (Dinajpur -> Destination)
             const outboundDep = new Date(currentDay);
@@ -252,11 +254,11 @@ async function main() {
 
     // -------------------------------------------------------------
     // B. Premium 4-Bus Rotation (Cox's Bazar, Chittagong, Barisal + Dhaka Express)
-    // Daily Cycle:
-    // - Bus 1: Outbound to main destination
-    // - Bus 2: Inbound from main destination
-    // - Bus 3: Round-Trip Dinajpur <-> Dhaka Express
-    // - Bus 4: Rests (Strict 1-day rest)
+    // Daily Rotation (modulo 4):
+    // - Bus (dayOffset % 4): Outbound to main destination
+    // - Bus ((dayOffset + 1) % 4): Inbound from main destination
+    // - Bus ((dayOffset + 2) % 4): Round-Trip Dinajpur <-> Dhaka Express
+    // - Bus ((dayOffset + 3) % 4): Resting (Strict 1-day rest)
     // -------------------------------------------------------------
     const dhakaRouteInfo = routesMap["Dhaka"];
 
@@ -309,15 +311,15 @@ async function main() {
         const buses = busesByModel[config.modelName];
         const mainRouteInfo = routesMap[config.destination];
 
-        for (let day = 0; day < 3; day++) {
-            const currentDay = new Date(baseDate);
-            currentDay.setDate(baseDate.getDate() + day);
+        for (let dayOffset = 0; dayOffset < TOTAL_DAYS; dayOffset++) {
+            const currentDay = new Date(today);
+            currentDay.setDate(today.getDate() + dayOffset);
 
             // 4-Bus Rotation Cycle
-            const mainOutboundBus = buses[day % 4];
-            const mainInboundBus  = buses[(day + 1) % 4];
-            const dhakaExpressBus = buses[(day + 2) % 4];
-            // Resting Bus: buses[(day + 3) % 4]
+            const mainOutboundBus = buses[dayOffset % 4];
+            const mainInboundBus  = buses[(dayOffset + 1) % 4];
+            const dhakaExpressBus = buses[(dayOffset + 2) % 4];
+            // Resting Bus: buses[(dayOffset + 3) % 4]
 
             // 1. Outbound to Main Destination (Dinajpur -> Cox's / Chittagong / Barisal)
             const mainOutDep = new Date(currentDay);
@@ -397,7 +399,7 @@ async function main() {
         data: schedulesData,
     });
 
-    console.log(`4. Successfully generated and saved ${schedulesData.length} schedules across 3 days!`);
+    console.log(`4. Successfully generated and saved ${schedulesData.length} schedules across 30 days (Day 0 through Day 30)!`);
     console.log('--- Database Seeding Completed Successfully ---');
 }
 
