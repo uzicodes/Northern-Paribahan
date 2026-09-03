@@ -29,9 +29,10 @@ type FormattedSchedule = {
     duration: string;
     type: string;
     fare: string;
+    rawFare: number;
     seats: number;
     period: string;
-    rawDeparture: Date;
+    rawDeparture: string;
 };
 
 export default async function TimetablePage() {
@@ -96,9 +97,10 @@ export default async function TimetablePage() {
             duration: `${diffHrs}h ${diffMins}m`,
             type: schedule.bus.type.replace('_', ' '), // e.g., NON_AC -> NON AC
             fare: `৳ ${schedule.fare.toLocaleString()}`,
+            rawFare: schedule.fare,
             seats: availableSeats,
             period: period,
-            rawDeparture: schedule.departureTime, // Kept for exact sorting if needed later
+            rawDeparture: schedule.departureTime.toISOString(),
         };
     });
 

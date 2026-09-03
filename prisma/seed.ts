@@ -43,12 +43,12 @@ async function main() {
         { name: "Mercedes-Benz OM 906", registrationNumber: "DHAKA METRO-BA 15-2003", type: BusType.AC, capacity: 41 },
         { name: "Mercedes-Benz OM 906", registrationNumber: "DHAKA METRO-BA 15-2004", type: BusType.AC, capacity: 41 },
 
-        // 3x Volvo B9R (AC, 40 seats) - Dedicated to Khulna
+        // 3x Volvo B9R (AC, 40 seats) - Dedicated to Sylhet
         { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1001", type: BusType.AC, capacity: 40 },
         { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1002", type: BusType.AC, capacity: 40 },
         { name: "Volvo B9R", registrationNumber: "DHAKA METRO-BA 15-1003", type: BusType.AC, capacity: 40 },
 
-        // 3x Hyundai Universe (AC, 40 seats) - Dedicated to Sylhet
+        // 3x Hyundai Universe (AC, 40 seats) - Dedicated to Khulna
         { name: "Hyundai Universe", registrationNumber: "DHAKA METRO-BA 15-7001", type: BusType.AC, capacity: 40 },
         { name: "Hyundai Universe", registrationNumber: "DHAKA METRO-BA 15-7002", type: BusType.AC, capacity: 40 },
         { name: "Hyundai Universe", registrationNumber: "DHAKA METRO-BA 15-7003", type: BusType.AC, capacity: 40 },
@@ -130,7 +130,7 @@ async function main() {
 
     console.log(`3. Created 16 point-to-point routes (8 outbound + 8 return).`);
 
-    // 4. Generate 3-Day Timetable with Strict Rotations
+    // 4. Generate 3-Day Timetable with Strict Departure Times & Rotations
     const baseDate = new Date();
     baseDate.setHours(0, 0, 0, 0);
 
@@ -147,47 +147,57 @@ async function main() {
     }[] = [];
 
     // -------------------------------------------------------------
-    // A. Standard 3-Bus Rotation (Sylhet, Khulna, Dhaka Primary, Rajshahi, Bogura)
+    // A. Standard 3-Bus Rotation (Sylhet, Khulna, Dhaka Regular, Rajshahi, Bogura)
     // Daily Cycle:
     // - Bus 1: Outbound (Dinajpur -> Destination)
     // - Bus 2: Inbound (Destination -> Dinajpur)
     // - Bus 3: Rests
     // -------------------------------------------------------------
     const standard3BusConfigs = [
+        // 1. Sylhet (Volvo AC, 11.5h) - Depart 19:30 (7:30 PM)
         {
             destination: "Sylhet",
-            modelName: "Hyundai Universe",
+            modelName: "Volvo B9R",
             fare: 1450,
-            outboundDep: { hour: 20, minute: 30 }, // 08:30 PM
-            inboundDep: { hour: 20, minute: 30 },  // 08:30 PM
+            estimatedHours: 11.5,
+            outboundDep: { hour: 19, minute: 30 },
+            inboundDep:  { hour: 19, minute: 30 },
         },
+        // 2. Khulna (Hyundai AC, 10.0h) - Depart 20:30 (8:30 PM)
         {
             destination: "Khulna",
-            modelName: "Volvo B9R",
+            modelName: "Hyundai Universe",
             fare: 1350,
-            outboundDep: { hour: 21, minute: 0 },  // 09:00 PM
-            inboundDep: { hour: 21, minute: 0 },   // 09:00 PM
+            estimatedHours: 10.0,
+            outboundDep: { hour: 20, minute: 30 },
+            inboundDep:  { hour: 20, minute: 30 },
         },
+        // 3. Dhaka Regular (Hino AC, 7.5h) - Depart 08:30 (8:30 AM)
         {
             destination: "Dhaka",
             modelName: "Hino RN8J",
-            fare: 1000, // Standard AC fare
-            outboundDep: { hour: 22, minute: 0 },  // 10:00 PM
-            inboundDep: { hour: 22, minute: 0 },   // 10:00 PM
+            fare: 1000,
+            estimatedHours: 7.5,
+            outboundDep: { hour: 8, minute: 30 },
+            inboundDep:  { hour: 8, minute: 30 },
         },
+        // 4. Rajshahi (Ashok Non-AC, 4.5h) - Depart 08:00 (8:00 AM)
         {
             destination: "Rajshahi",
             modelName: "Ashok Leyland Eagle",
-            fare: 550, // Non-AC fare
-            outboundDep: { hour: 8, minute: 0 },   // 08:00 AM
-            inboundDep: { hour: 14, minute: 30 },  // 02:30 PM
+            fare: 550,
+            estimatedHours: 4.5,
+            outboundDep: { hour: 8, minute: 0 },
+            inboundDep:  { hour: 8, minute: 0 },
         },
+        // 5. Bogura (Eicher Non-AC, 3.0h) - Depart 09:00 (9:00 AM)
         {
             destination: "Bogura",
             modelName: "Eicher Pro",
-            fare: 350, // Non-AC fare
-            outboundDep: { hour: 9, minute: 0 },   // 09:00 AM
-            inboundDep: { hour: 15, minute: 0 },   // 03:00 PM
+            fare: 350,
+            estimatedHours: 3.0,
+            outboundDep: { hour: 9, minute: 0 },
+            inboundDep:  { hour: 9, minute: 0 },
         },
     ];
 
@@ -207,7 +217,7 @@ async function main() {
             // 1. Outbound (Dinajpur -> Destination)
             const outboundDep = new Date(currentDay);
             outboundDep.setHours(config.outboundDep.hour, config.outboundDep.minute, 0, 0);
-            const outboundArr = new Date(outboundDep.getTime() + routeInfo.estimatedHours * 60 * 60 * 1000);
+            const outboundArr = new Date(outboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: outboundBus.id,
@@ -224,7 +234,7 @@ async function main() {
             // 2. Inbound (Destination -> Dinajpur)
             const inboundDep = new Date(currentDay);
             inboundDep.setHours(config.inboundDep.hour, config.inboundDep.minute, 0, 0);
-            const inboundArr = new Date(inboundDep.getTime() + routeInfo.estimatedHours * 60 * 60 * 1000);
+            const inboundArr = new Date(inboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: inboundBus.id,
@@ -243,43 +253,55 @@ async function main() {
     // -------------------------------------------------------------
     // B. Premium 4-Bus Rotation (Cox's Bazar, Chittagong, Barisal + Dhaka Express)
     // Daily Cycle:
-    // - Bus 1: Outbound to main destination (e.g., Cox's Bazar / Chittagong / Barisal)
+    // - Bus 1: Outbound to main destination
     // - Bus 2: Inbound from main destination
-    // - Bus 3: Round Trip Dinajpur <-> Dhaka Express (Outbound morning, Inbound evening)
+    // - Bus 3: Round-Trip Dinajpur <-> Dhaka Express
     // - Bus 4: Rests (Strict 1-day rest)
     // -------------------------------------------------------------
     const dhakaRouteInfo = routesMap["Dhaka"];
 
     const premium4BusConfigs = [
+        // 1. Cox's Bazar (MAN Sleeper, 17.0h) - Depart 15:00 (3:00 PM)
+        //    Dhaka Sleeper Express (7.5h) - Outbound: 22:30, Inbound: 09:00 next day
         {
             destination: "Cox's Bazar",
             modelName: "MAN 24.460",
-            mainFare: 2200, // Luxury Sleeper to Cox's Bazar
-            dhakaFare: 1600, // Premium Sleeper to Dhaka
-            mainOutboundDep: { hour: 18, minute: 0 }, // 06:00 PM
-            mainInboundDep:  { hour: 18, minute: 0 }, // 06:00 PM
-            dhakaOutboundDep: { hour: 7, minute: 0 }, // 07:00 AM (Morning Sleeper to Dhaka)
-            dhakaInboundDep:  { hour: 21, minute: 30 }, // 09:30 PM (Night Sleeper back from Dhaka)
+            mainFare: 2200,
+            dhakaFare: 1600,
+            mainHours: 17.0,
+            dhakaHours: 7.5,
+            mainOutboundDep:  { hour: 15, minute: 0 },  // 03:00 PM
+            mainInboundDep:   { hour: 15, minute: 0 },  // 03:00 PM
+            dhakaOutboundDep: { hour: 22, minute: 30 }, // 10:30 PM (Night Sleeper to Dhaka)
+            dhakaInboundDep:  { hour: 9,  minute: 0, nextDay: true },  // 09:00 AM next day (Morning Sleeper from Dhaka)
         },
+        // 2. Chittagong (Scania AC, 14.0h) - Depart 17:00 (5:00 PM)
+        //    Dhaka Scania Express (7.5h) - Outbound: 11:00 AM, Inbound: 20:00 (8:00 PM)
         {
             destination: "Chittagong",
             modelName: "Scania Legacy SR2",
-            mainFare: 1800, // Multi-Axle AC to Chittagong
-            dhakaFare: 1350, // Multi-Axle AC to Dhaka
-            mainOutboundDep: { hour: 19, minute: 0 }, // 07:00 PM
-            mainInboundDep:  { hour: 19, minute: 0 }, // 07:00 PM
-            dhakaOutboundDep: { hour: 8, minute: 30 }, // 08:30 AM (Morning AC to Dhaka)
-            dhakaInboundDep:  { hour: 22, minute: 30 }, // 10:30 PM (Night AC back from Dhaka)
+            mainFare: 1800,
+            dhakaFare: 1350,
+            mainHours: 14.0,
+            dhakaHours: 7.5,
+            mainOutboundDep:  { hour: 17, minute: 0 },  // 05:00 PM
+            mainInboundDep:   { hour: 17, minute: 0 },  // 05:00 PM
+            dhakaOutboundDep: { hour: 11, minute: 0 },  // 11:00 AM (Day AC to Dhaka)
+            dhakaInboundDep:  { hour: 20, minute: 0 },  // 08:00 PM (Evening AC from Dhaka)
         },
+        // 3. Barisal (Mercedes AC, 11.5h) - Depart 19:00 (7:00 PM)
+        //    Dhaka Mercedes Express (7.5h) - Outbound: 06:00 AM, Inbound: 15:00 (3:00 PM)
         {
             destination: "Barisal",
             modelName: "Mercedes-Benz OM 906",
-            mainFare: 1450, // Executive AC to Barisal
-            dhakaFare: 1300, // Executive AC to Dhaka
-            mainOutboundDep: { hour: 20, minute: 0 }, // 08:00 PM
-            mainInboundDep:  { hour: 20, minute: 0 }, // 08:00 PM
-            dhakaOutboundDep: { hour: 10, minute: 0 }, // 10:00 AM (Day AC to Dhaka)
-            dhakaInboundDep:  { hour: 23, minute: 30 }, // 11:30 PM (Night AC back from Dhaka)
+            mainFare: 1450,
+            dhakaFare: 1300,
+            mainHours: 11.5,
+            dhakaHours: 7.5,
+            mainOutboundDep:  { hour: 19, minute: 0 },  // 07:00 PM
+            mainInboundDep:   { hour: 19, minute: 0 },  // 07:00 PM
+            dhakaOutboundDep: { hour: 6,  minute: 0 },  // 06:00 AM (Morning AC to Dhaka)
+            dhakaInboundDep:  { hour: 15, minute: 0 },  // 03:00 PM (Afternoon AC from Dhaka)
         },
     ];
 
@@ -297,10 +319,10 @@ async function main() {
             const dhakaExpressBus = buses[(day + 2) % 4];
             // Resting Bus: buses[(day + 3) % 4]
 
-            // 1. Outbound to Main Destination (Dinajpur -> Cox's/Chittagong/Barisal)
+            // 1. Outbound to Main Destination (Dinajpur -> Cox's / Chittagong / Barisal)
             const mainOutDep = new Date(currentDay);
             mainOutDep.setHours(config.mainOutboundDep.hour, config.mainOutboundDep.minute, 0, 0);
-            const mainOutArr = new Date(mainOutDep.getTime() + mainRouteInfo.estimatedHours * 60 * 60 * 1000);
+            const mainOutArr = new Date(mainOutDep.getTime() + config.mainHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: mainOutboundBus.id,
@@ -314,10 +336,10 @@ async function main() {
                 fare: config.mainFare,
             });
 
-            // 2. Inbound from Main Destination (Cox's/Chittagong/Barisal -> Dinajpur)
+            // 2. Inbound from Main Destination (Cox's / Chittagong / Barisal -> Dinajpur)
             const mainInDep = new Date(currentDay);
             mainInDep.setHours(config.mainInboundDep.hour, config.mainInboundDep.minute, 0, 0);
-            const mainInArr = new Date(mainInDep.getTime() + mainRouteInfo.estimatedHours * 60 * 60 * 1000);
+            const mainInArr = new Date(mainInDep.getTime() + config.mainHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: mainInboundBus.id,
@@ -334,7 +356,7 @@ async function main() {
             // 3. Dhaka Express Outbound (Dinajpur -> Dhaka)
             const dhakaOutDep = new Date(currentDay);
             dhakaOutDep.setHours(config.dhakaOutboundDep.hour, config.dhakaOutboundDep.minute, 0, 0);
-            const dhakaOutArr = new Date(dhakaOutDep.getTime() + dhakaRouteInfo.estimatedHours * 60 * 60 * 1000);
+            const dhakaOutArr = new Date(dhakaOutDep.getTime() + config.dhakaHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: dhakaExpressBus.id,
@@ -350,8 +372,11 @@ async function main() {
 
             // 4. Dhaka Express Inbound (Dhaka -> Dinajpur)
             const dhakaInDep = new Date(currentDay);
+            if (config.dhakaInboundDep.nextDay) {
+                dhakaInDep.setDate(dhakaInDep.getDate() + 1);
+            }
             dhakaInDep.setHours(config.dhakaInboundDep.hour, config.dhakaInboundDep.minute, 0, 0);
-            const dhakaInArr = new Date(dhakaInDep.getTime() + dhakaRouteInfo.estimatedHours * 60 * 60 * 1000);
+            const dhakaInArr = new Date(dhakaInDep.getTime() + config.dhakaHours * 60 * 60 * 1000);
 
             schedulesData.push({
                 busId: dhakaExpressBus.id,
