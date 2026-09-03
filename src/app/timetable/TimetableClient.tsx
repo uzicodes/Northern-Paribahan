@@ -50,10 +50,14 @@ const typeColor: Record<string, string> = {
 interface TimetableClientProps {
     schedules: ScheduleData[];
     routes: string[];
+    initialRoute?: string;
+    initialDate?: string;
 }
 
-export default function TimetableClient({ schedules, routes }: TimetableClientProps) {
-    const [selectedRoute, setSelectedRoute] = useState<string>("All Routes");
+export default function TimetableClient({ schedules, routes, initialRoute, initialDate }: TimetableClientProps) {
+    const [selectedRoute, setSelectedRoute] = useState<string>(
+        initialRoute && routes.includes(initialRoute) ? initialRoute : "All Routes"
+    );
     const [selectedType, setSelectedType] = useState<string>("All Types");
     const [selectedPeriod, setSelectedPeriod] = useState<string>("all");
     const [sortBy, setSortBy] = useState<string>("earliest");
@@ -110,9 +114,16 @@ export default function TimetableClient({ schedules, routes }: TimetableClientPr
                         </div>
                         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Live Timetable</h1>
                     </div>
-                    <p className="text-indigo-100 text-lg max-w-2xl leading-relaxed">
-                        View real-time departure and arrival schedules for Northern Paribahan.
-                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <p className="text-indigo-100 text-lg max-w-2xl leading-relaxed">
+                            View real-time departure and arrival schedules for Northern Paribahan.
+                        </p>
+                        {initialDate && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FCA311] text-[#172144] shadow-sm">
+                                📅 Journey Date: {initialDate}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
 

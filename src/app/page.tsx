@@ -207,12 +207,21 @@ export default function Page() {
     const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
     const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+    const formatToLocalDateString = (d: Date): string => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const handleQuickRouteSelect = (from: string, to: string) => {
         dispatch({ fromValue: from, toValue: to });
         const params = new URLSearchParams();
         params.set('from', from);
         params.set('to', to);
-        params.set('date', dateOfJourney.toISOString());
+        params.set('origin', from);
+        params.set('destination', to);
+        params.set('date', formatToLocalDateString(dateOfJourney));
         router.push(`/timetable?${params.toString()}`);
     };
 
@@ -336,7 +345,9 @@ export default function Page() {
                                 const params = new URLSearchParams();
                                 params.set('from', fromValue);
                                 params.set('to', toValue);
-                                params.set('date', dateOfJourney.toISOString());
+                                params.set('origin', fromValue);
+                                params.set('destination', toValue);
+                                params.set('date', formatToLocalDateString(dateOfJourney));
                                 router.push(`/timetable?${params.toString()}`);
                             } else {
                                 toast.error('Please select both From and To locations');

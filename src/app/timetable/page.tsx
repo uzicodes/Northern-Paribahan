@@ -35,14 +35,65 @@ type FormattedSchedule = {
     rawDeparture: string;
 };
 
-export default async function TimetablePage() {
+interface PageProps {
+    searchParams: Promise<{
+        date?: string;
+        origin?: string;
+        destination?: string;
+        from?: string;
+        to?: string;
+    }>;
+}
+
+export default async function TimetablePage(props: PageProps) {
+    const searchParams = await props.searchParams;
+    const dateParam = searchParams.date;
+    const originParam = searchParams.origin || searchParams.from;
+    const destinationParam = searchParams.destination || searchParams.to;
+
+    // Construct Prisma where filter
+    const whereClause: Prisma.ScheduleWhereInput = {};
+
+    if (dateParam) {
+        // Full-day bounding box in local date
+        // e.g. "2026-09-10" -> startOfDay: 2026-09-10T00:00:00.000, endOfDay: 2026-09-10T23:59:59.999
+        const parts = dateParam.split('-').map(Number);
+        if (parts.length === 3 && !parts.some(isNaN)) {
+            const [year, month, day] = parts;
+            const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+            const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+            whereClause.departureTime = {
+                gte: startOfDay,
+                lte: endOfDay,
+            };
+        } else {
+            whereClause.departureTime = {
+                gte: new Date(),
+            };
+        }
+    } else {
+        whereClause.departureTime = {
+            gte: new Date(),
+        };
+    }
+
+    if (originParam) {
+        whereClause.origin = {
+            equals: originParam,
+            mode: 'insensitive',
+        };
+    }
+
+    if (destinationParam) {
+        whereClause.destination = {
+            equals: destinationParam,
+            mode: 'insensitive',
+        };
+    }
+
     // 1. Fetch data directly from Prisma
     const rawSchedules: ScheduleWithBusAndTickets[] = await prisma.schedule.findMany({
-        where: {
-            departureTime: {
-                gte: new Date(), // Only show future schedules
-            },
-        },
+        where: whereClause,
         include: {
             bus: {
                 select: {
@@ -57,6 +108,18 @@ export default async function TimetablePage() {
         orderBy: {
             departureTime: 'asc',
         },
+    });
+
+    // Also fetch all available route names across the network for dropdown options
+    const allRoutes = await prisma.route.findMany({
+        select: {
+            origin: true,
+            destination: true,
+        },
+        orderBy: [
+            { origin: 'asc' },
+            { destination: 'asc' },
+        ],
     });
 
     // 2. Transform the database records into the format the UI needs
@@ -104,10 +167,24 @@ export default async function TimetablePage() {
         };
     });
 
-    // 3. Extract unique routes for the dropdown
-    const uniqueRoutes: string[] = Array.from(
-        new Set(formattedSchedules.map((s: FormattedSchedule) => `${s.from} → ${s.to}`))
-    );
+    // 3. Extract unique routes for the dropdown (from network routes + filtered schedules)
+    const uniqueRoutesSet = new Set<string>();
+    for (const r of allRoutes) {
+        uniqueRoutesSet.add(`${r.origin} → ${r.destination}`);
+    }
+    for (const s of formattedSchedules) {
+        uniqueRoutesSet.add(`${s.from} → ${s.to}`);
+    }
+    const uniqueRoutes: string[] = Array.from(uniqueRoutesSet);
 
-    return <TimetableClient schedules={formattedSchedules} routes={uniqueRoutes} />;
+    const initialRoute = originParam && destinationParam ? `${originParam} → ${destinationParam}` : undefined;
+
+    return (
+        <TimetableClient
+            schedules={formattedSchedules}
+            routes={uniqueRoutes}
+            initialRoute={initialRoute}
+            initialDate={dateParam}
+        />
+    );
 }
