@@ -70,19 +70,27 @@ export default function NavbarClient() {
     const isActive = (path: string) => pathname === path;
 
     return (
-        <nav className="relative flex items-center gap-4 text-sm">
+        <nav className="relative flex items-center gap-3 text-sm">
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
                 <Link
                     href="/timetable"
-                    className={isActive('/timetable') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                        isActive('/timetable')
+                            ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
+                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                    }`}
                 >
                     Timetable
                 </Link>
 
                 <Link
                     href="/buses"
-                    className={isActive('/buses') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                        isActive('/buses')
+                            ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
+                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                    }`}
                 >
                     Buses
                 </Link>
@@ -90,7 +98,11 @@ export default function NavbarClient() {
                 {role === 'ADMIN' && (
                     <Link
                         href="/admin"
-                        className={isActive('/admin') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                        className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                            isActive('/admin')
+                                ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
+                                : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                        }`}
                     >
                         Admin
                     </Link>
@@ -99,13 +111,21 @@ export default function NavbarClient() {
                     <>
                         <Link
                             href="/login"
-                            className={isActive('/login') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                            className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                                isActive('/login')
+                                    ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
+                                    : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                            }`}
                         >
                             Login
                         </Link>
                         <Link
                             href="/register"
-                            className={isActive('/register') ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                            className={`px-4 py-1.5 rounded-full font-semibold transition-all duration-200 ${
+                                isActive('/register')
+                                    ? 'bg-[#FCA311] text-[#172144] shadow-sm'
+                                    : 'bg-[#FCA311]/20 text-[#FCA311] hover:bg-[#FCA311] hover:text-[#172144] border border-[#FCA311]/40'
+                            }`}
                         >
                             Register
                         </Link>
@@ -121,7 +141,11 @@ export default function NavbarClient() {
                             toast.error('Please Login First');
                         }
                     }}
-                    className={(isLoggedIn || isActive('/profile')) ? 'text-[#FCA311] hover:text-[#FCA311]' : 'text-white hover:text-[#FCA311]'}
+                    className={`p-2 rounded-full transition-all duration-200 ${
+                        (isLoggedIn || isActive('/profile'))
+                            ? 'text-[#FCA311] bg-white/15'
+                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                    }`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -132,14 +156,20 @@ export default function NavbarClient() {
                         type="button"
                         aria-label="Contact Us"
                         onClick={() => setShowContactPopup(true)}
-                        className="text-white hover:text-[#FCA311]"
+                        className="p-2 rounded-full text-white hover:text-[#FCA311] hover:bg-white/10 transition-all duration-200"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                     </button>
                 ) : (
-                    <button type="button" onClick={logout} className="text-white hover:text-[#FCA311]">Logout</button>
+                    <button
+                        type="button"
+                        onClick={logout}
+                        className="px-3.5 py-1.5 rounded-full text-white hover:text-[#FCA311] hover:bg-white/10 font-medium transition-all duration-200"
+                    >
+                        Logout
+                    </button>
                 )}
             </div>
 
