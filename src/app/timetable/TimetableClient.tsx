@@ -104,32 +104,28 @@ export default function TimetableClient({ schedules, routes, initialRoute, initi
     };
 
     return (
-        <div style={{ backgroundColor: "#f8f9fa" }} className="min-h-screen pb-16">
-            {/* Hero Header */}
-            <div className="bg-gradient-to-br from-[#172144] via-[#1e2d5a] to-[#2a3d6e] text-white pt-24 pb-20">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-4 mb-4">
-                        <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md border border-white/10">
-                            <Clock size={28} className="text-[#FCA311]" />
-                        </div>
-                        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">Live Timetable</h1>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-indigo-100 text-lg max-w-2xl leading-relaxed">
-                            View real-time departure and arrival schedules for Northern Paribahan.
-                        </p>
-                        {initialDate && (
+        <div style={{ backgroundColor: "#C9CBA3" }} className="min-h-screen pb-16">
+            {/* Hero Header Banner */}
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 md:pt-12 pb-2">
+                <div className="bg-[#172144] rounded-2xl py-4 px-6 sm:py-5 sm:px-8 text-white shadow-lg border border-[#223062] flex flex-col items-center justify-center text-center gap-1.5">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Live Timetable</h1>
+                    <p className="text-indigo-100 text-xs sm:text-sm max-w-xl leading-relaxed mx-auto">
+                        View real-time departure and arrival schedules for Northern Paribahan.
+                    </p>
+
+                    {initialDate && (
+                        <div className="mt-1">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#FCA311] text-[#172144] shadow-sm">
                                 📅 Journey Date: {initialDate}
                             </span>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Filter Card */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-                <div className="bg-white rounded-2xl shadow-xl shadow-indigo-900/5 border border-gray-100 p-5 sm:p-7 space-y-6">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 relative z-10">
+                <div className="bg-[#EDF5F0] rounded-3xl shadow-lg border border-white/60 p-5 sm:p-7 space-y-6">
                     
                     {/* Top Row: Dropdown Filters Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
