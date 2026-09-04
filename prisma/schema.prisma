@@ -59,6 +59,7 @@ model Route {
   schedules       Schedule[]
   createdAt       DateTime   @default(now())
 
+  @@index([origin, destination])
   @@map("routes")
 }
 
@@ -83,6 +84,9 @@ model Schedule {
   bookings           Booking[]
   tickets            Ticket[]  // To quickly check which seats are taken for this specific trip
 
+  @@index([departureTime])
+  @@index([origin, destination])
+  @@index([departureTime, origin, destination])
   @@map("schedules")
 }
 
@@ -115,5 +119,6 @@ model Ticket {
 
   // CRUCIAL: A specific seat can only be booked ONCE per schedule
   @@unique([scheduleId, seatNumber]) 
+  @@index([scheduleId])
   @@map("tickets")
 }

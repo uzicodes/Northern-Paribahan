@@ -19,7 +19,7 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
             const images = Array.from(document.querySelectorAll('main img')) as HTMLImageElement[];
 
             if (images.length === 0) {
-                setTimeout(() => dispatch(false), 300);
+                dispatch(false);
                 return;
             }
 

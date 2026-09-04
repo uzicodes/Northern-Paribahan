@@ -4,7 +4,7 @@ import type { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic"; // Ensures fresh data for timetables
 
-type ScheduleWithBusAndTickets = Prisma.ScheduleGetPayload<{
+type ScheduleWithBusAndCount = Prisma.ScheduleGetPayload<{
     include: {
         bus: {
             select: {
@@ -12,8 +12,10 @@ type ScheduleWithBusAndTickets = Prisma.ScheduleGetPayload<{
                 capacity: true;
             };
         };
-        tickets: {
-            select: { id: true };
+        _count: {
+            select: {
+                tickets: true;
+            };
         };
     };
 }>;
@@ -45,6 +47,13 @@ interface PageProps {
     }>;
 }
 
+// Instantiate formatter once outside request loop
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+});
+
 export default async function TimetablePage(props: PageProps) {
     const searchParams = await props.searchParams;
     const dateParam = searchParams.date;
@@ -53,6 +62,8 @@ export default async function TimetablePage(props: PageProps) {
 
     // Construct Prisma where filter
     const whereClause: Prisma.ScheduleWhereInput = {};
+
+    let resolvedDateParam = dateParam;
 
     if (dateParam) {
         // Full-day bounding box in local date
@@ -72,9 +83,18 @@ export default async function TimetablePage(props: PageProps) {
             };
         }
     } else {
+        // High-performance default: Default to today's schedule (00:00 - 23:59)
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
         whereClause.departureTime = {
-            gte: new Date(),
+            gte: startOfToday,
+            lte: endOfToday,
         };
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        resolvedDateParam = `${year}-${month}-${day}`;
     }
 
     if (originParam) {
@@ -91,39 +111,41 @@ export default async function TimetablePage(props: PageProps) {
         };
     }
 
-    // 1. Fetch data directly from Prisma
-    const rawSchedules: ScheduleWithBusAndTickets[] = await prisma.schedule.findMany({
-        where: whereClause,
-        include: {
-            bus: {
-                select: {
-                    type: true,
-                    capacity: true,
+    // 1. Fetch schedules and routes concurrently in parallel via Promise.all
+    const [rawSchedules, allRoutes] = await Promise.all([
+        prisma.schedule.findMany({
+            where: whereClause,
+            include: {
+                bus: {
+                    select: {
+                        type: true,
+                        capacity: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tickets: true,
+                    },
                 },
             },
-            tickets: {
-                select: { id: true },
+            orderBy: {
+                departureTime: 'asc',
             },
-        },
-        orderBy: {
-            departureTime: 'asc',
-        },
-    });
-
-    // Also fetch all available route names across the network for dropdown options
-    const allRoutes = await prisma.route.findMany({
-        select: {
-            origin: true,
-            destination: true,
-        },
-        orderBy: [
-            { origin: 'asc' },
-            { destination: 'asc' },
-        ],
-    });
+        }),
+        prisma.route.findMany({
+            select: {
+                origin: true,
+                destination: true,
+            },
+            orderBy: [
+                { origin: 'asc' },
+                { destination: 'asc' },
+            ],
+        }),
+    ]);
 
     // 2. Transform the database records into the format the UI needs
-    const formattedSchedules: FormattedSchedule[] = rawSchedules.map((schedule: ScheduleWithBusAndTickets) => {
+    const formattedSchedules: FormattedSchedule[] = rawSchedules.map((schedule: ScheduleWithBusAndCount) => {
         const depDate = new Date(schedule.departureTime);
         const arrDate = new Date(schedule.arrivalTime);
         
@@ -139,15 +161,8 @@ export default async function TimetablePage(props: PageProps) {
         else if (hour >= 12 && hour < 17) period = "afternoon";
         else if (hour >= 17 && hour < 20) period = "evening";
 
-        // Calculate available seats
-        const availableSeats = schedule.bus.capacity - schedule.tickets.length;
-
-        // Format times (e.g., "6:00 AM")
-        const timeFormatter = new Intl.DateTimeFormat("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-        });
+        // Calculate available seats using SQL count
+        const availableSeats = schedule.bus.capacity - (schedule._count?.tickets ?? 0);
 
         return {
             id: schedule.id,
@@ -167,7 +182,7 @@ export default async function TimetablePage(props: PageProps) {
         };
     });
 
-    // 3. Extract unique routes for the dropdown (from network routes + filtered schedules)
+    // 3. Extract unique routes for the dropdown
     const uniqueRoutesSet = new Set<string>();
     for (const r of allRoutes) {
         uniqueRoutesSet.add(`${r.origin} → ${r.destination}`);
@@ -184,7 +199,7 @@ export default async function TimetablePage(props: PageProps) {
             schedules={formattedSchedules}
             routes={uniqueRoutes}
             initialRoute={initialRoute}
-            initialDate={dateParam}
+            initialDate={resolvedDateParam}
         />
     );
 }
