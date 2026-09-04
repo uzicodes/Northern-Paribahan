@@ -33,6 +33,7 @@ const LOCATIONS = [
     'Khulna',
     'Barisal',
     'Rajshahi',
+    'Rangpur',
     'Chittagong',
     "Cox's Bazar"
 ];
