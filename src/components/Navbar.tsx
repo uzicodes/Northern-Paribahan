@@ -75,10 +75,10 @@ export default function NavbarClient() {
             <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
                 <Link
                     href="/timetable"
-                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 border ${
                         isActive('/timetable')
-                            ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
-                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                            ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 font-semibold shadow-sm'
+                            : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                     }`}
                 >
                     Timetable
@@ -86,10 +86,10 @@ export default function NavbarClient() {
 
                 <Link
                     href="/buses"
-                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                    className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 border ${
                         isActive('/buses')
-                            ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
-                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                            ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 font-semibold shadow-sm'
+                            : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                     }`}
                 >
                     Buses
@@ -98,10 +98,10 @@ export default function NavbarClient() {
                 {role === 'ADMIN' && (
                     <Link
                         href="/admin"
-                        className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                        className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 border ${
                             isActive('/admin')
-                                ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
-                                : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                                ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 font-semibold shadow-sm'
+                                : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                         }`}
                     >
                         Admin
@@ -111,20 +111,20 @@ export default function NavbarClient() {
                     <>
                         <Link
                             href="/login"
-                            className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
+                            className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 border ${
                                 isActive('/login')
-                                    ? 'bg-[#FCA311] text-[#172144] font-bold shadow-sm'
-                                    : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                                    ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 font-semibold shadow-sm'
+                                    : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                             }`}
                         >
                             Login
                         </Link>
                         <Link
                             href="/register"
-                            className={`px-4 py-1.5 rounded-full font-semibold transition-all duration-200 ${
+                            className={`px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 border ${
                                 isActive('/register')
-                                    ? 'bg-[#FCA311] text-[#172144] shadow-sm'
-                                    : 'bg-[#FCA311]/20 text-[#FCA311] hover:bg-[#FCA311] hover:text-[#172144] border border-[#FCA311]/40'
+                                    ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 font-semibold shadow-sm'
+                                    : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                             }`}
                         >
                             Register
@@ -141,10 +141,10 @@ export default function NavbarClient() {
                             toast.error('Please Login First');
                         }
                     }}
-                    className={`p-2 rounded-full transition-all duration-200 ${
+                    className={`p-2 rounded-full transition-all duration-200 border ${
                         (isLoggedIn || isActive('/profile'))
-                            ? 'text-[#FCA311] bg-white/15'
-                            : 'text-white hover:text-[#FCA311] hover:bg-white/10'
+                            ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 shadow-sm'
+                            : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
                     }`}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
