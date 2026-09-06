@@ -109,18 +109,18 @@ const busShowcaseData: ShowcaseBus[] = [
 export default async function BusesPage() {
     try {
         const busesInDb = await prisma.bus.findMany({
-            distinct: ['name'],
+            distinct: ['modelName'],
             select: {
                 id: true,
-                name: true,
-                type: true,
+                modelName: true,
+                tier: true,
                 capacity: true,
             },
         });
 
         // Merge database IDs and dynamic attributes
         const mergedBuses = busShowcaseData.map((showcase) => {
-            const matched = busesInDb.find((b) => b.name.toLowerCase() === showcase.brand.toLowerCase());
+            const matched = busesInDb.find((b) => b.modelName.toLowerCase() === showcase.brand.toLowerCase());
             return {
                 ...showcase,
                 id: matched?.id,

@@ -3,19 +3,25 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
-// --- ENUMS for strict Data Integrity ---
+// --- ENUMS ---
 enum Role {
   USER
   ADMIN
 }
 
-enum BusType {
-  AC
+enum BusTier {
+  SUPER
+  MID
   NON_AC
-  SLEEPER
+}
+
+enum BusStatus {
+  ACTIVE
+  RESTING
+  MAINTENANCE
 }
 
 enum BookingStatus {
@@ -27,37 +33,55 @@ enum BookingStatus {
 // --- MODELS ---
 
 model User {
-  id          String    @id @default(uuid()) @db.Uuid // Matches Supabase Auth UUID
+  id          String    @id @default(uuid()) @db.Uuid
   name        String?
   email       String    @unique
   password    String?
   phoneNumber String?   @map("phone_number")
-  role        Role      @default(USER) 
+  role        Role      @default(USER)
   bookings    Booking[]
   createdAt   DateTime  @default(now())
 
-  @@map("users") // PostgreSQL standard is lowercase plural
+  @@map("users")
+}
+
+model Depot {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  code      String   @unique
+  city      String
+  buses     Bus[]
+  createdAt DateTime @default(now())
+
+  @@map("depots")
 }
 
 model Bus {
   id                 String     @id @default(cuid())
-  name               String     // e.g., "Volvo B11R"
+  modelName          String     @map("model_name")
   registrationNumber String     @unique @map("registration_number")
-  type               BusType
-  capacity           Int        // e.g., 40
+  tier               BusTier
+  status             BusStatus  @default(RESTING)
+  capacity           Int        @default(40)
+  
+  depotId            String     @map("depot_id")
+  depot              Depot      @relation(fields: [depotId], references: [id], onDelete: Cascade)
+  
   schedules          Schedule[]
   createdAt          DateTime   @default(now())
 
+  @@index([depotId])
+  @@index([tier])
   @@map("buses")
 }
 
 model Route {
-  id              String     @id @default(cuid())
-  origin          String     // e.g., "Dhaka"
-  destination     String     // e.g., "Chittagong"
-  estimatedHours  Float?     @map("estimated_hours")
-  schedules       Schedule[]
-  createdAt       DateTime   @default(now())
+  id             String     @id @default(cuid())
+  origin         String
+  destination    String
+  estimatedHours Float?     @map("estimated_hours")
+  schedules      Schedule[]
+  createdAt      DateTime   @default(now())
 
   @@index([origin, destination])
   @@map("routes")
@@ -67,22 +91,20 @@ model Schedule {
   id                 String    @id @default(cuid())
   departureTime      DateTime  @map("departure_time")
   arrivalTime        DateTime  @map("arrival_time")
-  fare               Float     // Price belongs to the schedule, not the bus
+  fare               Float
   
-  // Snapshot fields for fast reads and Supabase Studio inspection
   origin             String
   destination        String
   busName            String    @map("bus_name")
   registrationNumber String    @map("registration_number")
 
-  // Relationships
   busId              String    @map("bus_id")
   bus                Bus       @relation(fields: [busId], references: [id])
   routeId            String    @map("route_id")
   route              Route     @relation(fields: [routeId], references: [id])
   
   bookings           Booking[]
-  tickets            Ticket[]  // To quickly check which seats are taken for this specific trip
+  tickets            Ticket[]
 
   @@index([departureTime])
   @@index([origin, destination])
@@ -99,7 +121,7 @@ model Booking {
   
   totalFare     Float         @map("total_fare")
   status        BookingStatus @default(PENDING)
-  transactionId String?       @map("transaction_id") // Ready for payment gateway integration
+  transactionId String?       @map("transaction_id")
   
   tickets       Ticket[]
   createdAt     DateTime      @default(now())
@@ -109,7 +131,7 @@ model Booking {
 
 model Ticket {
   id         String   @id @default(cuid())
-  seatNumber String   @map("seat_number") // e.g., "A1"
+  seatNumber String   @map("seat_number")
   
   bookingId  String   @map("booking_id")
   booking    Booking  @relation(fields: [bookingId], references: [id])
@@ -117,8 +139,7 @@ model Ticket {
   scheduleId String   @map("schedule_id")
   schedule   Schedule @relation(fields: [scheduleId], references: [id])
 
-  // CRUCIAL: A specific seat can only be booked ONCE per schedule
-  @@unique([scheduleId, seatNumber]) 
+  @@unique([scheduleId, seatNumber])
   @@index([scheduleId])
   @@map("tickets")
 }
