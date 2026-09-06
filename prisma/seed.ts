@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient, BusTier, BusStatus } from '@prisma/client';
+import { PrismaClient, BusTier } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
@@ -11,9 +11,9 @@ const prisma = new PrismaClient({ adapter });
 function getTier(modelName: string): BusTier {
   const superModels = ['MAN 24.460', 'Scania Legacy SR2', 'Mercedes-Benz OM 906'];
   const midModels = ['Volvo B9R', 'Hino RN8J', 'Hyundai Universe'];
-  if (superModels.includes(modelName)) return BusTier.SUPER;
-  if (midModels.includes(modelName)) return BusTier.MID;
-  return BusTier.NON_AC;
+  if (superModels.includes(modelName)) return BusTier.PREMIUM;
+  if (midModels.includes(modelName)) return BusTier.BUSINESS;
+  return BusTier.ECONOMY;
 }
 
 function unpackRegistrationNumbers(rangeString: string): string[] {
@@ -138,6 +138,18 @@ const fleetData = [
 async function main() {
   console.log('--- Starting Database Seeding (Northern Paribahan) ---');
 
+  // Ensure PostgreSQL BusTier enum type contains the updated values
+  const pgClient = await pool.connect();
+  try {
+    await pgClient.query('ALTER TYPE "BusTier" ADD VALUE IF NOT EXISTS \'PREMIUM\';');
+    await pgClient.query('ALTER TYPE "BusTier" ADD VALUE IF NOT EXISTS \'BUSINESS\';');
+    await pgClient.query('ALTER TYPE "BusTier" ADD VALUE IF NOT EXISTS \'ECONOMY\';');
+  } catch (err) {
+    console.warn('Postgres enum check:', err);
+  } finally {
+    pgClient.release();
+  }
+
   // 1. Clear existing operational records
   await prisma.ticket.deleteMany({});
   await prisma.booking.deleteMany({});
@@ -170,9 +182,8 @@ async function main() {
           modelName: busGroup.model,
           registrationNumber: reg,
           tier: tier,
-          status: BusStatus.RESTING,
           depotId: depot.id,
-          capacity: tier === BusTier.SUPER ? 36 : (tier === BusTier.MID ? 40 : 45),
+          capacity: tier === BusTier.PREMIUM ? 36 : (tier === BusTier.BUSINESS ? 40 : 45),
         });
       }
     }

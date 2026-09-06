@@ -13,15 +13,9 @@ enum Role {
 }
 
 enum BusTier {
-  SUPER
-  MID
-  NON_AC
-}
-
-enum BusStatus {
-  ACTIVE
-  RESTING
-  MAINTENANCE
+  PREMIUM
+  BUSINESS
+  ECONOMY
 }
 
 enum BookingStatus {
@@ -61,7 +55,6 @@ model Bus {
   modelName          String     @map("model_name")
   registrationNumber String     @unique @map("registration_number")
   tier               BusTier
-  status             BusStatus  @default(RESTING)
   capacity           Int        @default(40)
   
   depotId            String     @map("depot_id")
