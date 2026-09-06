@@ -85,15 +85,18 @@ model Route {
 }
 
 model Fare {
-  id        String   @id @default(cuid())
-  price     Float
-  tier      BusTier
+  id          String   @id @default(cuid())
+  price       Float
+  tier        BusTier
   
-  routeId   String   @map("route_id")
-  route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  origin      String   // <-- Added for readability
+  destination String   // <-- Added for readability
+  
+  routeId     String   @map("route_id")
+  route       Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@unique([routeId, tier])
   @@index([routeId])

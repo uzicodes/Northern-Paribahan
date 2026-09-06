@@ -301,7 +301,7 @@ async function main() {
   });
   console.log(`3. Created ${routesData.length} master routes.`);
 
-  // 4. Generate the Manual Fares Matrix
+// 4. Generate the Manual Fares Matrix
   const dbRoutes = await prisma.route.findMany();
   
   const getDbRouteId = (origin: string, destination: string) => {
@@ -314,9 +314,30 @@ async function main() {
 
   for (const r of routesData) {
     const internalRouteId = getDbRouteId(r.origin, r.destination);
-    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.PREMIUM, price: r.fares.PREMIUM });
-    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.BUSINESS, price: r.fares.BUSINESS });
-    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.ECONOMY, price: r.fares.ECONOMY });
+    
+    faresToCreate.push({ 
+      routeId: internalRouteId, 
+      origin: r.origin,             // <-- Injected here
+      destination: r.destination,   // <-- Injected here
+      tier: BusTier.PREMIUM, 
+      price: r.fares.PREMIUM 
+    });
+    
+    faresToCreate.push({ 
+      routeId: internalRouteId, 
+      origin: r.origin,             // <-- Injected here
+      destination: r.destination,   // <-- Injected here
+      tier: BusTier.BUSINESS, 
+      price: r.fares.BUSINESS 
+    });
+    
+    faresToCreate.push({ 
+      routeId: internalRouteId, 
+      origin: r.origin,             // <-- Injected here
+      destination: r.destination,   // <-- Injected here
+      tier: BusTier.ECONOMY, 
+      price: r.fares.ECONOMY 
+    });
   }
 
   await prisma.fare.createMany({ data: faresToCreate });
