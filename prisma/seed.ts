@@ -154,6 +154,7 @@ async function main() {
   await prisma.ticket.deleteMany({});
   await prisma.booking.deleteMany({});
   await prisma.schedule.deleteMany({});
+  await prisma.fare.deleteMany({});
   await prisma.route.deleteMany({});
   await prisma.bus.deleteMany({});
   await prisma.depot.deleteMany({});
@@ -194,106 +195,134 @@ async function main() {
 
   console.log(`2. Inserted ${totalBusesInserted} buses across 9 Depots.`);
 
-  // 3. Define All 72 Master Routes
+  // 3. Define Master Routes with MANUAL PRICING
   const routesData = [
     // From Dinajpur
-    { routeId: "NP-DNJ-001", origin: "Dinajpur", destination: "Sylhet", estimatedHours: 11.0 },
-    { routeId: "NP-DNJ-002", origin: "Dinajpur", destination: "Bogura", estimatedHours: 4.0 },
-    { routeId: "NP-DNJ-003", origin: "Dinajpur", destination: "Rajshahi", estimatedHours: 5.0 },
-    { routeId: "NP-DNJ-004", origin: "Dinajpur", destination: "Dhaka", estimatedHours: 8.0 },
-    { routeId: "NP-DNJ-005", origin: "Dinajpur", destination: "Khulna", estimatedHours: 9.0 },
-    { routeId: "NP-DNJ-006", origin: "Dinajpur", destination: "Barisal", estimatedHours: 10.0 },
-    { routeId: "NP-DNJ-007", origin: "Dinajpur", destination: "Cox's Bazar", estimatedHours: 16.0 },
-    { routeId: "NP-DNJ-008", origin: "Dinajpur", destination: "Chittagong", estimatedHours: 13.0 },
+    { routeId: "NP-DNJ-001", origin: "Dinajpur", destination: "Sylhet", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-002", origin: "Dinajpur", destination: "Bogura", estimatedHours: 4.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-003", origin: "Dinajpur", destination: "Rajshahi", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-004", origin: "Dinajpur", destination: "Dhaka", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-005", origin: "Dinajpur", destination: "Khulna", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-006", origin: "Dinajpur", destination: "Barisal", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-007", origin: "Dinajpur", destination: "Cox's Bazar", estimatedHours: 16.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DNJ-008", origin: "Dinajpur", destination: "Chittagong", estimatedHours: 13.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Sylhet
-    { routeId: "NP-SYL-009", origin: "Sylhet", destination: "Dinajpur", estimatedHours: 11.0 },
-    { routeId: "NP-SYL-010", origin: "Sylhet", destination: "Bogura", estimatedHours: 8.0 },
-    { routeId: "NP-SYL-011", origin: "Sylhet", destination: "Rajshahi", estimatedHours: 10.0 },
-    { routeId: "NP-SYL-012", origin: "Sylhet", destination: "Dhaka", estimatedHours: 6.0 },
-    { routeId: "NP-SYL-013", origin: "Sylhet", destination: "Khulna", estimatedHours: 11.0 },
-    { routeId: "NP-SYL-014", origin: "Sylhet", destination: "Barisal", estimatedHours: 10.0 },
-    { routeId: "NP-SYL-015", origin: "Sylhet", destination: "Cox's Bazar", estimatedHours: 11.0 },
-    { routeId: "NP-SYL-016", origin: "Sylhet", destination: "Chittagong", estimatedHours: 8.0 },
+    { routeId: "NP-SYL-009", origin: "Sylhet", destination: "Dinajpur", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-010", origin: "Sylhet", destination: "Bogura", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-011", origin: "Sylhet", destination: "Rajshahi", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-012", origin: "Sylhet", destination: "Dhaka", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-013", origin: "Sylhet", destination: "Khulna", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-014", origin: "Sylhet", destination: "Barisal", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-015", origin: "Sylhet", destination: "Cox's Bazar", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-SYL-016", origin: "Sylhet", destination: "Chittagong", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Bogura
-    { routeId: "NP-BOG-017", origin: "Bogura", destination: "Dinajpur", estimatedHours: 4.0 },
-    { routeId: "NP-BOG-018", origin: "Bogura", destination: "Sylhet", estimatedHours: 8.0 },
-    { routeId: "NP-BOG-019", origin: "Bogura", destination: "Rajshahi", estimatedHours: 3.0 },
-    { routeId: "NP-BOG-020", origin: "Bogura", destination: "Dhaka", estimatedHours: 5.0 },
-    { routeId: "NP-BOG-021", origin: "Bogura", destination: "Khulna", estimatedHours: 7.0 },
-    { routeId: "NP-BOG-022", origin: "Bogura", destination: "Barisal", estimatedHours: 8.0 },
-    { routeId: "NP-BOG-023", origin: "Bogura", destination: "Cox's Bazar", estimatedHours: 13.0 },
-    { routeId: "NP-BOG-024", origin: "Bogura", destination: "Chittagong", estimatedHours: 9.0 },
+    { routeId: "NP-BOG-017", origin: "Bogura", destination: "Dinajpur", estimatedHours: 4.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-018", origin: "Bogura", destination: "Sylhet", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-019", origin: "Bogura", destination: "Rajshahi", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-020", origin: "Bogura", destination: "Dhaka", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-021", origin: "Bogura", destination: "Khulna", estimatedHours: 7.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-022", origin: "Bogura", destination: "Barisal", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-023", origin: "Bogura", destination: "Cox's Bazar", estimatedHours: 13.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BOG-024", origin: "Bogura", destination: "Chittagong", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Rajshahi
-    { routeId: "NP-RAJ-025", origin: "Rajshahi", destination: "Dinajpur", estimatedHours: 5.0 },
-    { routeId: "NP-RAJ-026", origin: "Rajshahi", destination: "Sylhet", estimatedHours: 10.0 },
-    { routeId: "NP-RAJ-027", origin: "Rajshahi", destination: "Bogura", estimatedHours: 3.0 },
-    { routeId: "NP-RAJ-028", origin: "Rajshahi", destination: "Dhaka", estimatedHours: 6.0 },
-    { routeId: "NP-RAJ-029", origin: "Rajshahi", destination: "Khulna", estimatedHours: 6.0 },
-    { routeId: "NP-RAJ-030", origin: "Rajshahi", destination: "Barisal", estimatedHours: 8.0 },
-    { routeId: "NP-RAJ-031", origin: "Rajshahi", destination: "Cox's Bazar", estimatedHours: 14.0 },
-    { routeId: "NP-RAJ-032", origin: "Rajshahi", destination: "Chittagong", estimatedHours: 11.0 },
+    { routeId: "NP-RAJ-025", origin: "Rajshahi", destination: "Dinajpur", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-026", origin: "Rajshahi", destination: "Sylhet", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-027", origin: "Rajshahi", destination: "Bogura", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-028", origin: "Rajshahi", destination: "Dhaka", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-029", origin: "Rajshahi", destination: "Khulna", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-030", origin: "Rajshahi", destination: "Barisal", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-031", origin: "Rajshahi", destination: "Cox's Bazar", estimatedHours: 14.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-RAJ-032", origin: "Rajshahi", destination: "Chittagong", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Dhaka
-    { routeId: "NP-DHK-033", origin: "Dhaka", destination: "Dinajpur", estimatedHours: 8.0 },
-    { routeId: "NP-DHK-034", origin: "Dhaka", destination: "Sylhet", estimatedHours: 6.0 },
-    { routeId: "NP-DHK-035", origin: "Dhaka", destination: "Bogura", estimatedHours: 5.0 },
-    { routeId: "NP-DHK-036", origin: "Dhaka", destination: "Rajshahi", estimatedHours: 6.0 },
-    { routeId: "NP-DHK-037", origin: "Dhaka", destination: "Khulna", estimatedHours: 5.0 },
-    { routeId: "NP-DHK-038", origin: "Dhaka", destination: "Barisal", estimatedHours: 4.0 },
-    { routeId: "NP-DHK-039", origin: "Dhaka", destination: "Cox's Bazar", estimatedHours: 9.0 },
-    { routeId: "NP-DHK-040", origin: "Dhaka", destination: "Chittagong", estimatedHours: 6.0 },
+    { routeId: "NP-DHK-033", origin: "Dhaka", destination: "Dinajpur", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-034", origin: "Dhaka", destination: "Sylhet", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-035", origin: "Dhaka", destination: "Bogura", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-036", origin: "Dhaka", destination: "Rajshahi", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-037", origin: "Dhaka", destination: "Khulna", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-038", origin: "Dhaka", destination: "Barisal", estimatedHours: 4.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-039", origin: "Dhaka", destination: "Cox's Bazar", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-DHK-040", origin: "Dhaka", destination: "Chittagong", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Khulna
-    { routeId: "NP-KHL-041", origin: "Khulna", destination: "Dinajpur", estimatedHours: 9.0 },
-    { routeId: "NP-KHL-042", origin: "Khulna", destination: "Sylhet", estimatedHours: 11.0 },
-    { routeId: "NP-KHL-043", origin: "Khulna", destination: "Bogura", estimatedHours: 7.0 },
-    { routeId: "NP-KHL-044", origin: "Khulna", destination: "Rajshahi", estimatedHours: 6.0 },
-    { routeId: "NP-KHL-045", origin: "Khulna", destination: "Dhaka", estimatedHours: 5.0 },
-    { routeId: "NP-KHL-046", origin: "Khulna", destination: "Barisal", estimatedHours: 3.0 },
-    { routeId: "NP-KHL-047", origin: "Khulna", destination: "Cox's Bazar", estimatedHours: 14.0 },
-    { routeId: "NP-KHL-048", origin: "Khulna", destination: "Chittagong", estimatedHours: 11.0 },
+    { routeId: "NP-KHL-041", origin: "Khulna", destination: "Dinajpur", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-042", origin: "Khulna", destination: "Sylhet", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-043", origin: "Khulna", destination: "Bogura", estimatedHours: 7.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-044", origin: "Khulna", destination: "Rajshahi", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-045", origin: "Khulna", destination: "Dhaka", estimatedHours: 5.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-046", origin: "Khulna", destination: "Barisal", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-047", origin: "Khulna", destination: "Cox's Bazar", estimatedHours: 14.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-KHL-048", origin: "Khulna", destination: "Chittagong", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Barisal
-    { routeId: "NP-BAR-049", origin: "Barisal", destination: "Dinajpur", estimatedHours: 10.0 },
-    { routeId: "NP-BAR-050", origin: "Barisal", destination: "Sylhet", estimatedHours: 10.0 },
-    { routeId: "NP-BAR-051", origin: "Barisal", destination: "Bogura", estimatedHours: 8.0 },
-    { routeId: "NP-BAR-052", origin: "Barisal", destination: "Rajshahi", estimatedHours: 8.0 },
-    { routeId: "NP-BAR-053", origin: "Barisal", destination: "Dhaka", estimatedHours: 4.0 },
-    { routeId: "NP-BAR-054", origin: "Barisal", destination: "Khulna", estimatedHours: 3.0 },
-    { routeId: "NP-BAR-055", origin: "Barisal", destination: "Cox's Bazar", estimatedHours: 12.0 },
-    { routeId: "NP-BAR-056", origin: "Barisal", destination: "Chittagong", estimatedHours: 9.0 },
+    { routeId: "NP-BAR-049", origin: "Barisal", destination: "Dinajpur", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-050", origin: "Barisal", destination: "Sylhet", estimatedHours: 10.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-051", origin: "Barisal", destination: "Bogura", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-052", origin: "Barisal", destination: "Rajshahi", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-053", origin: "Barisal", destination: "Dhaka", estimatedHours: 4.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-054", origin: "Barisal", destination: "Khulna", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-055", origin: "Barisal", destination: "Cox's Bazar", estimatedHours: 12.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-BAR-056", origin: "Barisal", destination: "Chittagong", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Cox's Bazar
-    { routeId: "NP-COX-057", origin: "Cox's Bazar", destination: "Dinajpur", estimatedHours: 16.0 },
-    { routeId: "NP-COX-058", origin: "Cox's Bazar", destination: "Sylhet", estimatedHours: 11.0 },
-    { routeId: "NP-COX-059", origin: "Cox's Bazar", destination: "Bogura", estimatedHours: 13.0 },
-    { routeId: "NP-COX-060", origin: "Cox's Bazar", destination: "Rajshahi", estimatedHours: 14.0 },
-    { routeId: "NP-COX-061", origin: "Cox's Bazar", destination: "Dhaka", estimatedHours: 9.0 },
-    { routeId: "NP-COX-062", origin: "Cox's Bazar", destination: "Khulna", estimatedHours: 14.0 },
-    { routeId: "NP-COX-063", origin: "Cox's Bazar", destination: "Barisal", estimatedHours: 12.0 },
-    { routeId: "NP-COX-064", origin: "Cox's Bazar", destination: "Chittagong", estimatedHours: 3.0 },
+    { routeId: "NP-COX-057", origin: "Cox's Bazar", destination: "Dinajpur", estimatedHours: 16.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-058", origin: "Cox's Bazar", destination: "Sylhet", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-059", origin: "Cox's Bazar", destination: "Bogura", estimatedHours: 13.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-060", origin: "Cox's Bazar", destination: "Rajshahi", estimatedHours: 14.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-061", origin: "Cox's Bazar", destination: "Dhaka", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-062", origin: "Cox's Bazar", destination: "Khulna", estimatedHours: 14.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-063", origin: "Cox's Bazar", destination: "Barisal", estimatedHours: 12.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-COX-064", origin: "Cox's Bazar", destination: "Chittagong", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
 
     // From Chittagong
-    { routeId: "NP-CTG-065", origin: "Chittagong", destination: "Dinajpur", estimatedHours: 13.0 },
-    { routeId: "NP-CTG-066", origin: "Chittagong", destination: "Sylhet", estimatedHours: 8.0 },
-    { routeId: "NP-CTG-067", origin: "Chittagong", destination: "Bogura", estimatedHours: 9.0 },
-    { routeId: "NP-CTG-068", origin: "Chittagong", destination: "Rajshahi", estimatedHours: 11.0 },
-    { routeId: "NP-CTG-069", origin: "Chittagong", destination: "Dhaka", estimatedHours: 6.0 },
-    { routeId: "NP-CTG-070", origin: "Chittagong", destination: "Khulna", estimatedHours: 11.0 },
-    { routeId: "NP-CTG-071", origin: "Chittagong", destination: "Barisal", estimatedHours: 9.0 },
-    { routeId: "NP-CTG-072", origin: "Chittagong", destination: "Cox's Bazar", estimatedHours: 3.0 },
+    { routeId: "NP-CTG-065", origin: "Chittagong", destination: "Dinajpur", estimatedHours: 13.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-066", origin: "Chittagong", destination: "Sylhet", estimatedHours: 8.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-067", origin: "Chittagong", destination: "Bogura", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-068", origin: "Chittagong", destination: "Rajshahi", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-069", origin: "Chittagong", destination: "Dhaka", estimatedHours: 6.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-070", origin: "Chittagong", destination: "Khulna", estimatedHours: 11.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-071", origin: "Chittagong", destination: "Barisal", estimatedHours: 9.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
+    { routeId: "NP-CTG-072", origin: "Chittagong", destination: "Cox's Bazar", estimatedHours: 3.0, fares: { PREMIUM: 0, BUSINESS: 0, ECONOMY: 0 } },
   ];
 
+  const routesToInsert = routesData.map(r => ({
+    routeId: r.routeId,
+    origin: r.origin,
+    destination: r.destination,
+    estimatedHours: r.estimatedHours
+  }));
+
   await prisma.route.createMany({ 
-    data: routesData, 
+    data: routesToInsert, 
     skipDuplicates: true 
   });
   console.log(`3. Created ${routesData.length} master routes.`);
 
-  // 4. Fetch Dinajpur buses for the schedules
+  // 4. Generate the Manual Fares Matrix
+  const dbRoutes = await prisma.route.findMany();
+  
+  const getDbRouteId = (origin: string, destination: string) => {
+    const route = dbRoutes.find(r => r.origin === origin && r.destination === destination);
+    if (!route) throw new Error(`Route not found in DB: ${origin} -> ${destination}`);
+    return route.id;
+  };
+
+  const faresToCreate = [];
+
+  for (const r of routesData) {
+    const internalRouteId = getDbRouteId(r.origin, r.destination);
+    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.PREMIUM, price: r.fares.PREMIUM });
+    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.BUSINESS, price: r.fares.BUSINESS });
+    faresToCreate.push({ routeId: internalRouteId, tier: BusTier.ECONOMY, price: r.fares.ECONOMY });
+  }
+
+  await prisma.fare.createMany({ data: faresToCreate });
+  console.log(`4. Manually set 216 Fare rules across all routes and tiers.`);
+
+  // 5. Fetch Dinajpur buses for the schedules
   const dinajpurBuses = await prisma.bus.findMany({
     where: { depot: { code: 'DNJ' } },
     orderBy: { registrationNumber: 'asc' },
@@ -307,40 +336,27 @@ async function main() {
     busesByModel[bus.modelName].push(bus);
   }
 
-  // Fetch all inserted routes to get their generated CUIDs for foreign key linking
-  const dbRoutes = await prisma.route.findMany();
-  
-  const getDbRouteId = (origin: string, destination: string) => {
-    const route = dbRoutes.find(r => r.origin === origin && r.destination === destination);
-    if (!route) throw new Error(`Route not found in DB: ${origin} -> ${destination}`);
-    return route.id;
-  };
-
-  // 5. Generate 30-Day Rolling Timetable
+  // 6. Generate 30-Day Rolling Timetable
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const TOTAL_DAYS = 31;
   const schedulesData = [];
 
   const routeConfigs = [
-    { destination: "Cox's Bazar", modelName: 'MAN 24.460', fare: 2200, estimatedHours: 17.0, outboundDep: { hour: 15, minute: 0 }, inboundDep: { hour: 15, minute: 0 } },
-    { destination: 'Chittagong', modelName: 'Scania Legacy SR2', fare: 1800, estimatedHours: 14.0, outboundDep: { hour: 17, minute: 0 }, inboundDep: { hour: 17, minute: 0 } },
-    { destination: 'Barisal', modelName: 'Mercedes-Benz OM 906', fare: 1450, estimatedHours: 11.5, outboundDep: { hour: 19, minute: 0 }, inboundDep: { hour: 19, minute: 0 } },
-    { destination: 'Sylhet', modelName: 'Volvo B9R', fare: 1450, estimatedHours: 11.5, outboundDep: { hour: 19, minute: 30 }, inboundDep: { hour: 19, minute: 30 } },
-    { destination: 'Khulna', modelName: 'Hyundai Universe', fare: 1350, estimatedHours: 10.0, outboundDep: { hour: 20, minute: 30 }, inboundDep: { hour: 20, minute: 30 } },
-    { destination: 'Dhaka', modelName: 'Hino RN8J', fare: 1000, estimatedHours: 7.5, outboundDep: { hour: 8, minute: 30 }, inboundDep: { hour: 8, minute: 30 } },
-    { destination: 'Rajshahi', modelName: 'Ashok Leyland Eagle', fare: 550, estimatedHours: 4.5, outboundDep: { hour: 8, minute: 0 }, inboundDep: { hour: 8, minute: 0 } },
-    { destination: 'Bogura', modelName: 'Eicher Pro', fare: 350, estimatedHours: 3.0, outboundDep: { hour: 9, minute: 0 }, inboundDep: { hour: 9, minute: 0 } },
+    { destination: "Cox's Bazar", modelName: 'MAN 24.460', estimatedHours: 17.0, outboundDep: { hour: 15, minute: 0 }, inboundDep: { hour: 15, minute: 0 } },
+    { destination: 'Chittagong', modelName: 'Scania Legacy SR2', estimatedHours: 14.0, outboundDep: { hour: 17, minute: 0 }, inboundDep: { hour: 17, minute: 0 } },
+    { destination: 'Barisal', modelName: 'Mercedes-Benz OM 906', estimatedHours: 11.5, outboundDep: { hour: 19, minute: 0 }, inboundDep: { hour: 19, minute: 0 } },
+    { destination: 'Sylhet', modelName: 'Volvo B9R', estimatedHours: 11.5, outboundDep: { hour: 19, minute: 30 }, inboundDep: { hour: 19, minute: 30 } },
+    { destination: 'Khulna', modelName: 'Hyundai Universe', estimatedHours: 10.0, outboundDep: { hour: 20, minute: 30 }, inboundDep: { hour: 20, minute: 30 } },
+    { destination: 'Dhaka', modelName: 'Hino RN8J', estimatedHours: 7.5, outboundDep: { hour: 8, minute: 30 }, inboundDep: { hour: 8, minute: 30 } },
+    { destination: 'Rajshahi', modelName: 'Ashok Leyland Eagle', estimatedHours: 4.5, outboundDep: { hour: 8, minute: 0 }, inboundDep: { hour: 8, minute: 0 } },
+    { destination: 'Bogura', modelName: 'Eicher Pro', estimatedHours: 3.0, outboundDep: { hour: 9, minute: 0 }, inboundDep: { hour: 9, minute: 0 } },
   ];
 
   for (const config of routeConfigs) {
     const buses = busesByModel[config.modelName];
-    if (!buses || buses.length < 3) {
-      console.error(`Missing buses for model ${config.modelName} in Dinajpur!`);
-      continue;
-    }
+    if (!buses || buses.length < 3) continue;
     
-    // Look up the specific database IDs for this route pair
     const outboundRouteId = getDbRouteId('Dinajpur', config.destination);
     const inboundRouteId = getDbRouteId(config.destination, 'Dinajpur');
 
@@ -351,7 +367,6 @@ async function main() {
       const outboundBus = buses[dayOffset % 3];
       const inboundBus = buses[(dayOffset + 1) % 3];
 
-      // Outbound (Dinajpur -> Destination)
       const outboundDep = new Date(currentDay);
       outboundDep.setHours(config.outboundDep.hour, config.outboundDep.minute, 0, 0);
       const outboundArr = new Date(outboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
@@ -365,10 +380,8 @@ async function main() {
         registrationNumber: outboundBus.registrationNumber,
         departureTime: outboundDep,
         arrivalTime: outboundArr,
-        fare: config.fare,
       });
 
-      // Inbound (Destination -> Dinajpur)
       const inboundDep = new Date(currentDay);
       inboundDep.setHours(config.inboundDep.hour, config.inboundDep.minute, 0, 0);
       const inboundArr = new Date(inboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
@@ -382,21 +395,18 @@ async function main() {
         registrationNumber: inboundBus.registrationNumber,
         departureTime: inboundDep,
         arrivalTime: inboundArr,
-        fare: config.fare,
       });
     }
   }
 
   await prisma.schedule.createMany({ data: schedulesData });
 
-  console.log(`4. Successfully generated and saved ${schedulesData.length} schedules across 30 days!`);
+  console.log(`5. Successfully generated and saved ${schedulesData.length} schedules across 30 days!`);
   console.log('--- Database Seeding Completed Successfully ---');
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
+  .then(async () => { await prisma.$disconnect(); })
   .catch(async (e) => {
     console.error('Seeding error:', e);
     await prisma.$disconnect();

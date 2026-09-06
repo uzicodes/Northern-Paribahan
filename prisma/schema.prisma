@@ -39,8 +39,6 @@ model User {
   @@map("users")
 }
 
-
-
 model Depot {
   id        String   @id @default(cuid())
   name      String   @unique
@@ -51,8 +49,6 @@ model Depot {
 
   @@map("depots")
 }
-
-
 
 model Bus {
   id                 String     @id @default(cuid())
@@ -72,8 +68,6 @@ model Bus {
   @@map("buses")
 }
 
-
-
 model Route {
   id             String     @id @default(cuid())
   routeId        String     @unique @map("route_id") 
@@ -82,7 +76,7 @@ model Route {
   estimatedHours Float?     @map("estimated_hours")
   
   schedules      Schedule[]
-  fares          Fare[]     // <-- NEW: Link to the Fare matrix
+  fares          Fare[]
 
   createdAt      DateTime   @default(now())
 
@@ -90,37 +84,26 @@ model Route {
   @@map("routes")
 }
 
-
-
-
 model Fare {
   id        String   @id @default(cuid())
   price     Float
-  tier      BusTier  // e.g., PREMIUM, BUSINESS, ECONOMY
+  tier      BusTier
   
-  // Relates to the internal ID of the Route model
   routeId   String   @map("route_id")
   route     Route    @relation(fields: [routeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt // Useful for tracking when prices change
+  updatedAt DateTime @updatedAt
 
-  // CRUCIAL: Ensures you can't accidentally create two PREMIUM prices for the same route
   @@unique([routeId, tier])
   @@index([routeId])
   @@map("fares")
 }
 
-
-
-
-
-
 model Schedule {
   id                 String    @id @default(cuid())
   departureTime      DateTime  @map("departure_time")
   arrivalTime        DateTime  @map("arrival_time")
-  fare               Float
   
   origin             String
   destination        String
@@ -141,9 +124,6 @@ model Schedule {
   @@map("schedules")
 }
 
-
-
-
 model Booking {
   id            String        @id @default(cuid())
   userId        String        @db.Uuid @map("user_id")
@@ -160,9 +140,6 @@ model Booking {
 
   @@map("bookings")
 }
-
-
-
 
 model Ticket {
   id         String   @id @default(cuid())
