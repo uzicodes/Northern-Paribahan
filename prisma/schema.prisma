@@ -70,6 +70,7 @@ model Bus {
 
 model Route {
   id             String     @id @default(cuid())
+  routeId        String     @unique @map("route_id") // <-- NEW COLUMN
   origin         String
   destination    String
   estimatedHours Float?     @map("estimated_hours")
