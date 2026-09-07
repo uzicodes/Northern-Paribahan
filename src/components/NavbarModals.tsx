@@ -307,11 +307,11 @@ export function ContactPopup({
                                 uzicodes
                             </a>
                             <a
-                                href="mailto:utshozi11@gmail.com"
+                                href="mailto:utsho8chowdhury@gmail.com"
                                 className="flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors group"
                             >
                                 <Mail className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                                utshozi11@gmail.com
+                                utsho8chowdhury@gmail.com
                             </a>
                         </div>
                     </div>
