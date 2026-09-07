@@ -29,6 +29,19 @@ function unpackRegistrationNumbers(rangeString: string): string[] {
   return regNumbers;
 }
 
+function parse12HourTime(timeStr: string): { hour: number; minute: number } {
+  const [time, modifier] = timeStr.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+  if (hours === 12) hours = modifier === 'AM' ? 0 : 12;
+  else if (modifier === 'PM') hours += 12;
+  return { hour: hours, minute: minutes };
+}
+
+function getArrivalTime(departureDate: Date, estimatedHours: number): Date {
+  const msToAdd = estimatedHours * 60 * 60 * 1000;
+  return new Date(departureDate.getTime() + msToAdd);
+}
+
 const fleetData = [
   {
     name: 'DINAJPUR', code: 'DNJ', city: 'Dinajpur',
@@ -343,86 +356,206 @@ async function main() {
   await prisma.fare.createMany({ data: faresToCreate });
   console.log(`4. Manually set 216 Fare rules across all routes and tiers.`);
 
-  // 5. Fetch Dinajpur buses for the schedules
-  const dinajpurBuses = await prisma.bus.findMany({
-    where: { depot: { code: 'DNJ' } },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // 5. Advanced 3-Day Fleet Rotation Schedule Engine (All 9 Depots)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // 5a. Fetch all buses grouped by depot city + modelName
+  const allBuses = await prisma.bus.findMany({
+    include: { depot: true },
     orderBy: { registrationNumber: 'asc' },
   });
 
-  const busesByModel: Record<string, typeof dinajpurBuses> = {};
-  for (const bus of dinajpurBuses) {
-    if (!busesByModel[bus.modelName]) {
-      busesByModel[bus.modelName] = [];
-    }
-    busesByModel[bus.modelName].push(bus);
+  const busesMap: Record<string, Record<string, typeof allBuses>> = {};
+  for (const bus of allBuses) {
+    const depotName = bus.depot.city;
+    if (!busesMap[depotName]) busesMap[depotName] = {};
+    if (!busesMap[depotName][bus.modelName]) busesMap[depotName][bus.modelName] = [];
+    busesMap[depotName][bus.modelName].push(bus);
   }
 
-  // 6. Generate 30-Day Rolling Timetable
+  // 5b. 72-Route Schedule Configuration
+  const routeConfigs = [
+    // From Dinajpur (8 routes)
+    { routeId: "NP-DNJ-001", origin: "Dinajpur", destination: "Sylhet", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DNJ-002", origin: "Dinajpur", destination: "Bogura", assignedModel: "Eicher Pro", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-DNJ-003", origin: "Dinajpur", destination: "Rajshahi", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DNJ-004", origin: "Dinajpur", destination: "Dhaka", assignedModel: "Volvo B9R", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DNJ-005", origin: "Dinajpur", destination: "Khulna", assignedModel: "Hyundai Universe", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DNJ-006", origin: "Dinajpur", destination: "Barisal", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DNJ-007", origin: "Dinajpur", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DNJ-008", origin: "Dinajpur", destination: "Chittagong", assignedModel: "Mercedes-Benz OM 906", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+
+    // From Sylhet (8 routes)
+    { routeId: "NP-SYL-009", origin: "Sylhet", destination: "Dinajpur", assignedModel: "MAN 24.460", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-010", origin: "Sylhet", destination: "Bogura", assignedModel: "Volvo B9R", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-011", origin: "Sylhet", destination: "Rajshahi", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-012", origin: "Sylhet", destination: "Dhaka", assignedModel: "Eicher Pro", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-SYL-013", origin: "Sylhet", destination: "Khulna", assignedModel: "Mercedes-Benz OM 906", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-014", origin: "Sylhet", destination: "Barisal", assignedModel: "Hyundai Universe", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-015", origin: "Sylhet", destination: "Cox's Bazar", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-SYL-016", origin: "Sylhet", destination: "Chittagong", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+
+    // From Bogura (8 routes)
+    { routeId: "NP-BOG-017", origin: "Bogura", destination: "Dinajpur", assignedModel: "Eicher Pro", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-BOG-018", origin: "Bogura", destination: "Sylhet", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BOG-019", origin: "Bogura", destination: "Rajshahi", assignedModel: "Hino AK1J", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-BOG-020", origin: "Bogura", destination: "Dhaka", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-BOG-021", origin: "Bogura", destination: "Khulna", assignedModel: "Volvo B9R", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-BOG-022", origin: "Bogura", destination: "Barisal", assignedModel: "Hyundai Universe", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BOG-023", origin: "Bogura", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-BOG-024", origin: "Bogura", destination: "Chittagong", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+
+    // From Rajshahi (8 routes)
+    { routeId: "NP-RAJ-025", origin: "Rajshahi", destination: "Dinajpur", assignedModel: "Eicher Pro", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-RAJ-026", origin: "Rajshahi", destination: "Sylhet", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-RAJ-027", origin: "Rajshahi", destination: "Bogura", assignedModel: "Hino AK1J", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-RAJ-028", origin: "Rajshahi", destination: "Dhaka", assignedModel: "Volvo B9R", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-RAJ-029", origin: "Rajshahi", destination: "Khulna", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-RAJ-030", origin: "Rajshahi", destination: "Barisal", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-RAJ-031", origin: "Rajshahi", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-RAJ-032", origin: "Rajshahi", destination: "Chittagong", assignedModel: "Mercedes-Benz OM 906", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+
+    // From Dhaka (8 routes)
+    { routeId: "NP-DHK-033", origin: "Dhaka", destination: "Dinajpur", assignedModel: "MAN 24.460", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DHK-034", origin: "Dhaka", destination: "Sylhet", assignedModel: "Mercedes-Benz OM 906", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DHK-035", origin: "Dhaka", destination: "Bogura", assignedModel: "Hino RN8J", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DHK-036", origin: "Dhaka", destination: "Rajshahi", assignedModel: "Scania Legacy SR2", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DHK-037", origin: "Dhaka", destination: "Khulna", assignedModel: "Hyundai Universe", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-DHK-038", origin: "Dhaka", destination: "Barisal", assignedModel: "Volvo B9R", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-DHK-039", origin: "Dhaka", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-DHK-040", origin: "Dhaka", destination: "Chittagong", assignedModel: "Scania Legacy SR2", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+
+    // From Khulna (8 routes)
+    { routeId: "NP-KHL-041", origin: "Khulna", destination: "Dinajpur", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-KHL-042", origin: "Khulna", destination: "Sylhet", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-KHL-043", origin: "Khulna", destination: "Bogura", assignedModel: "Hyundai Universe", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-KHL-044", origin: "Khulna", destination: "Rajshahi", assignedModel: "Volvo B9R", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-KHL-045", origin: "Khulna", destination: "Dhaka", assignedModel: "Volvo B9R", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-KHL-046", origin: "Khulna", destination: "Barisal", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-KHL-047", origin: "Khulna", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-KHL-048", origin: "Khulna", destination: "Chittagong", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+
+    // From Barisal (8 routes)
+    { routeId: "NP-BAR-049", origin: "Barisal", destination: "Dinajpur", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BAR-050", origin: "Barisal", destination: "Sylhet", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BAR-051", origin: "Barisal", destination: "Bogura", assignedModel: "Hyundai Universe", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BAR-052", origin: "Barisal", destination: "Rajshahi", assignedModel: "Volvo B9R", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-BAR-053", origin: "Barisal", destination: "Dhaka", assignedModel: "Volvo B9R", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-BAR-054", origin: "Barisal", destination: "Khulna", assignedModel: "Ashok Leyland Eagle", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+    { routeId: "NP-BAR-055", origin: "Barisal", destination: "Cox's Bazar", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-BAR-056", origin: "Barisal", destination: "Chittagong", assignedModel: "Hino RN8J", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+
+    // From Cox's Bazar (8 routes)
+    { routeId: "NP-COX-057", origin: "Cox's Bazar", destination: "Dinajpur", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-COX-058", origin: "Cox's Bazar", destination: "Sylhet", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-COX-059", origin: "Cox's Bazar", destination: "Bogura", assignedModel: "Mercedes-Benz OM 906", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-COX-060", origin: "Cox's Bazar", destination: "Rajshahi", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-COX-061", origin: "Cox's Bazar", destination: "Dhaka", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-COX-062", origin: "Cox's Bazar", destination: "Khulna", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-COX-063", origin: "Cox's Bazar", destination: "Barisal", assignedModel: "Mercedes-Benz OM 906", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-COX-064", origin: "Cox's Bazar", destination: "Chittagong", assignedModel: "Volvo B9R", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+
+    // From Chittagong (8 routes)
+    { routeId: "NP-CTG-065", origin: "Chittagong", destination: "Dinajpur", assignedModel: "MAN 24.460", outboundTime: "03:00 PM", inboundTime: "03:00 PM" },
+    { routeId: "NP-CTG-066", origin: "Chittagong", destination: "Sylhet", assignedModel: "Scania Legacy SR2", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-CTG-067", origin: "Chittagong", destination: "Bogura", assignedModel: "Mercedes-Benz OM 906", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-CTG-068", origin: "Chittagong", destination: "Rajshahi", assignedModel: "MAN 24.460", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-CTG-069", origin: "Chittagong", destination: "Dhaka", assignedModel: "Scania Legacy SR2", outboundTime: "08:30 AM", inboundTime: "03:00 PM" },
+    { routeId: "NP-CTG-070", origin: "Chittagong", destination: "Khulna", assignedModel: "MAN 24.460", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-CTG-071", origin: "Chittagong", destination: "Barisal", assignedModel: "Mercedes-Benz OM 906", outboundTime: "08:00 PM", inboundTime: "08:00 PM" },
+    { routeId: "NP-CTG-072", origin: "Chittagong", destination: "Cox's Bazar", assignedModel: "Volvo B9R", outboundTime: "08:00 AM", inboundTime: "04:00 PM" },
+  ];
+
+  // 5c. Generate 31-day rolling timetable with 3-bus rotation
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const TOTAL_DAYS = 31;
-  const schedulesData = [];
+  const schedulesData: Array<{
+    busId: string;
+    routeId: string;
+    origin: string;
+    destination: string;
+    busName: string;
+    registrationNumber: string;
+    departureTime: Date;
+    arrivalTime: Date;
+  }> = [];
 
-  const routeConfigs = [
-    { destination: "Cox's Bazar", modelName: 'MAN 24.460', estimatedHours: 17.0, outboundDep: { hour: 15, minute: 0 }, inboundDep: { hour: 15, minute: 0 } },
-    { destination: 'Chittagong', modelName: 'Scania Legacy SR2', estimatedHours: 14.0, outboundDep: { hour: 17, minute: 0 }, inboundDep: { hour: 17, minute: 0 } },
-    { destination: 'Barisal', modelName: 'Mercedes-Benz OM 906', estimatedHours: 11.5, outboundDep: { hour: 19, minute: 0 }, inboundDep: { hour: 19, minute: 0 } },
-    { destination: 'Sylhet', modelName: 'Volvo B9R', estimatedHours: 11.5, outboundDep: { hour: 19, minute: 30 }, inboundDep: { hour: 19, minute: 30 } },
-    { destination: 'Khulna', modelName: 'Hyundai Universe', estimatedHours: 10.0, outboundDep: { hour: 20, minute: 30 }, inboundDep: { hour: 20, minute: 30 } },
-    { destination: 'Dhaka', modelName: 'Hino RN8J', estimatedHours: 7.5, outboundDep: { hour: 8, minute: 30 }, inboundDep: { hour: 8, minute: 30 } },
-    { destination: 'Rajshahi', modelName: 'Ashok Leyland Eagle', estimatedHours: 4.5, outboundDep: { hour: 8, minute: 0 }, inboundDep: { hour: 8, minute: 0 } },
-    { destination: 'Bogura', modelName: 'Eicher Pro', estimatedHours: 3.0, outboundDep: { hour: 9, minute: 0 }, inboundDep: { hour: 9, minute: 0 } },
-  ];
+  let skippedRoutes = 0;
 
   for (const config of routeConfigs) {
-    const buses = busesByModel[config.modelName];
-    if (!buses || buses.length < 3) continue;
-    
-    const outboundRouteId = getDbRouteId('Dinajpur', config.destination);
-    const inboundRouteId = getDbRouteId(config.destination, 'Dinajpur');
+    // Find the bus pool for this route's origin depot and assigned model
+    const depotBuses = busesMap[config.origin];
+    if (!depotBuses) {
+      skippedRoutes++;
+      continue;
+    }
+    const assignedBuses = depotBuses[config.assignedModel];
+    if (!assignedBuses || assignedBuses.length < 3) {
+      skippedRoutes++;
+      continue;
+    }
+
+    // Find outbound and inbound route records from DB
+    const outboundRoute = dbRoutes.find(r => r.origin === config.origin && r.destination === config.destination);
+    const inboundRoute = dbRoutes.find(r => r.origin === config.destination && r.destination === config.origin);
+    if (!outboundRoute || !inboundRoute) {
+      skippedRoutes++;
+      continue;
+    }
+
+    // Parse AM/PM departure times
+    const outTimeParsed = parse12HourTime(config.outboundTime);
+    const inTimeParsed = parse12HourTime(config.inboundTime);
 
     for (let dayOffset = 0; dayOffset < TOTAL_DAYS; dayOffset++) {
       const currentDay = new Date(today);
       currentDay.setDate(today.getDate() + dayOffset);
 
-      const outboundBus = buses[dayOffset % 3];
-      const inboundBus = buses[(dayOffset + 1) % 3];
+      // 3-bus rotation: Bus 0 → outbound, Bus 1 → inbound, Bus 2 → resting (rotates daily)
+      const outboundBus = assignedBuses[dayOffset % 3];
+      const inboundBus = assignedBuses[(dayOffset + 1) % 3];
+      // assignedBuses[(dayOffset + 2) % 3] is resting this day
 
-      const outboundDep = new Date(currentDay);
-      outboundDep.setHours(config.outboundDep.hour, config.outboundDep.minute, 0, 0);
-      const outboundArr = new Date(outboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
+      // Outbound schedule
+      const outboundDepDate = new Date(currentDay);
+      outboundDepDate.setHours(outTimeParsed.hour, outTimeParsed.minute, 0, 0);
+      const outboundArrDate = getArrivalTime(outboundDepDate, outboundRoute.estimatedHours || 0);
 
       schedulesData.push({
         busId: outboundBus.id,
-        routeId: outboundRouteId,
-        origin: 'Dinajpur',
+        routeId: outboundRoute.id,
+        origin: config.origin,
         destination: config.destination,
         busName: outboundBus.modelName,
         registrationNumber: outboundBus.registrationNumber,
-        departureTime: outboundDep,
-        arrivalTime: outboundArr,
+        departureTime: outboundDepDate,
+        arrivalTime: outboundArrDate,
       });
 
-      const inboundDep = new Date(currentDay);
-      inboundDep.setHours(config.inboundDep.hour, config.inboundDep.minute, 0, 0);
-      const inboundArr = new Date(inboundDep.getTime() + config.estimatedHours * 60 * 60 * 1000);
+      // Inbound schedule (return trip)
+      const inboundDepDate = new Date(currentDay);
+      inboundDepDate.setHours(inTimeParsed.hour, inTimeParsed.minute, 0, 0);
+      const inboundArrDate = getArrivalTime(inboundDepDate, inboundRoute.estimatedHours || 0);
 
       schedulesData.push({
         busId: inboundBus.id,
-        routeId: inboundRouteId,
+        routeId: inboundRoute.id,
         origin: config.destination,
-        destination: 'Dinajpur',
+        destination: config.origin,
         busName: inboundBus.modelName,
         registrationNumber: inboundBus.registrationNumber,
-        departureTime: inboundDep,
-        arrivalTime: inboundArr,
+        departureTime: inboundDepDate,
+        arrivalTime: inboundArrDate,
       });
     }
   }
 
+  // 5d. Bulk insert all schedules
   await prisma.schedule.createMany({ data: schedulesData });
 
-  console.log(`5. Successfully generated and saved ${schedulesData.length} schedules across 30 days!`);
+  console.log(`5. Generated ${schedulesData.length} schedules across ${TOTAL_DAYS} days (${routeConfigs.length} route configs, ${skippedRoutes} skipped).`);
   console.log('--- Database Seeding Completed Successfully ---');
 }
 
