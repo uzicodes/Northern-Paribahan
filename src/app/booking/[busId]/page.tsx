@@ -50,6 +50,11 @@ export default async function BookingPage(props: PageProps) {
             where: { id: scheduleId },
             include: {
                 tickets: true,
+                route: {
+                    include: {
+                        fares: true,
+                    },
+                },
             },
         }),
     ]);
@@ -61,6 +66,9 @@ export default async function BookingPage(props: PageProps) {
     if (!schedule) {
         return <div className="max-w-4xl mx-auto py-12 text-center text-red-600 font-bold">Schedule not found</div>;
     }
+
+    // Find the matching fare based on bus tier
+    const applicableFare = schedule.route?.fares?.find((f) => f.tier === bus.tier);
 
     // Generate all seat numbers for this bus based on capacity
     const allSeatNumbers = generateSeatNumbers(bus.capacity);
@@ -75,9 +83,9 @@ export default async function BookingPage(props: PageProps) {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2">{bus.name}</h1>
+            <h1 className="text-3xl font-bold mb-2">{bus.modelName}</h1>
             <p className="text-gray-600 mb-2">
-                {bus.type} • {bus.registrationNumber} • ৳{schedule.fare}/seat
+                {bus.tier} • {bus.registrationNumber} • ৳{applicableFare?.price || "N/A"}/seat
             </p>
             {schedule.origin && schedule.destination && (
                 <p className="text-gray-500 mb-8">
