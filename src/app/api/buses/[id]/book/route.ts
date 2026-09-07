@@ -23,16 +23,34 @@ export async function POST(
             );
         }
 
-        // Fetch schedule to get the fare
+        // Fetch schedule to get the bus and route fares
         const schedule = await prisma.schedule.findUnique({
             where: { id: scheduleId },
+            include: {
+                bus: true,
+                route: {
+                    include: {
+                        fares: true,
+                    },
+                },
+            },
         });
 
         if (!schedule) {
             return NextResponse.json({ error: 'Schedule not found' }, { status: 404 });
         }
 
-        const totalFare = schedule.fare * normalizedSeatNumbers.length;
+        // Find the specific fare that matches this bus's tier (PREMIUM, BUSINESS, or ECONOMY)
+        const applicableFare = schedule.route.fares.find((f) => f.tier === schedule.bus.tier);
+
+        if (!applicableFare) {
+            return NextResponse.json(
+                { error: 'Fare configuration not found for this route and bus tier.' },
+                { status: 400 }
+            );
+        }
+
+        const totalFare = applicableFare.price * normalizedSeatNumbers.length;
 
         // Use a transaction to ensure booking and tickets are created atomically
         const result = await prisma.$transaction(async (tx) => {
