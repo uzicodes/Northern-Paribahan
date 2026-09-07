@@ -31,7 +31,7 @@ export async function GET() {
                         schedule: {
                             include: {
                                 bus: {
-                                    select: { type: true },
+                                    select: { tier: true, modelName: true },
                                 },
                             },
                         },
@@ -58,8 +58,8 @@ export async function GET() {
                 createdAt: booking.createdAt,
                 totalFare: booking.totalFare,
                 seatNumbers: booking.tickets.map(t => t.seatNumber),
-                busName: booking.schedule?.busName || 'Unknown Bus',
-                busType: booking.schedule?.bus?.type || 'Standard',
+                busName: booking.schedule?.busName || booking.schedule?.bus?.modelName || 'Unknown Bus',
+                busType: booking.schedule?.bus?.tier || 'Standard',
                 registrationNumber: booking.schedule?.registrationNumber || 'N/A',
                 route: booking.schedule
                     ? `${booking.schedule.origin} → ${booking.schedule.destination}`
