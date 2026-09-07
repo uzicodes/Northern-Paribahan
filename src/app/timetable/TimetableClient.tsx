@@ -42,6 +42,9 @@ const periodIcon: Record<string, React.ReactNode> = {
 };
 
 const typeColor: Record<string, string> = {
+    PREMIUM: "bg-purple-50 text-purple-700 border-purple-100",
+    BUSINESS: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    ECONOMY: "bg-emerald-50 text-emerald-700 border-emerald-100",
     AC: "bg-indigo-50 text-indigo-700 border-indigo-100",
     "NON AC": "bg-gray-100 text-gray-700 border-gray-200",
     SLEEPER: "bg-purple-50 text-purple-700 border-purple-100",

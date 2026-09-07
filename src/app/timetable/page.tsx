@@ -8,8 +8,14 @@ type ScheduleWithBusAndCount = Prisma.ScheduleGetPayload<{
     include: {
         bus: {
             select: {
-                type: true;
+                tier: true;
+                modelName: true;
                 capacity: true;
+            };
+        };
+        route: {
+            include: {
+                fares: true;
             };
         };
         _count: {
@@ -118,8 +124,14 @@ export default async function TimetablePage(props: PageProps) {
             include: {
                 bus: {
                     select: {
-                        type: true,
+                        tier: true,
+                        modelName: true,
                         capacity: true,
+                    },
+                },
+                route: {
+                    include: {
+                        fares: true,
                     },
                 },
                 _count: {
@@ -164,18 +176,22 @@ export default async function TimetablePage(props: PageProps) {
         // Calculate available seats using SQL count
         const availableSeats = schedule.bus.capacity - (schedule._count?.tickets ?? 0);
 
+        // Find applicable fare based on bus tier
+        const applicableFare = schedule.route?.fares?.find((f) => f.tier === schedule.bus.tier);
+        const farePrice = applicableFare ? applicableFare.price : 0;
+
         return {
             id: schedule.id,
-            bus: schedule.busName,
+            bus: schedule.busName || schedule.bus.modelName,
             code: schedule.registrationNumber,
             from: schedule.origin,
             to: schedule.destination,
             departure: timeFormatter.format(depDate),
             arrival: timeFormatter.format(arrDate),
             duration: `${diffHrs}h ${diffMins}m`,
-            type: schedule.bus.type.replace('_', ' '), // e.g., NON_AC -> NON AC
-            fare: `৳ ${schedule.fare.toLocaleString()}`,
-            rawFare: schedule.fare,
+            type: schedule.bus.tier,
+            fare: farePrice > 0 ? `৳ ${farePrice.toLocaleString()}` : 'N/A',
+            rawFare: farePrice,
             seats: availableSeats,
             period: period,
             rawDeparture: schedule.departureTime.toISOString(),

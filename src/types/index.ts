@@ -1,23 +1,39 @@
+export type BusTier = 'PREMIUM' | 'BUSINESS' | 'ECONOMY';
+
 export interface Bus {
     id: string;
-    name: string;
+    modelName: string;
     registrationNumber: string;
-    type: string;
+    tier: BusTier;
     capacity: number;
+    depotId?: string;
+    // Legacy aliases for backward compatibility
+    name?: string;
+    type?: string;
+}
+
+export interface Fare {
+    id: string;
+    price: number;
+    tier: BusTier;
+    origin: string;
+    destination: string;
+    routeId: string;
 }
 
 export interface Route {
     id: string;
+    routeId?: string;
     origin: string;
     destination: string;
     estimatedHours: number | null;
+    fares?: Fare[];
 }
 
 export interface Schedule {
     id: string;
     departureTime: string;
     arrivalTime: string;
-    fare: number;
     origin: string;
     destination: string;
     busName: string;
@@ -26,6 +42,7 @@ export interface Schedule {
     routeId: string;
     bus?: Bus;
     route?: Route;
+    fare?: number; // Dynamically computed from route.fares based on bus.tier
 }
 
 export interface Ticket {
