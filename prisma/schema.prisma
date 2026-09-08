@@ -74,6 +74,7 @@ model Route {
   origin         String
   destination    String
   estimatedHours Float?     @map("estimated_hours")
+  distanceKm     Int
   
   schedules      Schedule[]
   fares          Fare[]
