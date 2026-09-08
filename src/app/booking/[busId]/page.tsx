@@ -11,22 +11,25 @@ interface PageProps {
     }>;
 }
 
-/**
- * Generate seat labels (A1, A2, A3, A4, B1, B2, ...) for a given capacity.
- * 4 seats per row, rows labeled A-Z.
- */
 function generateSeatNumbers(capacity: number): string[] {
     const seats: string[] = [];
     const seatsPerRow = 4;
     for (let i = 0; i < capacity; i++) {
-        const row = String.fromCharCode(65 + Math.floor(i / seatsPerRow)); // A, B, C, ...
+        const row = String.fromCharCode(65 + Math.floor(i / seatsPerRow));
         const col = (i % seatsPerRow) + 1;
         seats.push(`${row}${col}`);
     }
     return seats;
 }
 
-// Server Component
+const formatTime = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(date);
+};
+
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' }).format(date);
+};
+
 export default async function BookingPage(props: PageProps) {
     const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
     const { busId } = params;
@@ -34,68 +37,157 @@ export default async function BookingPage(props: PageProps) {
 
     if (!scheduleId) {
         return (
-            <div className="max-w-4xl mx-auto py-12 text-center">
-                <h1 className="text-2xl font-bold text-red-600 mb-2">No Schedule Selected</h1>
-                <p className="text-gray-600">Please select a schedule from the timetable to book seats.</p>
+            <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">
+                <div className="bg-white max-w-md w-full p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">No Schedule Selected</h1>
+                    <p className="text-gray-500">Please return to the timetable and select a specific trip.</p>
+                </div>
             </div>
         );
     }
 
-    // Fetch bus and the schedule with its existing tickets
     const [bus, schedule] = await Promise.all([
-        prisma.bus.findUnique({
-            where: { id: busId },
-        }),
+        prisma.bus.findUnique({ where: { id: busId } }),
         prisma.schedule.findUnique({
             where: { id: scheduleId },
             include: {
                 tickets: true,
-                route: {
-                    include: {
-                        fares: true,
-                    },
-                },
+                route: { include: { fares: true } },
             },
         }),
     ]);
 
-    if (!bus) {
-        return <div className="max-w-4xl mx-auto py-12 text-center text-red-600 font-bold">Bus not found</div>;
+    if (!bus || !schedule) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+                <div className="text-center bg-white p-8 rounded-xl shadow-sm border border-red-100">
+                    <h1 className="text-2xl font-bold text-red-600 mb-2">Trip Not Found</h1>
+                </div>
+            </div>
+        );
     }
 
-    if (!schedule) {
-        return <div className="max-w-4xl mx-auto py-12 text-center text-red-600 font-bold">Schedule not found</div>;
-    }
-
-    // Find the matching fare based on bus tier
     const applicableFare = schedule.route?.fares?.find((f) => f.tier === bus.tier);
+    const farePrice = applicableFare?.price || 0;
 
-    // Generate all seat numbers for this bus based on capacity
     const allSeatNumbers = generateSeatNumbers(bus.capacity);
-
-    // Determine which seats are already booked for this schedule
     const bookedSeatNumbers = new Set(schedule.tickets.map((t) => t.seatNumber));
-
     const seats: SeatDisplay[] = allSeatNumbers.map((seatNumber) => ({
         seatNumber,
         isBooked: bookedSeatNumbers.has(seatNumber),
     }));
 
-    return (
-        <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2">{bus.modelName}</h1>
-            <p className="text-gray-600 mb-2">
-                {bus.tier} • {bus.registrationNumber} • ৳{applicableFare?.price || "N/A"}/seat
-            </p>
-            {schedule.origin && schedule.destination && (
-                <p className="text-gray-500 mb-8">
-                    {schedule.origin} → {schedule.destination}
-                </p>
-            )}
+    const tierConfig = {
+        PREMIUM: "bg-amber-100 text-amber-800",
+        BUSINESS: "bg-blue-100 text-blue-800",
+        ECONOMY: "bg-green-100 text-green-800",
+    }[bus.tier] || "bg-gray-100 text-gray-800";
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-                <h2 className="text-xl font-semibold mb-6 text-center">Select Your Seats</h2>
-                <SeatLayout busId={bus.id} scheduleId={scheduleId} seats={seats} />
+    return (
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+                
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    {/* LEFT COLUMN: Seat Selection Area (Bus Canvas) */}
+                    <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
+                            <h2 className="text-xl font-bold text-gray-900 mb-6 border-b pb-4">
+                                Select Your Seats
+                            </h2>
+                            
+                            {/* The "Bus" Container */}
+                            <div className="bg-gray-100/50 rounded-3xl p-6 border-2 border-gray-200 max-w-sm mx-auto relative shadow-inner">
+                                
+                                {/* Front of Bus (Steering Wheel) */}
+                                <div className="flex justify-end mb-8 border-b-2 border-gray-300 pb-4">
+                                    <div className="flex flex-col items-center text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 12L19 5M12 12L5 5M12 12V22" />
+                                        </svg>
+                                        <span className="text-[10px] uppercase font-bold tracking-wider">Driver</span>
+                                    </div>
+                                </div>
+
+                                {/* The Actual Seat Grid */}
+                                <div className="w-full">
+                                    <SeatLayout busId={bus.id} scheduleId={scheduleId} seats={seats} />
+                                </div>
+                            </div>
+                            
+                            {/* Simple Legend below the bus */}
+                            <div className="flex justify-center gap-6 mt-8 text-sm font-medium text-gray-600">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 border-2 border-blue-600 rounded"></div>
+                                    Available
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-5 h-5 bg-gray-300 rounded"></div>
+                                    Booked
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* RIGHT COLUMN: Sticky Trip Details Sidebar */}
+                    <div className="lg:col-span-5 xl:col-span-4">
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden sticky top-8">
+                            
+                            {/* Blue Header */}
+                            <div className="bg-blue-600 p-6 text-white text-center">
+                                <h3 className="text-lg font-medium text-blue-100">{formatDate(schedule.departureTime)}</h3>
+                                <div className="flex items-center justify-center gap-3 mt-2 text-2xl font-bold">
+                                    <span>{schedule.origin}</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                    <span>{schedule.destination}</span>
+                                </div>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                {/* Timing Info: Departure & Arrival Side-by-Side */}
+                                <div className="grid grid-cols-2 gap-4 border-b border-gray-100 pb-5">
+                                    <div>
+                                        <p className="text-sm text-gray-500">Departure</p>
+                                        <p className="text-lg font-bold text-gray-900">{formatTime(schedule.departureTime)}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-gray-500">Arrival</p>
+                                        <p className="text-lg font-bold text-gray-900">{formatTime(schedule.arrivalTime)}</p>
+                                    </div>
+                                </div>
+
+                                {/* Fare Display */}
+                                <div className="flex justify-between items-center border-b border-gray-100 pb-5">
+                                    <span className="text-gray-500 text-sm">Fare per Seat</span>
+                                    <span className="text-2xl font-bold text-blue-600">৳{farePrice}</span>
+                                </div>
+
+                                {/* Bus Info */}
+                                <div className="bg-gray-50 p-4 rounded-xl space-y-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500 text-sm">Bus Model</span>
+                                        <span className="font-semibold text-gray-900">{bus.modelName}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500 text-sm">Class</span>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded ${tierConfig}`}>
+                                            {bus.tier}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-500 text-sm">Coach No.</span>
+                                        <span className="font-semibold text-gray-900">{bus.registrationNumber}</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     );
