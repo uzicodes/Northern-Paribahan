@@ -315,7 +315,7 @@ async function main() {
   });
   console.log(`3. Created ${routesData.length} master routes.`);
 
-// 4. Generate the Manual Fares Matrix
+  // 4. Generate the Dynamic Fares Matrix (Based on Kilometers)
   const dbRoutes = await prisma.route.findMany();
   
   const getDbRouteId = (origin: string, destination: string) => {
@@ -326,36 +326,43 @@ async function main() {
 
   const faresToCreate = [];
 
+  // Realistic Bangladesh Per-Kilometer Rates (BDT)
+  const KM_RATE = {
+    PREMIUM: 6.0,
+    BUSINESS: 4.0,
+    ECONOMY: 2.5
+  };
+
   for (const r of routesData) {
     const internalRouteId = getDbRouteId(r.origin, r.destination);
     
     faresToCreate.push({ 
       routeId: internalRouteId, 
-      origin: r.origin,             // <-- Injected here
-      destination: r.destination,   // <-- Injected here
+      origin: r.origin,
+      destination: r.destination,
       tier: BusTier.PREMIUM, 
-      price: r.fares.PREMIUM 
+      price: Math.round(r.distanceKm * KM_RATE.PREMIUM) // Using distanceKm!
     });
     
     faresToCreate.push({ 
       routeId: internalRouteId, 
-      origin: r.origin,             // <-- Injected here
-      destination: r.destination,   // <-- Injected here
+      origin: r.origin,
+      destination: r.destination,
       tier: BusTier.BUSINESS, 
-      price: r.fares.BUSINESS 
+      price: Math.round(r.distanceKm * KM_RATE.BUSINESS) // Using distanceKm!
     });
     
     faresToCreate.push({ 
       routeId: internalRouteId, 
-      origin: r.origin,             // <-- Injected here
-      destination: r.destination,   // <-- Injected here
+      origin: r.origin,
+      destination: r.destination,
       tier: BusTier.ECONOMY, 
-      price: r.fares.ECONOMY 
+      price: Math.round(r.distanceKm * KM_RATE.ECONOMY) // Using distanceKm!
     });
   }
 
   await prisma.fare.createMany({ data: faresToCreate });
-  console.log(`4. Manually set 216 Fare rules across all routes and tiers.`);
+  console.log(`4. Generated 216 Fare rules dynamically based on KM distance.`);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 5. Advanced 3-Day Fleet Rotation Schedule Engine (All 9 Depots)
