@@ -315,7 +315,7 @@ async function main() {
   });
   console.log(`3. Created ${routesData.length} master routes.`);
 
-  // 4. Generate the Dynamic Fares Matrix (Based on Kilometers)
+  // 4. Generate the Dynamic Fares Matrix (Based on Kilometers & Rounded)
   const dbRoutes = await prisma.route.findMany();
   
   const getDbRouteId = (origin: string, destination: string) => {
@@ -333,6 +333,9 @@ async function main() {
     ECONOMY: 2.5
   };
 
+  // Helper function to round fares to the nearest 10 Taka
+  const roundFare = (price: number) => Math.round(price / 10) * 10;
+
   for (const r of routesData) {
     const internalRouteId = getDbRouteId(r.origin, r.destination);
     
@@ -341,7 +344,7 @@ async function main() {
       origin: r.origin,
       destination: r.destination,
       tier: BusTier.PREMIUM, 
-      price: Math.round(r.distanceKm * KM_RATE.PREMIUM) // Using distanceKm!
+      price: roundFare(r.distanceKm * KM_RATE.PREMIUM)
     });
     
     faresToCreate.push({ 
@@ -349,7 +352,7 @@ async function main() {
       origin: r.origin,
       destination: r.destination,
       tier: BusTier.BUSINESS, 
-      price: Math.round(r.distanceKm * KM_RATE.BUSINESS) // Using distanceKm!
+      price: roundFare(r.distanceKm * KM_RATE.BUSINESS)
     });
     
     faresToCreate.push({ 
@@ -357,12 +360,12 @@ async function main() {
       origin: r.origin,
       destination: r.destination,
       tier: BusTier.ECONOMY, 
-      price: Math.round(r.distanceKm * KM_RATE.ECONOMY) // Using distanceKm!
+      price: roundFare(r.distanceKm * KM_RATE.ECONOMY)
     });
   }
 
   await prisma.fare.createMany({ data: faresToCreate });
-  console.log(`4. Generated 216 Fare rules dynamically based on KM distance.`);
+  console.log(`4. Generated 216 Fare rules dynamically (Rounded to nearest 10 Taka).`);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 5. Advanced 3-Day Fleet Rotation Schedule Engine (All 9 Depots)
