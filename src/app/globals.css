@@ -4,11 +4,12 @@
 
 html {
   scrollbar-gutter: stable;
+  background-color: #C9CBA3;
 }
 
 body {
   font-family: 'Satoshi', sans-serif;
-  background-color: #f3f4f6;
+  background-color: #C9CBA3;
   color: #1f2937;
 }
 
