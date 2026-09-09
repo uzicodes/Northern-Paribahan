@@ -37,7 +37,7 @@ export default async function BookingPage(props: PageProps) {
 
     if (!scheduleId) {
         return (
-            <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">
+            <div className="min-h-screen bg-[#C9CBA3] py-12 px-4 flex items-center justify-center">
                 <div className="bg-white max-w-md w-full p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">No Schedule Selected</h1>
                     <p className="text-gray-500">Please return to the timetable and select a specific trip.</p>
@@ -59,7 +59,7 @@ export default async function BookingPage(props: PageProps) {
 
     if (!bus || !schedule) {
         return (
-            <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+            <div className="min-h-screen bg-[#C9CBA3] flex justify-center items-center">
                 <div className="text-center bg-white p-8 rounded-xl shadow-sm border border-red-100">
                     <h1 className="text-2xl font-bold text-red-600 mb-2">Trip Not Found</h1>
                 </div>
@@ -84,7 +84,7 @@ export default async function BookingPage(props: PageProps) {
     }[bus.tier] || "bg-gray-100 text-gray-800";
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#C9CBA3] py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-6xl mx-auto">
                 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

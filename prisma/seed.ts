@@ -315,6 +315,7 @@ async function main() {
   });
   console.log(`3. Created ${routesData.length} master routes.`);
 
+  // 4. Generate the Dynamic Fares Matrix (Based on Kilometers)
   // 4. Generate the Dynamic Fares Matrix (Based on Kilometers & Rounded)
   const dbRoutes = await prisma.route.findMany();
   
