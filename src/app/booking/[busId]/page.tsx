@@ -91,43 +91,13 @@ export default async function BookingPage(props: PageProps) {
                     
                     {/* LEFT COLUMN: Seat Selection Area (Bus Canvas) */}
                     <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8">
-                            <h2 className="text-xl font-bold text-gray-900 mb-6 border-b pb-4">
-                                Select Your Seats
-                            </h2>
-                            
-                            {/* The "Bus" Container */}
-                            <div className="bg-gray-100/50 rounded-3xl p-6 border-2 border-gray-200 max-w-sm mx-auto relative shadow-inner">
-                                
-                                {/* Front of Bus (Steering Wheel) */}
-                                <div className="flex justify-end mb-8 border-b-2 border-gray-300 pb-4">
-                                    <div className="flex flex-col items-center text-gray-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 12L19 5M12 12L5 5M12 12V22" />
-                                        </svg>
-                                        <span className="text-[10px] uppercase font-bold tracking-wider">Driver</span>
-                                    </div>
-                                </div>
-
-                                {/* The Actual Seat Grid */}
-                                <div className="w-full">
-                                    <SeatLayout busId={bus.id} scheduleId={scheduleId} seats={seats} />
-                                </div>
-                            </div>
-                            
-                            {/* Simple Legend below the bus */}
-                            <div className="flex justify-center gap-6 mt-8 text-sm font-medium text-gray-600">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-5 h-5 border-2 border-blue-600 rounded"></div>
-                                    Available
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-5 h-5 bg-gray-300 rounded"></div>
-                                    Booked
-                                </div>
-                            </div>
-                        </div>
+                        <SeatLayout 
+                            busId={bus.id} 
+                            scheduleId={scheduleId} 
+                            busModel={bus.modelName}
+                            fare={farePrice}
+                            bookedSeats={Array.from(bookedSeatNumbers)}
+                        />
                     </div>
 
                     {/* RIGHT COLUMN: Sticky Trip Details Sidebar */}
