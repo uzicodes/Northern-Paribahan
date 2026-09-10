@@ -3,17 +3,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import SeatLayout from "@/components/SeatLayout";
 import { 
-    ChevronDown, 
-    ChevronUp, 
     Clock, 
     ArrowRight, 
     Bus, 
     MapPin, 
-    Sparkles, 
-    ShieldCheck, 
-    Armchair 
+    ShieldCheck 
 } from "lucide-react";
 
 export default function TimetablePage() {
@@ -24,7 +19,6 @@ export default function TimetablePage() {
 
     const [schedules, setSchedules] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [expandedScheduleId, setExpandedScheduleId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!origin || !destination || !date) {
@@ -156,7 +150,6 @@ export default function TimetablePage() {
                             );
                             const farePrice = applicableFare?.price || schedule.fare || 0;
                             const busModelName = schedule.bus?.modelName || schedule.busName || "Volvo B9R";
-                            const isExpanded = expandedScheduleId === schedule.id;
 
                             // Tier badges
                             const tierBadgeColor = 
@@ -213,7 +206,7 @@ export default function TimetablePage() {
                                             </div>
                                         </div>
 
-                                        {/* Right Section: Fare & Toggle Button */}
+                                        {/* Right Section: Fare & Navigation Action */}
                                         <div className="flex-1 flex flex-row lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto gap-4">
                                             <div className="text-left lg:text-right">
                                                 <span className="text-xs text-slate-400 font-medium block">Starting from</span>
@@ -222,38 +215,15 @@ export default function TimetablePage() {
                                                 </p>
                                             </div>
 
-                                            <button
-                                                type="button"
-                                                onClick={() => setExpandedScheduleId(isExpanded ? null : schedule.id)}
-                                                className={`
-                                                    inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-150 shadow-sm
-                                                    ${
-                                                        isExpanded
-                                                            ? "bg-slate-200 text-slate-800 hover:bg-slate-300"
-                                                            : "bg-[#172144] hover:bg-[#101730] text-white shadow-[#172144]/20 hover:shadow-md"
-                                                    }
-                                                `}
+                                            <Link
+                                                href={`/booking/${schedule.bus?.id || schedule.busId}?scheduleId=${schedule.id}`}
+                                                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#172144] hover:bg-[#101730] text-white shadow-sm shadow-[#172144]/20 hover:shadow-md transition-all duration-150"
                                             >
-                                                <Armchair size={16} />
-                                                <span>{isExpanded ? "Close Seats" : "Select Seats"}</span>
-                                                {isExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
-                                            </button>
+                                                <span>Select Seats</span>
+                                                <ArrowRight size={15} />
+                                            </Link>
                                         </div>
                                     </div>
-
-                                    {/* Expanded Seat Selection UI */}
-                                    {isExpanded && (
-                                        <div className="mt-6 pt-6 border-t border-slate-200 animate-in fade-in slide-in-from-top-2 duration-200">
-                                            <SeatLayout
-                                                busId={schedule.bus?.id || schedule.busId}
-                                                scheduleId={schedule.id}
-                                                busModel={busModelName}
-                                                fare={farePrice}
-                                                bookedSeats={["A1", "A2"]} // Mock booked seats as requested to test disabled state
-                                                proceedUrl={`/booking/${schedule.bus?.id || schedule.busId}?scheduleId=${schedule.id}`}
-                                            />
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}

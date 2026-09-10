@@ -13,7 +13,7 @@ export interface SeatLayoutProps {
   busModel?: string;
   fare?: number;
   bookedSeats?: string[];
-  seats?: SeatDisplay[]; // Optional backwards-compatibility prop
+  seats?: SeatDisplay[]; 
   onSeatSelect?: (seats: string[]) => void;
   onProceed?: (selectedSeats: string[], totalFare: number) => void;
   proceedUrl?: string;
@@ -31,7 +31,7 @@ interface LayoutConfig {
 }
 
 /**
- * Determines the layout architecture based on the bus model string.
+ * seat layout architecture based on the bus model.
  * 1. Premium 2+1 Layout (12 Rows, 36 Seats total) if model includes "Scania" or "MAN".
  * 2. Executive 2+2 Layout (9 Rows, 36 Seats total) if model includes "Mercedes".
  * 3. Standard 2+2 Layout (10 Rows, 40 Seats total) for all other models (Volvo, Hino, etc.).
@@ -96,7 +96,7 @@ export default function SeatLayout({
   // Combine propBookedSeats with any legacy seat objects or fallback mocks
   const bookedSet = useMemo(() => {
     const set = new Set<string>();
-    if (propBookedSeats && propBookedSeats.length > 0) {
+    if (propBookedSeats !== undefined) {
       propBookedSeats.forEach((s) => set.add(s.toUpperCase()));
     } else if (legacySeats && legacySeats.length > 0) {
       legacySeats.filter((s) => s.isBooked).forEach((s) => set.add(s.seatNumber.toUpperCase()));
@@ -173,8 +173,6 @@ export default function SeatLayout({
       const url = new URL(proceedUrl, window.location.origin);
       url.searchParams.set("seats", selectedSeats.join(","));
       window.location.href = url.toString();
-    } else if (busId && scheduleId) {
-      window.location.href = `/booking/${busId}?scheduleId=${scheduleId}&seats=${selectedSeats.join(",")}`;
     } else {
       toast.success(`Reserved seats: ${selectedSeats.join(", ")}`, {
         description: `Total fare: ৳ ${totalFare.toLocaleString()}`,
