@@ -2,18 +2,25 @@
 
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { 
+  getCurrentBSTDate, 
+  getBSTDayBoundaries, 
+  OPERATIONAL_BUFFER_MINUTES 
+} from '@/lib/dateUtils';
 
 // ==========================================
-// 1. Types & Interfaces
+// 1. TypeScript Types (Stripped at compile time)
 // ==========================================
 
-export interface GetSchedulesParams {
+export type { GetSchedulesParams, ScheduleWithDetails, EnrichedSchedule };
+
+interface GetSchedulesParams {
   origin: string;
   destination: string;
   travelDate: string; // Expected format: "YYYY-MM-DD"
 }
 
-export type ScheduleWithDetails = Prisma.ScheduleGetPayload<{
+type ScheduleWithDetails = Prisma.ScheduleGetPayload<{
   include: {
     bus: {
       select: {
@@ -37,55 +44,14 @@ export type ScheduleWithDetails = Prisma.ScheduleGetPayload<{
   };
 }>;
 
-export interface EnrichedSchedule extends ScheduleWithDetails {
+interface EnrichedSchedule extends ScheduleWithDetails {
   fare: number;
   fareFormatted: string;
   availableSeats: number;
 }
 
 // ==========================================
-// 2. Constants & Timezone Helper Utilities
-// ==========================================
-
-export const BST_TIMEZONE = 'Asia/Dhaka';
-export const OPERATIONAL_BUFFER_MINUTES = 30;
-
-/**
- * Returns the current calendar date in Bangladesh Standard Time (BST, UTC+6)
- * formatted strictly as "YYYY-MM-DD".
- */
-export function getCurrentBSTDate(now: Date = new Date()): string {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: BST_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  const parts = formatter.formatToParts(now);
-  const year = parts.find((p) => p.type === 'year')?.value;
-  const month = parts.find((p) => p.type === 'month')?.value;
-  const day = parts.find((p) => p.type === 'day')?.value;
-
-  return `${year}-${month}-${day}`;
-}
-
-/**
- * Returns the UTC Date objects representing the exact start (00:00:00.000)
- * and end (23:59:59.999) of a calendar day in Bangladesh Standard Time (+06:00).
- */
-export function getBSTDayBoundaries(dateStr: string): {
-  startOfDayBST: Date;
-  endOfDayBST: Date;
-} {
-  const startOfDayBST = new Date(`${dateStr}T00:00:00.000+06:00`);
-  const endOfDayBST = new Date(`${dateStr}T23:59:59.999+06:00`);
-
-  return { startOfDayBST, endOfDayBST };
-}
-
-// ==========================================
-// 3. Server Action / Query Function
+// 2. Server Action (Async Function Export Only)
 // ==========================================
 
 /**
@@ -108,7 +74,7 @@ export async function getSchedules({
     return [];
   }
 
-  // Validate YYYY-MM-DD format
+  // Validate YYYY-MM-DD pattern
   const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
   if (!DATE_REGEX.test(travelDate.trim())) {
     return [];
@@ -124,9 +90,7 @@ export async function getSchedules({
   const now = new Date();
   const todayInBST = getCurrentBSTDate(now);
 
-  // Rule 4: Historical Dates
-  // If the requested travel date is before today in Bangladesh Standard Time,
-  // return an empty array immediately.
+  // Rule 4: Historical Dates -> Return empty array immediately
   if (cleanTravelDate < todayInBST) {
     return [];
   }
@@ -139,13 +103,12 @@ export async function getSchedules({
   // - Future-date: departureTime >= 00:00:00.000 BST
   const lowerBound = cleanTravelDate === todayInBST ? operationalCutoff : startOfDayBST;
 
-  // If the same-day cutoff is already past the end of the day, no buses remain today
+  // If cutoff has passed the end of the day (e.g. late night search), no trips remain
   if (lowerBound > endOfDayBST) {
     return [];
   }
 
   try {
-    // Database query with relational data
     const rawSchedules = await prisma.schedule.findMany({
       where: {
         origin: { equals: origin.trim(), mode: 'insensitive' },
@@ -181,8 +144,8 @@ export async function getSchedules({
       },
     });
 
-    // Compute dynamic pricing and available seat capacity
-    const schedules: EnrichedSchedule[] = rawSchedules.map((schedule) => {
+    // Compute dynamic pricing and available seats
+    return rawSchedules.map((schedule) => {
       const applicableFare = schedule.route?.fares?.find(
         (f) => f.tier === schedule.bus.tier
       );
@@ -197,11 +160,8 @@ export async function getSchedules({
         availableSeats,
       };
     });
-
-    return schedules;
   } catch (error) {
     console.error('Error fetching time-gated schedules:', error);
     throw error;
   }
 }
-

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSchedules, getCurrentBSTDate } from '@/actions/getSchedules';
+import { getSchedules } from '@/actions/getSchedules';
+import { getCurrentBSTDate } from '@/lib/dateUtils';
 
 export const dynamic = 'force-dynamic';
 
