@@ -16,6 +16,25 @@ function getTier(modelName: string): BusTier {
   return BusTier.ECONOMY;
 }
 
+function getCapacity(modelName: string): number {
+  const normalized = modelName.toLowerCase().trim();
+
+  // 36 Seats Models: MAN, Scania, Mercedes-Benz (OM 906)
+  if (normalized.includes('man')) return 36;
+  if (normalized.includes('scania')) return 36;
+  if (normalized.includes('mercedes')) return 36;
+
+  // 40 Seats Models: Volvo (B9R / BR9), Hino (RN8J, AK1J), Ashok Leyland Eagle, Eicher Pro, Hyundai Universe
+  if (normalized.includes('volvo')) return 40;
+  if (normalized.includes('hino')) return 40;
+  if (normalized.includes('ashok leyland') || normalized.includes('eagle')) return 40;
+  if (normalized.includes('eicher')) return 40;
+  if (normalized.includes('hyundai')) return 40;
+
+  console.warn(`Warning: Unknown bus model "${modelName}", defaulting to 40 seats.`);
+  return 40;
+}
+
 function unpackRegistrationNumbers(rangeString: string): string[] {
   const match = rangeString.match(/(.*)-(\d+)-(\d+)$/);
   if (!match) return [rangeString];
@@ -197,7 +216,7 @@ async function main() {
           registrationNumber: reg,
           tier: tier,
           depotId: depot.id,
-          capacity: tier === BusTier.PREMIUM ? 36 : (tier === BusTier.BUSINESS ? 40 : 45),
+          capacity: getCapacity(busGroup.model),
         });
       }
     }
