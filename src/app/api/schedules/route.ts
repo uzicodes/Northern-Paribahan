@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { getSchedules, getCurrentBSTDate } from '@/actions/getSchedules';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const destination = searchParams.get('destination') || searchParams.get('to');
   const dateStr = searchParams.get('date'); // Optional, expected format: 'YYYY-MM-DD'
 
-  // 2. Validate the request
+  // 2. Validate required search parameters
   if (!origin || !destination) {
     return NextResponse.json(
       { error: 'Missing required search parameters: origin (or from) and destination (or to).' },
@@ -19,78 +19,16 @@ export async function GET(request: Request) {
   }
 
   try {
-    // 3. Build where filter with case-insensitive matching
-    const whereClause: any = {
-      origin: { equals: origin, mode: 'insensitive' },
-      destination: { equals: destination, mode: 'insensitive' },
-    };
+    // If no date is specified, default to today in Bangladesh Standard Time (BST)
+    const travelDate = dateStr?.trim() || getCurrentBSTDate();
 
-    if (dateStr) {
-      const searchDate = new Date(dateStr);
-      searchDate.setHours(0, 0, 0, 0);
-      const nextDay = new Date(searchDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-      whereClause.departureTime = {
-        gte: searchDate,
-        lt: nextDay,
-      };
-    } else {
-      // Default to start of today onwards if no specific date is provided
-      const now = new Date();
-      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-      whereClause.departureTime = {
-        gte: startOfToday,
-      };
-    }
-
-    // 4. Query the Database with bus and route.fares
-    const rawSchedules = await prisma.schedule.findMany({
-      where: whereClause,
-      include: {
-        bus: {
-          select: {
-            id: true,
-            modelName: true,
-            registrationNumber: true,
-            tier: true,
-            capacity: true,
-          },
-        },
-        route: {
-          include: {
-            fares: true,
-          },
-        },
-        _count: {
-          select: {
-            tickets: true,
-          },
-        },
-      },
-      orderBy: {
-        departureTime: 'asc',
-      },
+    const schedules = await getSchedules({
+      origin,
+      destination,
+      travelDate,
     });
 
-    // 5. Compute dynamic fare and available seats for each schedule
-    const schedules = rawSchedules.map((schedule) => {
-      const applicableFare = schedule.route?.fares?.find(
-        (f) => f.tier === schedule.bus.tier
-      );
-      const farePrice = applicableFare ? applicableFare.price : 0;
-      const availableSeats = schedule.bus.capacity - (schedule._count?.tickets ?? 0);
-
-      return {
-        ...schedule,
-        fare: farePrice,
-        fareFormatted: farePrice > 0 ? `৳ ${farePrice.toLocaleString()}` : 'N/A',
-        availableSeats,
-      };
-    });
-
-    // 6. Return the enriched schedules
     return NextResponse.json({ schedules }, { status: 200 });
-
   } catch (error) {
     console.error('Failed to fetch schedules:', error);
     return NextResponse.json(
