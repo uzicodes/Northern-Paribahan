@@ -102,10 +102,16 @@ export default async function BookingPage(props: PageProps) {
                             </span>
                         </div>
 
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-1">
+                            <span className="text-emerald-700">Departure Terminal: {schedule.origin}</span>
+                            <span className="text-slate-300">•</span>
+                            <span className="text-amber-700">Arrival Terminal: {schedule.destination}</span>
+                        </div>
+
                         <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-                            <span>{schedule.origin}</span>
+                            <span className="text-emerald-800">{schedule.origin}</span>
                             <ArrowRight className="w-6 h-6 text-[#FCA311]" />
-                            <span>{schedule.destination}</span>
+                            <span className="text-amber-800">{schedule.destination}</span>
                         </h1>
 
                         <p className="text-slate-600 text-sm mt-1">
@@ -117,7 +123,7 @@ export default async function BookingPage(props: PageProps) {
                     <div className="flex items-center gap-4 bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 sm:px-5">
                         <div className="text-right">
                             <span className="text-[11px] text-slate-400 font-semibold uppercase tracking-wider block">Fare per seat</span>
-                            <p className="text-2xl font-black text-[#172144]">
+                            <p className="text-2xl font-black text-rose-600">
                                 ৳{farePrice.toLocaleString()}
                             </p>
                         </div>
