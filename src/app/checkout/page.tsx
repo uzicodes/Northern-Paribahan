@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, Suspense, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { 
     Clock, 
     ArrowLeft, 
@@ -14,7 +13,9 @@ import {
     CreditCard, 
     CheckCircle2, 
     ChevronRight,
-    Calendar
+    Calendar,
+    AlertTriangle,
+    X
 } from "lucide-react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/GlobalLoader";
@@ -45,6 +46,8 @@ function CheckoutContent() {
     const boardingPoint = `Northern Paribahan ${origin} Counter`;
     const droppingPoint = `Northern Paribahan ${destination} Counter`;
 
+    const router = useRouter();
+
     // Form states
     const [fullName, setFullName] = useState("");
     const [mobileNumber, setMobileNumber] = useState("");
@@ -52,6 +55,38 @@ function CheckoutContent() {
     const [gender, setGender] = useState<"Male" | "Female" | "Other">("Male");
     const [paymentMethod, setPaymentMethod] = useState<"bkash" | "nagad" | "sslcommerz">("bkash");
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Warning dialog modal state
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+
+    // Intercept browser back navigation and window unload
+    useEffect(() => {
+        window.history.pushState({ checkoutGuard: true }, "", window.location.href);
+
+        const handlePopState = () => {
+            setShowLeaveModal(true);
+            window.history.pushState({ checkoutGuard: true }, "", window.location.href);
+        };
+
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = "";
+            return "";
+        };
+
+        window.addEventListener("popstate", handlePopState);
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopState);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
+
+    const handleConfirmLeave = useCallback(() => {
+        setShowLeaveModal(false);
+        router.push(`/booking/${busId}?scheduleId=${scheduleId}`);
+    }, [busId, scheduleId, router]);
 
     // 10-minute temporary seat hold countdown timer
     const [secondsLeft, setSecondsLeft] = useState(600); // 10:00 minutes
@@ -105,15 +140,16 @@ function CheckoutContent() {
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: "#C9CBA3" }}>
             <div className="max-w-6xl mx-auto space-y-5">
                 
-                {/* Back Link & Security Badge */}
+                {/* Back Button & Action */}
                 <div className="flex items-center justify-between">
-                    <Link
-                        href={`/booking/${busId}?scheduleId=${scheduleId}`}
-                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 hover:text-black bg-white/80 hover:bg-white border border-black/10 px-3.5 py-2 rounded-xl shadow-2xs transition-all active:scale-95"
+                    <button
+                        type="button"
+                        onClick={() => setShowLeaveModal(true)}
+                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 hover:text-black bg-white/80 hover:bg-white border border-black/10 px-3.5 py-2 rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
                     >
                         <ArrowLeft size={16} />
                         <span>Modify Seat Selection</span>
-                    </Link>
+                    </button>
                 </div>
 
                 {/* 1. Top Banner (Seat Hold Timer) */}
@@ -158,13 +194,10 @@ function CheckoutContent() {
                                             Boarding & Dropping Points
                                         </h3>
                                         <p className="text-xs text-slate-500">
-                                            Select your specific bus terminal counter
+                                            Official designated bus terminal counters
                                         </p>
                                     </div>
                                 </div>
-                                <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                    Step 1 of 2
-                                </span>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
@@ -214,9 +247,6 @@ function CheckoutContent() {
                                         </p>
                                     </div>
                                 </div>
-                                <span className="text-[11px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                                    Step 2 of 2
-                                </span>
                             </div>
 
                             <div className="space-y-4">
@@ -522,6 +552,71 @@ function CheckoutContent() {
                 </form>
 
             </div>
+
+            {/* Warning Dialog Box: Released Seats Confirmation Modal */}
+            {showLeaveModal && (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-xs animate-in fade-in duration-150"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="warning-modal-title"
+                >
+                    <div 
+                        className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center text-center relative animate-in zoom-in-95 duration-150"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Close icon */}
+                        <button
+                            type="button"
+                            onClick={() => setShowLeaveModal(false)}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                            aria-label="Stay on checkout"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        {/* Alert Icon Badge */}
+                        <div className="w-14 h-14 rounded-2xl bg-amber-100/90 border border-amber-300 flex items-center justify-center text-amber-600 mb-4 shadow-xs">
+                            <AlertTriangle size={30} className="stroke-[2.2]" />
+                        </div>
+
+                        {/* Title */}
+                        <h3 id="warning-modal-title" className="text-xl font-black text-slate-900 tracking-tight">
+                            Release Selected Seats?
+                        </h3>
+
+                        {/* Message Body */}
+                        <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+                            Your seats <span className="font-bold text-slate-900 bg-amber-100/80 px-2 py-0.5 rounded border border-amber-200">{selectedSeats.join(", ")}</span> are currently held under your reservation.
+                        </p>
+
+                        <div className="mt-3.5 p-3 rounded-xl bg-rose-50 border border-rose-200/80 text-left flex items-start gap-2.5">
+                            <span className="text-base leading-none mt-0.5">⚠️</span>
+                            <p className="text-xs text-rose-700 font-semibold leading-relaxed">
+                                Going back or modifying selection will immediately <span className="underline font-bold">release your seats</span>. They will become available for other passengers to book.
+                            </p>
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex flex-col-reverse sm:flex-row gap-2.5 w-full mt-6">
+                            <button
+                                type="button"
+                                onClick={() => setShowLeaveModal(false)}
+                                className="flex-1 py-3 px-4 rounded-xl border border-slate-300 hover:border-slate-400 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 transition-colors cursor-pointer active:scale-[0.99]"
+                            >
+                                Stay on Checkout
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleConfirmLeave}
+                                className="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-600/25 transition-all active:scale-[0.98] cursor-pointer"
+                            >
+                                Leave & Release Seats
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
