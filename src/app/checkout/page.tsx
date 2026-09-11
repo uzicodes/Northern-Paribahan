@@ -59,6 +59,9 @@ function CheckoutContent() {
     // Warning dialog modal state
     const [showLeaveModal, setShowLeaveModal] = useState(false);
 
+    const holdStorageKey = `northern_seat_hold_${busId}_${scheduleId}_${seatsParam}`;
+    const formDraftKey = `northern_checkout_draft_${busId}_${scheduleId}`;
+
     // Intercept browser back navigation and window unload
     useEffect(() => {
         window.history.pushState({ checkoutGuard: true }, "", window.location.href);
@@ -83,21 +86,98 @@ function CheckoutContent() {
         };
     }, []);
 
+    const clearCheckoutSession = useCallback(() => {
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.removeItem(holdStorageKey);
+                sessionStorage.removeItem(formDraftKey);
+            } catch {
+                // Ignore storage errors
+            }
+        }
+    }, [holdStorageKey, formDraftKey]);
+
     const handleConfirmLeave = useCallback(() => {
+        clearCheckoutSession();
         setShowLeaveModal(false);
         router.push(`/booking/${busId}?scheduleId=${scheduleId}`);
-    }, [busId, scheduleId, router]);
+    }, [busId, scheduleId, router, clearCheckoutSession]);
 
-    // 10-minute temporary seat hold countdown timer
-    const [secondsLeft, setSecondsLeft] = useState(600); // 10:00 minutes
+    // 10-minute seat hold countdown timer (persisted across reloads via target timestamp)
+    const [secondsLeft, setSecondsLeft] = useState(600);
+    const [isExpired, setIsExpired] = useState(false);
 
     useEffect(() => {
-        if (secondsLeft <= 0) return;
-        const interval = setInterval(() => {
-            setSecondsLeft((prev) => prev - 1);
-        }, 1000);
+        if (typeof window === "undefined") return;
+
+        const HOLD_DURATION_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
+        let targetExpiresAt: number;
+
+        try {
+            const stored = sessionStorage.getItem(holdStorageKey);
+            if (stored) {
+                const parsed = parseInt(stored, 10);
+                if (!isNaN(parsed) && parsed > 0) {
+                    targetExpiresAt = parsed;
+                } else {
+                    targetExpiresAt = Date.now() + HOLD_DURATION_MS;
+                    sessionStorage.setItem(holdStorageKey, targetExpiresAt.toString());
+                }
+            } else {
+                targetExpiresAt = Date.now() + HOLD_DURATION_MS;
+                sessionStorage.setItem(holdStorageKey, targetExpiresAt.toString());
+            }
+        } catch {
+            targetExpiresAt = Date.now() + HOLD_DURATION_MS;
+        }
+
+        const updateTimer = () => {
+            const remaining = Math.max(0, Math.floor((targetExpiresAt - Date.now()) / 1000));
+            setSecondsLeft(remaining);
+            if (remaining <= 0) {
+                setIsExpired(true);
+            }
+        };
+
+        updateTimer();
+        const interval = setInterval(updateTimer, 1000);
+
         return () => clearInterval(interval);
-    }, [secondsLeft]);
+    }, [holdStorageKey]);
+
+    // Restore form draft on mount if available
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        try {
+            const savedDraft = sessionStorage.getItem(formDraftKey);
+            if (savedDraft) {
+                const draft = JSON.parse(savedDraft);
+                if (draft.fullName) setFullName(draft.fullName);
+                if (draft.mobileNumber) setMobileNumber(draft.mobileNumber);
+                if (draft.email) setEmail(draft.email);
+                if (draft.gender) setGender(draft.gender);
+                if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod);
+            }
+        } catch {
+            // Ignore parse errors
+        }
+    }, [formDraftKey]);
+
+    // Save form draft on change
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        try {
+            sessionStorage.setItem(formDraftKey, JSON.stringify({
+                fullName,
+                mobileNumber,
+                email,
+                gender,
+                paymentMethod
+            }));
+        } catch {
+            // Ignore storage errors
+        }
+    }, [fullName, mobileNumber, email, gender, paymentMethod, formDraftKey]);
 
     const formatTimer = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -107,6 +187,11 @@ function CheckoutContent() {
 
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (secondsLeft <= 0 || isExpired) {
+            toast.error("Your seat hold has expired. Please re-select your seats.");
+            return;
+        }
 
         if (!fullName.trim()) {
             toast.error("Please enter the passenger's full name.");
@@ -123,6 +208,7 @@ function CheckoutContent() {
         setIsSubmitting(true);
         setTimeout(() => {
             setIsSubmitting(false);
+            clearCheckoutSession();
             toast.success("Booking Order Placed Successfully!", {
                 description: `Payment gateway initialized for ৳${grandTotal.toLocaleString()} via ${paymentMethod.toUpperCase()}`,
             });
@@ -153,25 +239,54 @@ function CheckoutContent() {
                 </div>
 
                 {/* 1. Top Banner (Seat Hold Timer) */}
-                <div className="bg-gradient-to-r from-amber-500 via-[#FCA311] to-amber-600 rounded-2xl p-4 sm:p-4.5 shadow-sm text-slate-950 flex flex-col sm:flex-row items-center justify-between gap-3 border border-amber-400/40">
+                <div className={`rounded-2xl p-4 sm:p-4.5 shadow-sm text-slate-950 flex flex-col sm:flex-row items-center justify-between gap-3 border transition-colors ${
+                    secondsLeft <= 0
+                        ? "bg-rose-50 border-rose-300"
+                        : "bg-gradient-to-r from-amber-500 via-[#FCA311] to-amber-600 border-amber-400/40"
+                }`}>
                     <div className="flex items-center gap-3 text-center sm:text-left">
-                        <div className="w-10 h-10 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/40">
-                            <Clock className="w-5 h-5 text-slate-950" />
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
+                            secondsLeft <= 0
+                                ? "bg-rose-100 border-rose-300 text-rose-600"
+                                : "bg-white/30 backdrop-blur-md border-white/40 text-slate-950"
+                        }`}>
+                            {secondsLeft <= 0 ? <AlertTriangle className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
                         </div>
                         <div>
-                            <h2 className="text-sm sm:text-base font-black tracking-tight">
-                                Seats Temporarily Reserved For You
+                            <h2 className={`text-sm sm:text-base font-black tracking-tight ${secondsLeft <= 0 ? "text-rose-900" : "text-slate-950"}`}>
+                                {secondsLeft <= 0 ? "Seat Hold Reservation Expired" : "Seats Temporarily Reserved For You"}
                             </h2>
-                            <p className="text-xs font-medium text-slate-900/80">
-                                Seats <span className="font-bold underline">{selectedSeats.join(", ")}</span> are held temporarily. Complete checkout before the timer expires.
+                            <p className={`text-xs font-medium ${secondsLeft <= 0 ? "text-rose-700" : "text-slate-900/80"}`}>
+                                {secondsLeft <= 0 ? (
+                                    <>
+                                        Your hold on seats <span className="font-bold underline">{selectedSeats.join(", ")}</span> has expired.{" "}
+                                        <button
+                                            type="button"
+                                            onClick={handleConfirmLeave}
+                                            className="font-bold underline hover:text-rose-950 cursor-pointer ml-1"
+                                        >
+                                            Click here to re-select seats
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        Seats <span className="font-bold underline">{selectedSeats.join(", ")}</span> are held temporarily. Complete checkout before the timer expires.
+                                    </>
+                                )}
                             </p>
                         </div>
                     </div>
 
-                    <div className="bg-slate-950 text-white px-4 py-2 rounded-xl flex items-center gap-2 shadow-inner border border-white/10 shrink-0">
-                        <span className="text-xs uppercase font-bold tracking-wider text-amber-400">Time Left</span>
+                    <div className={`px-4 py-2 rounded-xl flex items-center gap-2 shadow-inner border shrink-0 ${
+                        secondsLeft <= 0
+                            ? "bg-rose-600 text-white border-rose-700"
+                            : "bg-slate-950 text-white border-white/10"
+                    }`}>
+                        <span className={`text-xs uppercase font-bold tracking-wider ${secondsLeft <= 0 ? "text-rose-200" : "text-amber-400"}`}>
+                            {secondsLeft <= 0 ? "Status" : "Time Left"}
+                        </span>
                         <span className="font-mono text-lg font-black tracking-wider text-white">
-                            {formatTimer(secondsLeft)}
+                            {secondsLeft <= 0 ? "EXPIRED" : formatTimer(secondsLeft)}
                         </span>
                     </div>
                 </div>
@@ -530,11 +645,13 @@ function CheckoutContent() {
                             {/* Checkout Button */}
                             <button
                                 type="submit"
-                                disabled={isSubmitting || selectedSeats.length === 0}
-                                className="w-full py-4 px-4 bg-[#172144] hover:bg-[#101730] text-white font-black text-sm rounded-xl shadow-md shadow-[#172144]/25 transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50"
+                                disabled={isSubmitting || selectedSeats.length === 0 || secondsLeft <= 0}
+                                className="w-full py-4 px-4 bg-[#172144] hover:bg-[#101730] text-white font-black text-sm rounded-xl shadow-md shadow-[#172144]/25 transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                                 {isSubmitting ? (
                                     <span>Connecting Gateway...</span>
+                                ) : secondsLeft <= 0 ? (
+                                    <span>Hold Expired — Re-select Seats</span>
                                 ) : (
                                     <>
                                         <span>Confirm & Pay ৳{grandTotal.toLocaleString()}</span>
