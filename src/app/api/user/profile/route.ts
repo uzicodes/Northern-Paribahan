@@ -1,8 +1,34 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
+
+const profileInclude = {
+    bookings: {
+        include: {
+            tickets: true,
+            schedule: {
+                include: {
+                    bus: {
+                        select: { tier: true, modelName: true },
+                    },
+                },
+            },
+        },
+        orderBy: {
+            createdAt: 'desc' as const,
+        },
+    },
+} satisfies Prisma.UserInclude;
+
+type UserWithBookings = Prisma.UserGetPayload<{
+    include: typeof profileInclude;
+}>;
+
+type BookingWithDetails = UserWithBookings['bookings'][number];
+type TicketWithDetails = BookingWithDetails['tickets'][number];
 
 export async function GET() {
     const supabase = await createClient();
@@ -14,25 +40,9 @@ export async function GET() {
 
     try {
         // Pure read: look up existing user profile and bookings
-        let profile = await prisma.user.findUnique({
+        let profile: UserWithBookings | null = await prisma.user.findUnique({
             where: { id: user.id },
-            include: {
-                bookings: {
-                    include: {
-                        tickets: true,
-                        schedule: {
-                            include: {
-                                bus: {
-                                    select: { tier: true, modelName: true },
-                                },
-                            },
-                        },
-                    },
-                    orderBy: {
-                        createdAt: 'desc',
-                    },
-                },
-            },
+            include: profileInclude,
         });
 
         // Safe lazy fallback: only creates the Prisma record if the user exists in Supabase Auth but not in Prisma DB
@@ -44,23 +54,7 @@ export async function GET() {
                     name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
                     phoneNumber: user.user_metadata?.phone_number || null,
                 },
-                include: {
-                    bookings: {
-                        include: {
-                            tickets: true,
-                            schedule: {
-                                include: {
-                                    bus: {
-                                        select: { tier: true, modelName: true },
-                                    },
-                                },
-                            },
-                        },
-                        orderBy: {
-                            createdAt: 'desc',
-                        },
-                    },
-                },
+                include: profileInclude,
             });
         }
 
@@ -73,12 +67,12 @@ export async function GET() {
                 phoneNumber: profile.phoneNumber || user.user_metadata?.phone_number || '',
                 role: profile.role,
             },
-            bookings: profile.bookings.map(booking => ({
+            bookings: profile.bookings.map((booking: BookingWithDetails) => ({
                 id: booking.id,
                 status: booking.status,
                 createdAt: booking.createdAt,
                 totalFare: booking.totalFare,
-                seatNumbers: booking.tickets.map(t => t.seatNumber),
+                seatNumbers: booking.tickets.map((t: TicketWithDetails) => t.seatNumber),
                 busName: booking.schedule?.busName || booking.schedule?.bus?.modelName || 'Unknown Bus',
                 busType: booking.schedule?.bus?.tier || 'Standard',
                 registrationNumber: booking.schedule?.registrationNumber || 'N/A',
