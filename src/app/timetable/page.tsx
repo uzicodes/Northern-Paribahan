@@ -412,7 +412,7 @@ export default function TimetablePage() {
                                                     {busModelName}
                                                 </h2>
                                                 <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold tracking-wide border ${tierBadgeColor}`}>
-                                                    {schedule.bus?.tier || 'EXPRESS'}
+                                                    {schedule.bus?.tier || 'ECONOMY'}
                                                 </span>
                                             </div>
                                             <p className="text-xs text-slate-500 font-medium flex items-center gap-2">
@@ -441,9 +441,10 @@ export default function TimetablePage() {
                                             </div>
                                             
                                             {/* Visual Progress Connector */}
-                                            <div className="flex flex-col items-center px-1.5">
-                                                <div className="h-[2px] bg-slate-300 w-14 sm:w-20 relative flex items-center justify-between">
+                                            <div className="flex flex-col items-center px-2">
+                                                <div className="h-[2px] bg-slate-300 w-20 sm:w-28 relative flex items-center justify-between">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 -ml-0.5 border border-white shadow-2xs" />
+                                                    <ArrowRight size={10} className="text-slate-400 absolute left-1/2 -translate-x-1/2" />
                                                     <div className="w-1.5 h-1.5 rounded-full bg-amber-600 -mr-0.5 border border-white shadow-2xs" />
                                                 </div>
                                             </div>

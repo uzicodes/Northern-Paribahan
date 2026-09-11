@@ -11,6 +11,7 @@ export interface SeatLayoutProps {
   busId?: string;
   scheduleId?: string;
   busModel?: string;
+  tier?: string;
   fare?: number;
   bookedSeats?: string[];
   seats?: SeatDisplay[]; 
@@ -31,45 +32,60 @@ interface LayoutConfig {
 }
 
 /**
- * seat layout architecture based on the bus model.
+ * seat layout architecture based on the bus model and tier.
  * 1. Premium 2+1 Layout (12 Rows, 36 Seats total) if model includes "Scania" or "MAN".
  * 2. Executive 2+2 Layout (9 Rows, 36 Seats total) if model includes "Mercedes".
  * 3. Standard 2+2 Layout (10 Rows, 40 Seats total) for all other models (Volvo, Hino, etc.).
  */
-export function getLayoutConfig(busModel: string = ""): LayoutConfig {
+export function getLayoutConfig(busModel: string = "", tier?: string): LayoutConfig {
   const model = busModel.toLowerCase().trim();
+  const normalizedTier = tier?.toUpperCase();
 
-  if (model.includes("scania") || model.includes("man")) {
+  // PREMIUM: MAN 24.460, Scania Legacy SR2, Mercedes-Benz OM 906
+  if (
+    normalizedTier === "PREMIUM" ||
+    model.includes("man") ||
+    model.includes("scania") ||
+    model.includes("mercedes")
+  ) {
+    const isMercedes = model.includes("mercedes");
     return {
-      architecture: "PREMIUM_2_1",
-      label: "Premium 2+1 Layout",
-      badge: "36 Seats • Business Class",
-      badgeColor: "bg-purple-100 text-purple-800 border-purple-200",
-      rowCount: 12,
+      architecture: isMercedes ? "EXECUTIVE_2_2" : "PREMIUM_2_1",
+      label: isMercedes ? "Executive 2+2 Layout" : "Premium 2+1 Layout",
+      badge: "Premium Class",
+      badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
+      rowCount: isMercedes ? 9 : 12,
       leftCols: 2,
-      rightCols: 1,
+      rightCols: isMercedes ? 2 : 1,
       totalSeats: 36,
     };
   }
 
-  if (model.includes("mercedes")) {
+  // BUSINESS: Volvo B9R, Hino RN8J, Hyundai Universe
+  if (
+    normalizedTier === "BUSINESS" ||
+    model.includes("volvo") ||
+    model.includes("rn8j") ||
+    model.includes("hyundai")
+  ) {
     return {
-      architecture: "EXECUTIVE_2_2",
-      label: "Executive 2+2 Layout",
-      badge: "36 Seats • Royal Executive",
-      badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
-      rowCount: 9,
+      architecture: "STANDARD_2_2",
+      label: "Standard 2+2 Layout",
+      badge: "Business Class",
+      badgeColor: "bg-indigo-100 text-indigo-900 border-indigo-300",
+      rowCount: 10,
       leftCols: 2,
       rightCols: 2,
-      totalSeats: 36,
+      totalSeats: 40,
     };
   }
 
+  // ECONOMY: Ashok Leyland Eagle, Eicher Pro, Hino AK1J
   return {
     architecture: "STANDARD_2_2",
     label: "Standard 2+2 Layout",
-    badge: "40 Seats • Express Class",
-    badgeColor: "bg-blue-100 text-blue-800 border-blue-200",
+    badge: "Economy Class",
+    badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
     rowCount: 10,
     leftCols: 2,
     rightCols: 2,
@@ -81,6 +97,7 @@ export default function SeatLayout({
   busId,
   scheduleId,
   busModel = "Volvo B9R",
+  tier,
   fare = 0,
   bookedSeats: propBookedSeats,
   seats: legacySeats,
@@ -90,8 +107,8 @@ export default function SeatLayout({
 }: SeatLayoutProps) {
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
 
-  // Parse dynamic grid layout architecture from bus model
-  const config = useMemo(() => getLayoutConfig(busModel), [busModel]);
+  // Parse dynamic grid layout architecture from bus model and tier
+  const config = useMemo(() => getLayoutConfig(busModel, tier), [busModel, tier]);
 
   // Combine propBookedSeats with any legacy seat objects or fallback mocks
   const bookedSet = useMemo(() => {
@@ -185,32 +202,45 @@ export default function SeatLayout({
       {/* Header Info Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-5 border-b border-slate-100 gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-              Select Your Seats
-            </h3>
-            <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${config.badgeColor}`}>
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+            Select Your Seats
+          </h3>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <span className="text-xs sm:text-sm text-slate-500 font-medium">Coach Model:</span>
+            <span className="font-bold text-slate-800 text-xs sm:text-sm">{busModel}</span>
+            {/* Total Seats Badge */}
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full border bg-sky-50 text-sky-800 border-sky-200">
+              {config.totalSeats} Seats
+            </span>
+            {/* Class Tier Badge */}
+            <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border ${config.badgeColor}`}>
               {config.badge}
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Coach Model: <span className="font-semibold text-slate-700">{busModel}</span> ({config.label})
-          </p>
         </div>
 
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-md bg-white border-2 border-slate-300 shadow-2xs" />
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-6 rounded-t-lg rounded-b-md bg-white border-2 border-slate-300 relative shadow-2xs flex flex-col items-center">
+              <div className="w-3.5 h-1.5 bg-slate-200 rounded-t-sm mt-0.5 border-b border-slate-300" />
+              <div className="flex-1 w-full" />
+            </div>
             <span>Available</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-md bg-blue-600 border border-blue-700 shadow-2xs" />
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-6 rounded-t-lg rounded-b-md bg-blue-600 border-2 border-blue-700 relative shadow-2xs flex flex-col items-center">
+              <div className="w-3.5 h-1.5 bg-blue-500 rounded-t-sm mt-0.5 border-b border-blue-700" />
+              <div className="flex-1 w-full flex items-center justify-center">
+                <Check className="w-2.5 h-2.5 text-white" />
+              </div>
+            </div>
             <span className="text-blue-700 font-semibold">Selected</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-md bg-slate-200 border border-slate-300 relative">
-              <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-6 rounded-t-lg rounded-b-md bg-slate-200 border border-slate-300 relative shadow-inner flex flex-col items-center opacity-75">
+              <div className="w-3.5 h-1.5 bg-slate-300 rounded-t-sm mt-0.5 border-b border-slate-300" />
+              <div className="flex-1 w-full flex items-center justify-center">
                 <div className="w-2.5 h-[1.5px] bg-slate-400 rotate-45" />
               </div>
             </div>
@@ -224,7 +254,7 @@ export default function SeatLayout({
         
         {/* The Bus Body Visual Container */}
         <div className="lg:col-span-7 xl:col-span-8 flex justify-center">
-          <div className="w-full max-w-sm bg-gradient-to-b from-slate-50 via-slate-100/70 to-slate-50 border-2 border-slate-300 rounded-[2.5rem] p-4 sm:p-6 shadow-inner relative">
+          <div className="w-full max-w-md bg-gradient-to-b from-slate-50 via-slate-100/70 to-slate-50 border-2 border-slate-300 rounded-[2.5rem] p-4 sm:p-6 shadow-inner relative">
             
             {/* Front of Bus Cabin: Windshield & Driver Cab */}
             <div className="flex items-center justify-between pb-4 mb-5 border-b-2 border-dashed border-slate-300 text-slate-400">
@@ -257,11 +287,11 @@ export default function SeatLayout({
             </div>
 
             {/* Seat Grid Rows with Aisle */}
-            <div className="space-y-2.5 sm:space-y-3">
+            <div className="space-y-3 sm:space-y-3.5">
               {rows.map(({ rowLetter, left, right }) => (
                 <div key={rowLetter} className="flex items-center justify-between gap-2 sm:gap-4">
                   {/* Left Column Seats */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sm:gap-2.5">
                     {left.map((seatNum) => {
                       const isBooked = bookedSet.has(seatNum);
                       const isSelected = selectedSeats.includes(seatNum);
@@ -274,18 +304,59 @@ export default function SeatLayout({
                           onClick={() => handleSeatClick(seatNum)}
                           aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isSelected ? "Selected" : "Available"}`}
                           className={`
-                            w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-150 relative select-none
+                            w-11 h-13 sm:w-12 sm:h-14 rounded-t-xl rounded-b-lg font-bold flex flex-col items-center justify-between p-1 transition-all duration-150 relative select-none group
                             ${
                               isBooked
                                 ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-inner"
                                 : isSelected
-                                ? "bg-blue-600 text-white border-2 border-blue-700 shadow-md shadow-blue-600/30 scale-105 ring-2 ring-blue-300"
-                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 shadow-2xs active:scale-95"
+                                ? "bg-blue-600 text-white border-2 border-blue-700 shadow-lg shadow-blue-600/35 scale-105 ring-2 ring-blue-300"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 shadow-sm active:scale-95"
                             }
                           `}
                         >
-                          {isSelected && <Check className="w-3.5 h-3.5 absolute top-1 right-1 text-white" />}
-                          {seatNum}
+                          {/* Seat Headrest */}
+                          <div
+                            className={`w-7 sm:w-8 h-2.5 sm:h-3 rounded-t-md rounded-b-xs transition-colors shrink-0 ${
+                              isBooked
+                                ? "bg-slate-300 border-b border-slate-400/50"
+                                : isSelected
+                                ? "bg-blue-500/90 border-b border-blue-700"
+                                : "bg-slate-100 group-hover:bg-blue-100/70 border-b border-slate-200 group-hover:border-blue-200"
+                            }`}
+                          />
+
+                          {/* Seat Cushion Body with Number & Indicator */}
+                          <div className="flex-1 w-full flex items-center justify-center relative px-0.5">
+                            {/* Armrest Side Indents */}
+                            <div
+                              className={`absolute left-0 top-1 bottom-1 w-[2px] rounded-r-full ${
+                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                              }`}
+                            />
+                            <div
+                              className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-l-full ${
+                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                              }`}
+                            />
+
+                            <span className="text-[11px] sm:text-xs font-black tracking-tight leading-none">
+                              {seatNum}
+                            </span>
+                            {isSelected && (
+                              <Check className="w-3 h-3 absolute top-0.5 right-0.5 text-white drop-shadow-xs" />
+                            )}
+                          </div>
+
+                          {/* Lower Seat Lip / Cushion edge */}
+                          <div
+                            className={`w-full h-1 rounded-b-md ${
+                              isBooked
+                                ? "bg-slate-300/80"
+                                : isSelected
+                                ? "bg-blue-700/80"
+                                : "bg-slate-200/80 group-hover:bg-blue-200/60"
+                            }`}
+                          />
                         </button>
                       );
                     })}
@@ -299,7 +370,7 @@ export default function SeatLayout({
                   </div>
 
                   {/* Right Column Seats */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 sm:gap-2.5">
                     {right.map((seatNum) => {
                       const isBooked = bookedSet.has(seatNum);
                       const isSelected = selectedSeats.includes(seatNum);
@@ -312,18 +383,59 @@ export default function SeatLayout({
                           onClick={() => handleSeatClick(seatNum)}
                           aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isSelected ? "Selected" : "Available"}`}
                           className={`
-                            w-10 h-10 sm:w-11 sm:h-11 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center transition-all duration-150 relative select-none
+                            w-11 h-13 sm:w-12 sm:h-14 rounded-t-xl rounded-b-lg font-bold flex flex-col items-center justify-between p-1 transition-all duration-150 relative select-none group
                             ${
                               isBooked
                                 ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-inner"
                                 : isSelected
-                                ? "bg-blue-600 text-white border-2 border-blue-700 shadow-md shadow-blue-600/30 scale-105 ring-2 ring-blue-300"
-                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/50 shadow-2xs active:scale-95"
+                                ? "bg-blue-600 text-white border-2 border-blue-700 shadow-lg shadow-blue-600/35 scale-105 ring-2 ring-blue-300"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 shadow-sm active:scale-95"
                             }
                           `}
                         >
-                          {isSelected && <Check className="w-3.5 h-3.5 absolute top-1 right-1 text-white" />}
-                          {seatNum}
+                          {/* Seat Headrest */}
+                          <div
+                            className={`w-7 sm:w-8 h-2.5 sm:h-3 rounded-t-md rounded-b-xs transition-colors shrink-0 ${
+                              isBooked
+                                ? "bg-slate-300 border-b border-slate-400/50"
+                                : isSelected
+                                ? "bg-blue-500/90 border-b border-blue-700"
+                                : "bg-slate-100 group-hover:bg-blue-100/70 border-b border-slate-200 group-hover:border-blue-200"
+                            }`}
+                          />
+
+                          {/* Seat Cushion Body with Number & Indicator */}
+                          <div className="flex-1 w-full flex items-center justify-center relative px-0.5">
+                            {/* Armrest Side Indents */}
+                            <div
+                              className={`absolute left-0 top-1 bottom-1 w-[2px] rounded-r-full ${
+                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                              }`}
+                            />
+                            <div
+                              className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-l-full ${
+                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                              }`}
+                            />
+
+                            <span className="text-[11px] sm:text-xs font-black tracking-tight leading-none">
+                              {seatNum}
+                            </span>
+                            {isSelected && (
+                              <Check className="w-3 h-3 absolute top-0.5 right-0.5 text-white drop-shadow-xs" />
+                            )}
+                          </div>
+
+                          {/* Lower Seat Lip / Cushion edge */}
+                          <div
+                            className={`w-full h-1 rounded-b-md ${
+                              isBooked
+                                ? "bg-slate-300/80"
+                                : isSelected
+                                ? "bg-blue-700/80"
+                                : "bg-slate-200/80 group-hover:bg-blue-200/60"
+                            }`}
+                          />
                         </button>
                       );
                     })}
@@ -356,7 +468,7 @@ export default function SeatLayout({
 
             {/* Selected Seats Chips */}
             <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 text-center">
                 Selected Seats
               </p>
               {selectedSeats.length === 0 ? (
@@ -366,20 +478,20 @@ export default function SeatLayout({
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
                   {selectedSeats.map((seat) => (
                     <span
                       key={seat}
-                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-xs font-bold shadow-2xs"
+                      className="inline-flex items-center justify-between px-2 py-1 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-xs font-bold shadow-2xs min-w-0"
                     >
-                      {seat}
+                      <span className="truncate">{seat}</span>
                       <button
                         type="button"
                         onClick={() => handleSeatClick(seat)}
-                        className="hover:text-rose-600 transition-colors"
+                        className="hover:text-rose-600 transition-colors ml-1 shrink-0 p-0.5"
                         aria-label={`Remove seat ${seat}`}
                       >
-                        <X size={13} />
+                        <X size={12} />
                       </button>
                     </span>
                   ))}
@@ -391,7 +503,7 @@ export default function SeatLayout({
             <div className="border-t border-slate-200 pt-4 space-y-2.5">
               <div className="flex justify-between text-xs sm:text-sm text-slate-600">
                 <span>Fare per Seat</span>
-                <span className="font-semibold text-slate-900">৳ {fare.toLocaleString()}</span>
+                <span className="font-bold text-rose-600">৳ {fare.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-xs sm:text-sm text-slate-600">
                 <span>Selected Seats</span>
@@ -399,7 +511,7 @@ export default function SeatLayout({
               </div>
               <div className="border-t border-slate-200 pt-3 flex justify-between items-baseline">
                 <span className="font-bold text-slate-900 text-sm sm:text-base">Total Fare</span>
-                <span className="text-xl sm:text-2xl font-black text-blue-600">
+                <span className="text-xl sm:text-2xl font-black text-rose-600">
                   ৳ {totalFare.toLocaleString()}
                 </span>
               </div>
