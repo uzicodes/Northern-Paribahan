@@ -91,11 +91,12 @@ function CheckoutContent() {
             try {
                 sessionStorage.removeItem(holdStorageKey);
                 sessionStorage.removeItem(formDraftKey);
+                sessionStorage.removeItem(`selected_seats_${busId}_${scheduleId}`);
             } catch {
                 // Ignore storage errors
             }
         }
-    }, [holdStorageKey, formDraftKey]);
+    }, [holdStorageKey, formDraftKey, busId, scheduleId]);
 
     const handleConfirmLeave = useCallback(() => {
         clearCheckoutSession();

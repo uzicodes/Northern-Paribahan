@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Check, X, ShieldAlert, Armchair, ChevronRight, Info } from "lucide-react";
 import { SeatDisplay } from "@/types";
@@ -125,6 +125,56 @@ export default function SeatLayout({
     }
     return set;
   }, [propBookedSeats, legacySeats]);
+
+  const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
+  const isInitialMount = useRef(true);
+
+  // Restore saved seats from sessionStorage on mount (survives page reloads)
+  useEffect(() => {
+    if (!storageKey || typeof window === "undefined") return;
+
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // Filter out any seats that are now booked or invalid, capped at 4
+          const validSeats = parsed.filter(
+            (seat): seat is string => typeof seat === "string" && !bookedSet.has(seat.toUpperCase())
+          ).slice(0, 4);
+
+          if (validSeats.length > 0) {
+            setSelectedSeats(validSeats);
+            onSeatSelect?.(validSeats);
+          } else {
+            sessionStorage.removeItem(storageKey);
+          }
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }, [storageKey, bookedSet, onSeatSelect]);
+
+  // Persist selected seats to sessionStorage when selection changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (!storageKey || typeof window === "undefined") return;
+
+    try {
+      if (selectedSeats.length > 0) {
+        sessionStorage.setItem(storageKey, JSON.stringify(selectedSeats));
+      } else {
+        sessionStorage.removeItem(storageKey);
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }, [selectedSeats, storageKey]);
 
   // Generate grid rows based on architecture
   const rows = useMemo(() => {
