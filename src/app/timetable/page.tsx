@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
+import GlobalLoader from "@/components/GlobalLoader";
 import { getCurrentBSTDate } from "@/lib/dateUtils";
 import { 
     Clock, 
@@ -127,10 +128,7 @@ export default function TimetablePage() {
                 className="flex justify-center items-center min-h-[calc(100vh-140px)]"
                 style={{ backgroundColor: "#C9CBA3" }}
             >
-                <div className="flex flex-col items-center gap-3">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#172144]"></div>
-                    <p className="text-sm font-semibold text-slate-800">Searching active schedules...</p>
-                </div>
+                <GlobalLoader />
             </div>
         );
     }

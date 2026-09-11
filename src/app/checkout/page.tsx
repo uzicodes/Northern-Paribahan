@@ -17,6 +17,7 @@ import {
     Calendar
 } from "lucide-react";
 import { toast } from "sonner";
+import GlobalLoader from "@/components/GlobalLoader";
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -529,9 +530,7 @@ export default function CheckoutPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen py-16 flex items-center justify-center" style={{ backgroundColor: "#C9CBA3" }}>
-                <div className="text-center bg-white p-8 rounded-2xl shadow-sm">
-                    <p className="font-bold text-slate-800">Loading Checkout Details...</p>
-                </div>
+                <GlobalLoader />
             </div>
         }>
             <CheckoutContent />
