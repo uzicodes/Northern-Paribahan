@@ -13,17 +13,9 @@ export async function GET() {
     }
 
     try {
-        // Auto-upsert: if user exists in Supabase Auth but not in Prisma (e.g. after DB reset),
-        // create the Prisma record on the fly so the profile page works seamlessly.
-        const profile = await prisma.user.upsert({
+        // Pure read: look up existing user profile and bookings
+        let profile = await prisma.user.findUnique({
             where: { id: user.id },
-            update: {}, // Don't overwrite existing data on every profile fetch
-            create: {
-                id: user.id,
-                email: user.email!,
-                name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
-                phoneNumber: user.user_metadata?.phone_number || null,
-            },
             include: {
                 bookings: {
                     include: {
@@ -42,6 +34,35 @@ export async function GET() {
                 },
             },
         });
+
+        // Safe lazy fallback: only creates the Prisma record if the user exists in Supabase Auth but not in Prisma DB
+        if (!profile) {
+            profile = await prisma.user.create({
+                data: {
+                    id: user.id,
+                    email: user.email!,
+                    name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
+                    phoneNumber: user.user_metadata?.phone_number || null,
+                },
+                include: {
+                    bookings: {
+                        include: {
+                            tickets: true,
+                            schedule: {
+                                include: {
+                                    bus: {
+                                        select: { tier: true, modelName: true },
+                                    },
+                                },
+                            },
+                        },
+                        orderBy: {
+                            createdAt: 'desc',
+                        },
+                    },
+                },
+            });
+        }
 
         // Return the shape the frontend expects: { user, bookings }
         return NextResponse.json({
