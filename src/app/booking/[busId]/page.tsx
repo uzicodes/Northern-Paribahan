@@ -184,6 +184,7 @@ export default async function BookingPage(props: PageProps) {
                     tier={bus.tier}
                     fare={farePrice}
                     bookedSeats={Array.from(bookedSeatNumbers)}
+                    proceedUrl={`/checkout?busId=${encodeURIComponent(bus.id)}&scheduleId=${encodeURIComponent(scheduleId)}&origin=${encodeURIComponent(schedule.origin)}&destination=${encodeURIComponent(schedule.destination)}&busModel=${encodeURIComponent(bus.modelName)}&tier=${encodeURIComponent(bus.tier)}&regNo=${encodeURIComponent(bus.registrationNumber)}&time=${encodeURIComponent(formatTime(schedule.departureTime))}&arrival=${encodeURIComponent(formatTime(schedule.arrivalTime))}&date=${encodeURIComponent(travelDateISO)}&fare=${farePrice}`}
                 />
             </div>
         </div>
