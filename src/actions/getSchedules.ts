@@ -1,5 +1,4 @@
-"use server";
-
+import 'server-only';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { 
@@ -51,7 +50,7 @@ interface EnrichedSchedule extends ScheduleWithDetails {
 }
 
 // ==========================================
-// 2. Server Action (Async Function Export Only)
+// 2. Server Data Query Service
 // ==========================================
 
 /**
