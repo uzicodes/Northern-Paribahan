@@ -182,14 +182,17 @@ async function main() {
     pgClient.release();
   }
 
-  // 1. Clear existing operational records
-  await prisma.ticket.deleteMany({});
-  await prisma.booking.deleteMany({});
-  await prisma.schedule.deleteMany({});
-  await prisma.fare.deleteMany({});
-  await prisma.route.deleteMany({});
-  await prisma.bus.deleteMany({});
-  await prisma.depot.deleteMany({});
+  // 1. Clear existing operational records in correct foreign-key dependency order
+  // Executed atomically in a single round-trip transaction to avoid sequential round-trip waterfall overhead
+  await prisma.$transaction([
+    prisma.ticket.deleteMany(),
+    prisma.booking.deleteMany(),
+    prisma.schedule.deleteMany(),
+    prisma.fare.deleteMany(),
+    prisma.route.deleteMany(),
+    prisma.bus.deleteMany(),
+    prisma.depot.deleteMany(),
+  ]);
 
   console.log('1. Cleared all existing database records.');
 
