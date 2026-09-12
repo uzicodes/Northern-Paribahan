@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -13,7 +13,8 @@ import {
     Bus, 
     MapPin, 
     Calendar,
-    Search 
+    Search,
+    ChevronDown
 } from "lucide-react";
 
 const LOCATIONS = [
@@ -43,6 +44,26 @@ export default function TimetablePage() {
     const [filterFrom, setFilterFrom] = useState(origin || "");
     const [filterTo, setFilterTo] = useState(destination || "");
     const [filterDate, setFilterDate] = useState(date || getCurrentBSTDate());
+
+    // Custom centered dropdown menu states
+    const [openFromDropdown, setOpenFromDropdown] = useState(false);
+    const [openToDropdown, setOpenToDropdown] = useState(false);
+    const fromRef = useRef<HTMLDivElement>(null);
+    const toRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (fromRef.current && !fromRef.current.contains(e.target as Node)) {
+                setOpenFromDropdown(false);
+            }
+            if (toRef.current && !toRef.current.contains(e.target as Node)) {
+                setOpenToDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     // Synchronize filter fields when searchParams change
     useEffect(() => {
@@ -279,27 +300,68 @@ export default function TimetablePage() {
                 {/* On-Page Search Filter Bar */}
                 <form 
                     onSubmit={handleFilterSubmit}
-                    className="bg-white/90 backdrop-blur-md rounded-2xl p-4 sm:p-5 shadow-sm border border-black/5"
+                    className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/5 relative z-30"
                 >
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
                         {/* From Select */}
-                        <div className="lg:col-span-3">
+                        <div className={`lg:col-span-3 relative ${openFromDropdown ? "z-50" : "z-20"}`} ref={fromRef}>
                             <label className="block text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
                                 <MapPin size={12} className="text-emerald-600" />
                                 <span>FROM</span>
                             </label>
-                            <select
-                                value={filterFrom}
-                                onChange={(e) => setFilterFrom(e.target.value)}
-                                className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all cursor-pointer"
+                            
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpenFromDropdown((prev) => !prev);
+                                    setOpenToDropdown(false);
+                                }}
+                                className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                    openFromDropdown
+                                        ? "border-emerald-600 ring-2 ring-emerald-500/20 text-slate-900 bg-white"
+                                        : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                }`}
                             >
-                                <option value="" disabled>Select FROM</option>
-                                {LOCATIONS.map((loc) => (
-                                    <option key={loc} value={loc} disabled={loc === filterTo}>
-                                        {loc}
-                                    </option>
-                                ))}
-                            </select>
+                                <span className="truncate text-center w-full px-4">
+                                    {filterFrom || "Select FROM"}
+                                </span>
+                                <ChevronDown 
+                                    size={16} 
+                                    className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                        openFromDropdown ? "rotate-180 text-emerald-600" : ""
+                                    }`} 
+                                />
+                            </button>
+
+                            {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                            {openFromDropdown && (
+                                <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                    {LOCATIONS.map((loc) => {
+                                        const isSelected = loc === filterFrom;
+                                        const isDisabled = loc === filterTo;
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={loc}
+                                                disabled={isDisabled}
+                                                onClick={() => {
+                                                    setFilterFrom(loc);
+                                                    setOpenFromDropdown(false);
+                                                }}
+                                                className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-emerald-50 text-emerald-800 font-bold"
+                                                        : isDisabled
+                                                        ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                }`}
+                                            >
+                                                {loc}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         {/* Swap Button */}
@@ -312,30 +374,71 @@ export default function TimetablePage() {
                                 onClick={handleSwapLocations}
                                 title="Swap FROM & TO"
                                 aria-label="Swap FROM and TO"
-                                className="w-full h-11 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 flex items-center justify-center transition-all duration-150 active:rotate-180"
+                                className="w-full h-11 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-200/90 hover:border-amber-300 shadow-2xs flex items-center justify-center transition-all duration-150 active:scale-95 active:rotate-180 cursor-pointer"
                             >
-                                <ArrowLeftRight size={16} />
+                                <ArrowLeftRight size={17} className="stroke-[2.2]" />
                             </button>
                         </div>
 
                         {/* To Select */}
-                        <div className="lg:col-span-3">
+                        <div className={`lg:col-span-3 relative ${openToDropdown ? "z-50" : "z-20"}`} ref={toRef}>
                             <label className="block text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
                                 <MapPin size={12} className="text-amber-600" />
                                 <span>TO</span>
                             </label>
-                            <select
-                                value={filterTo}
-                                onChange={(e) => setFilterTo(e.target.value)}
-                                className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all cursor-pointer"
+                            
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpenToDropdown((prev) => !prev);
+                                    setOpenFromDropdown(false);
+                                }}
+                                className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                    openToDropdown
+                                        ? "border-amber-600 ring-2 ring-amber-500/20 text-slate-900 bg-white"
+                                        : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                }`}
                             >
-                                <option value="" disabled>Select TO</option>
-                                {LOCATIONS.map((loc) => (
-                                    <option key={loc} value={loc} disabled={loc === filterFrom}>
-                                        {loc}
-                                    </option>
-                                ))}
-                            </select>
+                                <span className="truncate text-center w-full px-4">
+                                    {filterTo || "Select TO"}
+                                </span>
+                                <ChevronDown 
+                                    size={16} 
+                                    className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                        openToDropdown ? "rotate-180 text-amber-600" : ""
+                                    }`} 
+                                />
+                            </button>
+
+                            {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                            {openToDropdown && (
+                                <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                    {LOCATIONS.map((loc) => {
+                                        const isSelected = loc === filterTo;
+                                        const isDisabled = loc === filterFrom;
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={loc}
+                                                disabled={isDisabled}
+                                                onClick={() => {
+                                                    setFilterTo(loc);
+                                                    setOpenToDropdown(false);
+                                                }}
+                                                className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-amber-50 text-amber-900 font-bold"
+                                                        : isDisabled
+                                                        ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                }`}
+                                            >
+                                                {loc}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         {/* Date Input */}
@@ -381,7 +484,7 @@ export default function TimetablePage() {
                         </p>
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-4 relative z-0">
                         {schedules.map((schedule) => {
                             const applicableFare = schedule.route?.fares?.find(
                                 (f: any) => f.tier === schedule.bus?.tier
@@ -427,20 +530,20 @@ export default function TimetablePage() {
                                         </div>
 
                                         {/* Middle Section: Departure & Arrival Timing with Departure & Arrival Terminal Labels */}
-                                        <div className="flex-1 flex items-center justify-between sm:justify-center w-full lg:w-auto gap-3 sm:gap-5 bg-slate-50/90 py-2 px-3 sm:py-2 sm:px-4 rounded-xl border border-slate-200/70">
+                                        <div className="flex-initial sm:flex-1 lg:flex-[1.4] flex items-center justify-between sm:justify-center w-full lg:w-auto min-w-[310px] sm:min-w-[360px] md:min-w-[390px] gap-3 sm:gap-5 md:gap-6 bg-slate-50/90 py-2.5 px-3.5 sm:py-2.5 sm:px-5 rounded-xl border border-slate-200/70 shrink-0">
                                             {/* Departure Time & FROM Origin Location */}
-                                            <div className="text-center">
-                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                            <div className="text-center min-w-[95px] sm:min-w-[110px] shrink-0">
+                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight whitespace-nowrap">
                                                     {formatTime(schedule.departureTime)}
                                                 </p>
-                                                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50/90 border border-emerald-200/80 px-2 py-0.5 rounded-md mt-0.5 shadow-2xs">
+                                                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50/90 border border-emerald-200/80 px-2.5 py-0.5 rounded-md mt-1 shadow-2xs whitespace-nowrap">
                                                     {origin}
                                                 </span>
                                             </div>
                                             
                                             {/* Visual Progress Connector */}
-                                            <div className="flex flex-col items-center px-2">
-                                                <div className="h-[2px] bg-slate-300 w-20 sm:w-28 relative flex items-center justify-between">
+                                            <div className="flex flex-col items-center px-1 sm:px-2 flex-1 min-w-[44px] max-w-[80px] sm:max-w-[120px]">
+                                                <div className="h-[2px] bg-slate-300 w-full relative flex items-center justify-between">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 -ml-0.5 border border-white shadow-2xs" />
                                                     <ArrowRight size={10} className="text-slate-400 absolute left-1/2 -translate-x-1/2" />
                                                     <div className="w-1.5 h-1.5 rounded-full bg-amber-600 -mr-0.5 border border-white shadow-2xs" />
@@ -448,18 +551,18 @@ export default function TimetablePage() {
                                             </div>
 
                                             {/* Arrival Time & TO Destination Location */}
-                                            <div className="text-center">
-                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                                            <div className="text-center min-w-[95px] sm:min-w-[110px] shrink-0">
+                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight whitespace-nowrap">
                                                     {formatTime(schedule.arrivalTime)}
                                                 </p>
-                                                <span className="inline-block text-[11px] font-bold text-amber-800 bg-amber-50/90 border border-amber-200/80 px-2 py-0.5 rounded-md mt-0.5 shadow-2xs">
+                                                <span className="inline-block text-[11px] font-bold text-amber-800 bg-amber-50/90 border border-amber-200/80 px-2.5 py-0.5 rounded-md mt-1 shadow-2xs whitespace-nowrap">
                                                     {destination}
                                                 </span>
                                             </div>
                                         </div>
 
                                         {/* Right Section: Fare & Navigation Action */}
-                                        <div className="flex-1 flex flex-row lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto gap-2.5">
+                                        <div className="flex-initial sm:flex-1 lg:flex-initial lg:min-w-[170px] flex flex-row lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto gap-2.5 shrink-0">
                                             <div className="text-left lg:text-right">
                                                 <span className="text-[11px] text-slate-400 font-medium block">Starting from</span>
                                                 <p className="text-xl sm:text-2xl font-black text-rose-600 tracking-tight leading-tight">
