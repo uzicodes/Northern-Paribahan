@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect, Suspense, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { 
     Clock, 
     ArrowLeft, 
@@ -19,6 +22,31 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import GlobalLoader from "@/components/GlobalLoader";
+
+// Step 1: Define strict Passenger Details validation schema with exact regex
+const passengerSchema = z.object({
+    fullName: z
+        .string()
+        .min(1, "Full name is required")
+        .max(50, "Full name must not exceed 50 characters")
+        .regex(/^[A-Za-z\s]+$/, "Full name must contain only alphabets and spaces (no numbers or special characters)")
+        .refine((val) => val.trim().length > 0, "Full name cannot be blank spaces only"),
+    mobileNumber: z
+        .string()
+        .min(1, "Mobile number is required")
+        .regex(/^0\d{10}$/, "Mobile number must be exactly 11 digits and start with '0' (numbers only)"),
+    email: z
+        .string()
+        .min(1, "Email address is required")
+        .regex(
+            /^[a-zA-Z0-9.]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            "Email must contain exactly one '@', a valid domain (.com), and no special characters other than '.' and '@'"
+        ),
+    gender: z.enum(["Male", "Female", "Other"]),
+    paymentMethod: z.enum(["bkash", "nagad", "sslcommerz"]),
+});
+
+type PassengerFormData = z.infer<typeof passengerSchema>;
 
 function CheckoutContent() {
     const searchParams = useSearchParams();
@@ -48,13 +76,32 @@ function CheckoutContent() {
 
     const router = useRouter();
 
-    // Form states
-    const [fullName, setFullName] = useState("");
-    const [mobileNumber, setMobileNumber] = useState("");
-    const [email, setEmail] = useState("");
-    const [gender, setGender] = useState<"Male" | "Female" | "Other">("Male");
-    const [paymentMethod, setPaymentMethod] = useState<"bkash" | "nagad" | "sslcommerz">("bkash");
+    // Form & submission state
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        setFocus,
+        formState: { errors },
+    } = useForm<PassengerFormData>({
+        resolver: zodResolver(passengerSchema),
+        defaultValues: {
+            fullName: "",
+            mobileNumber: "",
+            email: "",
+            gender: "Male",
+            paymentMethod: "bkash",
+        },
+        mode: "onChange",
+        reValidateMode: "onChange",
+    });
+
+    const currentGender = watch("gender");
+    const currentPaymentMethod = watch("paymentMethod");
+    const formValues = watch();
 
     // Warning dialog modal state
     const [showLeaveModal, setShowLeaveModal] = useState(false);
@@ -153,32 +200,26 @@ function CheckoutContent() {
             const savedDraft = sessionStorage.getItem(formDraftKey);
             if (savedDraft) {
                 const draft = JSON.parse(savedDraft);
-                if (draft.fullName) setFullName(draft.fullName);
-                if (draft.mobileNumber) setMobileNumber(draft.mobileNumber);
-                if (draft.email) setEmail(draft.email);
-                if (draft.gender) setGender(draft.gender);
-                if (draft.paymentMethod) setPaymentMethod(draft.paymentMethod);
+                if (draft.fullName) setValue("fullName", draft.fullName, { shouldValidate: false });
+                if (draft.mobileNumber) setValue("mobileNumber", draft.mobileNumber, { shouldValidate: false });
+                if (draft.email) setValue("email", draft.email, { shouldValidate: false });
+                if (draft.gender) setValue("gender", draft.gender, { shouldValidate: false });
+                if (draft.paymentMethod) setValue("paymentMethod", draft.paymentMethod, { shouldValidate: false });
             }
         } catch {
             // Ignore parse errors
         }
-    }, [formDraftKey]);
+    }, [formDraftKey, setValue]);
 
     // Save form draft on change
     useEffect(() => {
         if (typeof window === "undefined") return;
         try {
-            sessionStorage.setItem(formDraftKey, JSON.stringify({
-                fullName,
-                mobileNumber,
-                email,
-                gender,
-                paymentMethod
-            }));
+            sessionStorage.setItem(formDraftKey, JSON.stringify(formValues));
         } catch {
             // Ignore storage errors
         }
-    }, [fullName, mobileNumber, email, gender, paymentMethod, formDraftKey]);
+    }, [formValues, formDraftKey]);
 
     const formatTimer = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60);
@@ -186,23 +227,9 @@ function CheckoutContent() {
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     };
 
-    const handleFormSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
+    const onValidSubmit = (data: PassengerFormData) => {
         if (secondsLeft <= 0 || isExpired) {
             toast.error("Your seat hold has expired. Please re-select your seats.");
-            return;
-        }
-
-        if (!fullName.trim()) {
-            toast.error("Please enter the passenger's full name.");
-            return;
-        }
-
-        // Validate BD mobile phone numbers
-        const cleanPhone = mobileNumber.replace(/[\s-]/g, "");
-        if (!/^(\+?8801|01)[3-9]\d{8}$/.test(cleanPhone)) {
-            toast.error("Please provide a valid 11-digit Bangladeshi mobile number (e.g. 017XXXXXXXX).");
             return;
         }
 
@@ -211,9 +238,100 @@ function CheckoutContent() {
             setIsSubmitting(false);
             clearCheckoutSession();
             toast.success("Booking Order Placed Successfully!", {
-                description: `Payment gateway initialized for ৳${grandTotal.toLocaleString()} via ${paymentMethod.toUpperCase()}`,
+                description: `Payment gateway initialized for ৳${grandTotal.toLocaleString()} via ${data.paymentMethod.toUpperCase()}`,
             });
         }, 800);
+    };
+
+    const onInvalidSubmit = (fieldErrors: typeof errors) => {
+        const errorKeys = Object.keys(fieldErrors) as (keyof PassengerFormData)[];
+        if (errorKeys.length > 0) {
+            const firstKey = errorKeys[0];
+            const msg = fieldErrors[firstKey]?.message;
+            toast.error("Passenger Form Incomplete", {
+                description: msg || "Please fill in all required fields accurately according to the validation rules.",
+            });
+            setFocus(firstKey);
+        }
+    };
+
+    // Strict input filter: Full Name (alphabets and spaces only, max 50 chars)
+    const handleFullNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (
+            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+            e.ctrlKey ||
+            e.metaKey
+        ) {
+            return;
+        }
+        // Disallow numbers, symbols, and special characters
+        if (!/^[a-zA-Z\s]$/.test(e.key)) {
+            e.preventDefault();
+        }
+    };
+
+    const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const sanitized = e.target.value.replace(/[^A-Za-z\s]/g, "").slice(0, 50);
+        setValue("fullName", sanitized, { shouldValidate: true, shouldDirty: true });
+    };
+
+    // Strict input filter: Mobile Number (numbers only, exactly 11 digits, must start with 0)
+    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (
+            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+            e.ctrlKey ||
+            e.metaKey
+        ) {
+            return;
+        }
+        // Disallow alphabets, spaces, +, -, and symbols
+        if (!/^[0-9]$/.test(e.key)) {
+            e.preventDefault();
+            return;
+        }
+        // First digit must strictly be '0'
+        const target = e.currentTarget;
+        if ((target.selectionStart === 0 || target.value.length === 0) && e.key !== "0") {
+            e.preventDefault();
+        }
+    };
+
+    const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let digits = e.target.value.replace(/\D/g, "");
+        if (digits.length > 0 && !digits.startsWith("0")) {
+            digits = "0" + digits.replace(/^[^0]+/, "");
+        }
+        digits = digits.slice(0, 11);
+        setValue("mobileNumber", digits, { shouldValidate: true, shouldDirty: true });
+    };
+
+    // Strict input filter: Email (no spaces, no +, #, !, only valid email characters and max one @)
+    const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (
+            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+            e.ctrlKey ||
+            e.metaKey
+        ) {
+            return;
+        }
+        // Disallow spaces and symbols like +, #, !, $, %, &, *, etc.
+        if (!/^[a-zA-Z0-9.@\-_]$/.test(e.key)) {
+            e.preventDefault();
+            return;
+        }
+        // Only allow a single '@'
+        if (e.key === "@" && e.currentTarget.value.includes("@")) {
+            e.preventDefault();
+        }
+    };
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/[^a-zA-Z0-9.@\-_]/g, "");
+        const parts = val.split("@");
+        if (parts.length > 2) {
+            val = parts[0] + "@" + parts.slice(1).join("").replace(/@/g, "");
+        }
+        setValue("email", val, { shouldValidate: true, shouldDirty: true });
     };
 
     const formattedDate = new Date(travelDate).toLocaleDateString("en-US", {
@@ -293,7 +411,7 @@ function CheckoutContent() {
                 </div>
 
                 {/* 2. Core Layout (Grid: Left 65%, Right 35%) */}
-                <form onSubmit={handleFormSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <form onSubmit={handleSubmit(onValidSubmit, onInvalidSubmit)} noValidate className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
                     {/* Left Column: Forms & Details (8 Cols) */}
                     <div className="lg:col-span-7 xl:col-span-8 space-y-5">
@@ -368,69 +486,123 @@ function CheckoutContent() {
                             <div className="space-y-4">
                                 {/* Full Name */}
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                        Passenger Full Name *
-                                    </label>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                            Passenger Full Name *
+                                        </label>
+                                        <span className="text-[11px] font-mono text-slate-400 font-semibold">
+                                            {watch("fullName")?.length || 0}/50
+                                        </span>
+                                    </div>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                             <User size={16} />
                                         </div>
                                         <input
                                             type="text"
-                                            required
-                                            value={fullName}
-                                            onChange={(e) => setFullName(e.target.value)}
+                                            {...register("fullName")}
+                                            value={watch("fullName") || ""}
+                                            maxLength={50}
+                                            onKeyDown={handleFullNameKeyDown}
+                                            onChange={handleFullNameChange}
                                             placeholder="e.g. MD. Tariqul Islam"
-                                            className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#172144] focus:border-transparent transition-all shadow-2xs"
+                                            className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs ${
+                                                errors.fullName 
+                                                    ? "border-red-500 bg-red-50/30 focus:ring-2 focus:ring-red-400 focus:border-red-500" 
+                                                    : "border-slate-300 focus:ring-2 focus:ring-[#172144] focus:border-transparent"
+                                            }`}
                                         />
                                     </div>
+                                    {errors.fullName ? (
+                                        <span className="text-red-500 text-xs mt-1.5 font-semibold flex items-center gap-1">
+                                            <AlertTriangle size={13} className="shrink-0" />
+                                            <span>{errors.fullName.message}</span>
+                                        </span>
+                                    ) : (
+                                        <span className="text-[10.5px] text-slate-400 mt-1 block">
+                                            Max 50 characters, alphabets and spaces only.
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Mobile & Email Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Mobile Number */}
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                            Mobile Number (BD) *
-                                        </label>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                                Mobile Number (BD) *
+                                            </label>
+                                            <span className="text-[11px] font-mono text-slate-400 font-semibold">
+                                                {watch("mobileNumber")?.length || 0}/11 digits
+                                            </span>
+                                        </div>
                                         <div className="relative">
                                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                                 <Phone size={16} />
                                             </div>
                                             <input
                                                 type="tel"
-                                                required
-                                                value={mobileNumber}
-                                                onChange={(e) => setMobileNumber(e.target.value)}
+                                                {...register("mobileNumber")}
+                                                value={watch("mobileNumber") || ""}
+                                                maxLength={11}
+                                                onKeyDown={handleMobileKeyDown}
+                                                onChange={handleMobileChange}
                                                 placeholder="017XXXXXXXX"
-                                                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#172144] focus:border-transparent transition-all shadow-2xs"
+                                                className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs ${
+                                                    errors.mobileNumber 
+                                                        ? "border-red-500 bg-red-50/30 focus:ring-2 focus:ring-red-400 focus:border-red-500" 
+                                                        : "border-slate-300 focus:ring-2 focus:ring-[#172144] focus:border-transparent"
+                                                }`}
                                             />
                                         </div>
-                                        <span className="text-[10.5px] text-slate-400 mt-1 block">
-                                            via Contacting Passenger.
-                                        </span>
+                                        {errors.mobileNumber ? (
+                                            <span className="text-red-500 text-xs mt-1.5 font-semibold flex items-center gap-1">
+                                                <AlertTriangle size={13} className="shrink-0" />
+                                                <span>{errors.mobileNumber.message}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10.5px] text-slate-400 mt-1 block">
+                                                Must be 11 digits starting with 0 (e.g. 017XXXXXXXX).
+                                            </span>
+                                        )}
                                     </div>
 
                                     {/* Email */}
                                     <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                                            Email Address (Optional)
-                                        </label>
+                                        <div className="flex items-center justify-between mb-1.5">
+                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                                                Email Address *
+                                            </label>
+                                        </div>
                                         <div className="relative">
                                             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                                 <Mail size={16} />
                                             </div>
                                             <input
                                                 type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
+                                                {...register("email")}
+                                                value={watch("email") || ""}
+                                                onKeyDown={handleEmailKeyDown}
+                                                onChange={handleEmailChange}
                                                 placeholder="passenger@example.com"
-                                                className="w-full bg-slate-50 border border-slate-300 rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#172144] focus:border-transparent transition-all shadow-2xs"
+                                                className={`w-full bg-slate-50 border rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none transition-all shadow-2xs ${
+                                                    errors.email 
+                                                        ? "border-red-500 bg-red-50/30 focus:ring-2 focus:ring-red-400 focus:border-red-500" 
+                                                        : "border-slate-300 focus:ring-2 focus:ring-[#172144] focus:border-transparent"
+                                                }`}
                                             />
                                         </div>
-                                        <span className="text-[10.5px] text-slate-400 mt-1 block">
-                                            Digital PDF e-ticket receipt copy
-                                        </span>
+                                        {errors.email ? (
+                                            <span className="text-red-500 text-xs mt-1.5 font-semibold flex items-center gap-1">
+                                                <AlertTriangle size={13} className="shrink-0" />
+                                                <span>{errors.email.message}</span>
+                                            </span>
+                                        ) : (
+                                            <span className="text-[10.5px] text-slate-400 mt-1 block">
+                                                Digital PDF e-ticket receipt copy
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
 
@@ -446,7 +618,7 @@ function CheckoutContent() {
                                                 className={`
                                                     flex items-center justify-center gap-2 p-3 rounded-xl border text-xs sm:text-sm font-bold cursor-pointer transition-all select-none
                                                     ${
-                                                        gender === gen
+                                                        currentGender === gen
                                                             ? "bg-slate-900 text-white border-slate-900 shadow-sm"
                                                             : "bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100"
                                                     }
@@ -456,8 +628,8 @@ function CheckoutContent() {
                                                     type="radio"
                                                     name="gender"
                                                     value={gen}
-                                                    checked={gender === gen}
-                                                    onChange={() => setGender(gen)}
+                                                    checked={currentGender === gen}
+                                                    onChange={() => setValue("gender", gen, { shouldValidate: true })}
                                                     className="sr-only"
                                                 />
                                                 <span>{gen}</span>
@@ -550,7 +722,7 @@ function CheckoutContent() {
                                         className={`
                                             flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all select-none
                                             ${
-                                                paymentMethod === "bkash"
+                                                currentPaymentMethod === "bkash"
                                                     ? "bg-[#D12053]/5 border-[#D12053] ring-1 ring-[#D12053]"
                                                     : "bg-slate-50 border-slate-200 hover:bg-slate-100"
                                             }
@@ -560,8 +732,8 @@ function CheckoutContent() {
                                             <input
                                                 type="radio"
                                                 name="payment"
-                                                checked={paymentMethod === "bkash"}
-                                                onChange={() => setPaymentMethod("bkash")}
+                                                checked={currentPaymentMethod === "bkash"}
+                                                onChange={() => setValue("paymentMethod", "bkash", { shouldValidate: true })}
                                                 className="sr-only"
                                             />
                                             <div className="w-8 h-8 rounded-lg bg-[#D12053] text-white flex items-center justify-center font-bold text-xs">
@@ -572,7 +744,7 @@ function CheckoutContent() {
                                                 <p className="text-[10px] text-slate-500">Fast instant digital wallet</p>
                                             </div>
                                         </div>
-                                        {paymentMethod === "bkash" && (
+                                        {currentPaymentMethod === "bkash" && (
                                             <CheckCircle2 size={18} className="text-[#D12053]" />
                                         )}
                                     </label>
@@ -582,7 +754,7 @@ function CheckoutContent() {
                                         className={`
                                             flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all select-none
                                             ${
-                                                paymentMethod === "nagad"
+                                                currentPaymentMethod === "nagad"
                                                     ? "bg-[#F7931E]/5 border-[#F7931E] ring-1 ring-[#F7931E]"
                                                     : "bg-slate-50 border-slate-200 hover:bg-slate-100"
                                             }
@@ -592,8 +764,8 @@ function CheckoutContent() {
                                             <input
                                                 type="radio"
                                                 name="payment"
-                                                checked={paymentMethod === "nagad"}
-                                                onChange={() => setPaymentMethod("nagad")}
+                                                checked={currentPaymentMethod === "nagad"}
+                                                onChange={() => setValue("paymentMethod", "nagad", { shouldValidate: true })}
                                                 className="sr-only"
                                             />
                                             <div className="w-8 h-8 rounded-lg bg-[#F7931E] text-white flex items-center justify-center font-bold text-xs">
@@ -604,7 +776,7 @@ function CheckoutContent() {
                                                 <p className="text-[10px] text-slate-500">Instant MFS transaction</p>
                                             </div>
                                         </div>
-                                        {paymentMethod === "nagad" && (
+                                        {currentPaymentMethod === "nagad" && (
                                             <CheckCircle2 size={18} className="text-[#F7931E]" />
                                         )}
                                     </label>
@@ -614,7 +786,7 @@ function CheckoutContent() {
                                         className={`
                                             flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all select-none
                                             ${
-                                                paymentMethod === "sslcommerz"
+                                                currentPaymentMethod === "sslcommerz"
                                                     ? "bg-blue-600/5 border-blue-600 ring-1 ring-blue-600"
                                                     : "bg-slate-50 border-slate-200 hover:bg-slate-100"
                                             }
@@ -624,8 +796,8 @@ function CheckoutContent() {
                                             <input
                                                 type="radio"
                                                 name="payment"
-                                                checked={paymentMethod === "sslcommerz"}
-                                                onChange={() => setPaymentMethod("sslcommerz")}
+                                                checked={currentPaymentMethod === "sslcommerz"}
+                                                onChange={() => setValue("paymentMethod", "sslcommerz", { shouldValidate: true })}
                                                 className="sr-only"
                                             />
                                             <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
@@ -636,7 +808,7 @@ function CheckoutContent() {
                                                 <p className="text-[10px] text-slate-500">Visa, Mastercard, DBBL Nexus</p>
                                             </div>
                                         </div>
-                                        {paymentMethod === "sslcommerz" && (
+                                        {currentPaymentMethod === "sslcommerz" && (
                                             <CheckCircle2 size={18} className="text-blue-600" />
                                         )}
                                     </label>
