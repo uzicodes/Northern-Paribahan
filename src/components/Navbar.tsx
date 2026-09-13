@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { Menu } from 'lucide-react';
 import { MobileMenu, ContactPopup } from './NavbarModals';
 import { toast } from 'sonner';
@@ -66,6 +66,33 @@ export default function NavbarClient() {
         router.push('/');
         router.refresh();
     }
+
+    const isRedirectingRef = useRef(false);
+
+    const handleProfileClick = () => {
+        if (isLoggedIn) {
+            router.push('/profile');
+            return;
+        }
+
+        if (isRedirectingRef.current) return;
+        isRedirectingRef.current = true;
+
+        const duration = 2500;
+        const doRedirect = () => {
+            isRedirectingRef.current = false;
+            router.push('/login');
+        };
+
+        toast.error('Please Login First', {
+            description: 'Redirecting to login page...',
+            duration: duration,
+            onAutoClose: doRedirect,
+            onDismiss: doRedirect,
+        });
+
+        setTimeout(doRedirect, duration);
+    };
 
     const isActive = (path: string) => pathname === path;
 
@@ -134,13 +161,7 @@ export default function NavbarClient() {
                 <button
                     type="button"
                     aria-label="User Profile"
-                    onClick={() => {
-                        if (isLoggedIn) {
-                            router.push('/profile');
-                        } else {
-                            toast.error('Please Login First');
-                        }
-                    }}
+                    onClick={handleProfileClick}
                     className={`p-2 rounded-full transition-all duration-200 border ${
                         (isLoggedIn || isActive('/profile'))
                             ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 shadow-sm'
@@ -198,7 +219,7 @@ export default function NavbarClient() {
                 isActive={isActive}
                 role={role}
                 isLoggedIn={isLoggedIn}
-                onProfileClick={() => router.push('/profile')}
+                onProfileClick={handleProfileClick}
                 onLogoutClick={logout}
                 onContactClick={() => setShowContactPopup(true)}
                 satisfyClassName={satisfy.className}

@@ -172,43 +172,140 @@ export default function TimetablePage() {
 
                     {/* Integrated Search Filter */}
                     <form onSubmit={handleFilterSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
+                        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-2 items-end">
+                            {/* FROM Custom Centered Dropdown */}
+                            <div className={`relative ${openFromDropdown ? "z-50" : "z-20"}`} ref={fromRef}>
                                 <label className="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
                                     <MapPin size={13} className="text-emerald-600" />
                                     <span>FROM</span>
                                 </label>
-                                <select
-                                    value={filterFrom}
-                                    onChange={(e) => setFilterFrom(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 transition-all cursor-pointer"
+                                
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setOpenFromDropdown((prev) => !prev);
+                                        setOpenToDropdown(false);
+                                    }}
+                                    className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                        openFromDropdown
+                                            ? "border-emerald-600 ring-2 ring-emerald-500/20 text-slate-900 bg-white"
+                                            : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                    }`}
                                 >
-                                    <option value="" disabled>Select FROM</option>
-                                    {LOCATIONS.map((loc) => (
-                                        <option key={loc} value={loc} disabled={loc === filterTo}>
-                                            {loc}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <span className="truncate text-center w-full px-4">
+                                        {filterFrom || "Select FROM"}
+                                    </span>
+                                    <ChevronDown 
+                                        size={16} 
+                                        className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                            openFromDropdown ? "rotate-180 text-emerald-600" : ""
+                                        }`} 
+                                    />
+                                </button>
+
+                                {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                                {openFromDropdown && (
+                                    <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                        {LOCATIONS.map((loc) => {
+                                            const isSelected = loc === filterFrom;
+                                            const isDisabled = loc === filterTo;
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={loc}
+                                                    disabled={isDisabled}
+                                                    onClick={() => {
+                                                        setFilterFrom(loc);
+                                                        setOpenFromDropdown(false);
+                                                    }}
+                                                    className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-emerald-50 text-emerald-800 font-bold"
+                                                            : isDisabled
+                                                            ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                    }`}
+                                                >
+                                                    {loc}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
 
-                            <div>
+                            {/* Swap Button */}
+                            <div className="flex items-center justify-center">
+                                <button
+                                    type="button"
+                                    onClick={handleSwapLocations}
+                                    title="Swap FROM & TO"
+                                    aria-label="Swap FROM and TO"
+                                    className="w-11 h-11 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-200/90 hover:border-amber-300 shadow-2xs flex items-center justify-center transition-all duration-150 active:scale-95 active:rotate-180 cursor-pointer"
+                                >
+                                    <ArrowLeftRight size={17} className="stroke-[2.2]" />
+                                </button>
+                            </div>
+
+                            {/* TO Custom Centered Dropdown */}
+                            <div className={`relative ${openToDropdown ? "z-50" : "z-20"}`} ref={toRef}>
                                 <label className="block text-xs font-bold uppercase tracking-wider text-amber-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
                                     <MapPin size={13} className="text-amber-600" />
                                     <span>TO</span>
                                 </label>
-                                <select
-                                    value={filterTo}
-                                    onChange={(e) => setFilterTo(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition-all cursor-pointer"
+                                
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setOpenToDropdown((prev) => !prev);
+                                        setOpenFromDropdown(false);
+                                    }}
+                                    className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                        openToDropdown
+                                            ? "border-amber-600 ring-2 ring-amber-500/20 text-slate-900 bg-white"
+                                            : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                    }`}
                                 >
-                                    <option value="" disabled>Select TO</option>
-                                    {LOCATIONS.map((loc) => (
-                                        <option key={loc} value={loc} disabled={loc === filterFrom}>
-                                            {loc}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <span className="truncate text-center w-full px-4">
+                                        {filterTo || "Select TO"}
+                                    </span>
+                                    <ChevronDown 
+                                        size={16} 
+                                        className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                            openToDropdown ? "rotate-180 text-amber-600" : ""
+                                        }`} 
+                                    />
+                                </button>
+
+                                {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                                {openToDropdown && (
+                                    <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                        {LOCATIONS.map((loc) => {
+                                            const isSelected = loc === filterTo;
+                                            const isDisabled = loc === filterFrom;
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={loc}
+                                                    disabled={isDisabled}
+                                                    onClick={() => {
+                                                        setFilterTo(loc);
+                                                        setOpenToDropdown(false);
+                                                    }}
+                                                    className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-amber-50 text-amber-900 font-bold"
+                                                            : isDisabled
+                                                            ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                    }`}
+                                                >
+                                                    {loc}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -222,13 +319,13 @@ export default function TimetablePage() {
                                 min={minDate}
                                 value={filterDate}
                                 onChange={(e) => setFilterDate(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all cursor-pointer"
+                                className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all cursor-pointer"
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full py-3 bg-[#172144] hover:bg-[#101730] text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2"
+                            className="w-full h-11 bg-[#172144] hover:bg-[#101730] text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                         >
                             <Search size={16} />
                             <span>Search Available Buses</span>
