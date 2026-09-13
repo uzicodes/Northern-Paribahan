@@ -131,14 +131,14 @@ export function ProfileField({
     badge?: string;
 }) {
     return (
-        <div className="flex items-center gap-3.5 bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-700 flex items-center justify-center border border-amber-500/20 shrink-0">
+        <div className="flex items-start sm:items-center gap-3.5 bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-700 flex items-center justify-center border border-amber-500/20 shrink-0 mt-0.5 sm:mt-0">
                 <Icon size={18} />
             </div>
             <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-sm font-bold text-slate-800 truncate">{value}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                    <p className="text-sm font-bold text-slate-800 break-all">{value}</p>
                     {badge && (
                         <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full shrink-0">
                             {badge}

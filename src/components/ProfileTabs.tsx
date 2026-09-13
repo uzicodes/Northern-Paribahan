@@ -89,9 +89,9 @@ export function ProfileOverviewTab({
 
             {/* Profile Details Card */}
             <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 sm:p-6 space-y-5">
-                <div className="flex items-center justify-between border-b border-slate-200/80 pb-3.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3.5">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-[#172144] text-white flex items-center justify-center shadow-inner">
+                        <div className="w-8 h-8 rounded-xl bg-[#172144] text-white flex items-center justify-center shadow-inner shrink-0">
                             <User size={16} />
                         </div>
                         <div>
@@ -107,7 +107,7 @@ export function ProfileOverviewTab({
                     <button
                         type="button"
                         onClick={onEditClick}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 hover:text-black bg-white hover:bg-slate-50 border border-slate-300 px-3 py-2 rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-xs font-bold text-slate-800 hover:text-black bg-white hover:bg-slate-50 border border-slate-300 px-3.5 py-2.5 rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
                     >
                         <Pencil size={14} className="text-[#FCA311]" />
                         <span>Edit Details</span>

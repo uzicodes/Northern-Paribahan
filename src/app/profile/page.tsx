@@ -206,58 +206,91 @@ export default function ProfilePage() {
                     </Link>
 
                     <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800 bg-white/70 px-3 py-1.5 rounded-xl border border-black/5 hidden sm:inline-flex items-center gap-1.5">
-                            <Sparkles size={13} className="text-[#FCA311]" />
-                            <span>Passenger Portal</span>
-                        </span>
                     </div>
                 </div>
 
                 {/* Branded User Hero Banner */}
-                <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-black/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div className="flex items-center gap-4 sm:gap-5">
-                        {/* Avatar */}
-                        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-[#172144] ring-4 ring-amber-400/40 border-2 border-[#FCA311] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shrink-0 shadow-md">
-                            {userInitial}
-                        </div>
+                <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-black/5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 sm:gap-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 w-full lg:w-auto min-w-0">
+                        <div className="flex items-center sm:items-start gap-3.5 sm:gap-5 w-full sm:w-auto min-w-0">
+                            {/* Avatar */}
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#172144] ring-4 ring-amber-400/40 border-2 border-[#FCA311] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shrink-0 shadow-md">
+                                {userInitial}
+                            </div>
 
-                        {/* User Details */}
-                        <div className="space-y-1 min-w-0">
-                            <div className="flex items-center gap-2.5 flex-wrap">
-                                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight truncate">
+                            {/* User Name & Badges */}
+                            <div className="space-y-1 min-w-0 flex-1">
+                                <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight break-words leading-tight">
                                     {user.name || 'Northern Passenger'}
                                 </h1>
-                                <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
-                                    {user.role}
-                                </span>
-                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full">
-                                    <ShieldCheck size={11} className="text-emerald-600" />
-                                    Verified
-                                </span>
-                            </div>
 
-                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-500 font-medium pt-0.5">
-                                <span className="flex items-center gap-1.5 truncate">
-                                    <Mail size={13} className="text-slate-400 shrink-0" />
-                                    <span>{user.email}</span>
-                                </span>
-                                {user.phoneNumber && (
-                                    <span className="flex items-center gap-1.5">
-                                        <Phone size={13} className="text-slate-400 shrink-0" />
-                                        <span>+880 {user.phoneNumber}</span>
+                                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                    <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                                        {user.role}
                                     </span>
-                                )}
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full">
+                                        <ShieldCheck size={11} className="text-emerald-600" />
+                                        Verified
+                                    </span>
+                                </div>
+
+                                {/* Email and Phone for tablet / desktop (sm+) */}
+                                <div className="hidden sm:flex flex-wrap items-center gap-4 text-xs text-slate-500 font-medium pt-1">
+                                    <span className="flex items-center gap-1.5 min-w-0">
+                                        <Mail size={13} className="text-slate-400 shrink-0" />
+                                        <span className="break-all">{user.email}</span>
+                                    </span>
+                                    {user.phoneNumber && (
+                                        <span className="flex items-center gap-1.5 shrink-0">
+                                            <Phone size={13} className="text-slate-400 shrink-0" />
+                                            <span>+880 {user.phoneNumber}</span>
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Email and Phone for mobile screens (< sm) - cleanly organized and NEVER cut off */}
+                        <div className="flex sm:hidden flex-col gap-2 w-full pt-2 border-t border-slate-100 text-xs text-slate-600 font-medium">
+                            <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/70 min-w-0">
+                                <Mail size={14} className="text-slate-400 shrink-0" />
+                                <span className="break-all font-semibold text-slate-800">{user.email}</span>
+                            </div>
+                            {user.phoneNumber && (
+                                <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/70">
+                                    <Phone size={14} className="text-slate-400 shrink-0" />
+                                    <span className="font-semibold text-slate-800">+880 {user.phoneNumber}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Book New Journey Button */}
-                    <div className="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100">
+                    {/* Action Buttons: Edit Details + Book New Journey */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto lg:justify-end border-t lg:border-t-0 pt-4 lg:pt-0 border-slate-100 shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                dispatch({ activeTab: 'edit' });
+                                const tabArea = document.getElementById('profile-tab-content');
+                                if (tabArea) {
+                                    tabArea.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }}
+                            className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 font-bold text-xs sm:text-sm px-4 py-2.5 sm:py-3 rounded-xl border transition-all active:scale-95 cursor-pointer ${
+                                activeTab === 'edit'
+                                    ? 'bg-[#172144] text-white border-[#172144] shadow-md shadow-[#172144]/20'
+                                    : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300 shadow-2xs'
+                            }`}
+                        >
+                            <Pencil size={15} className="text-[#FCA311]" />
+                            <span>Edit Details</span>
+                        </button>
+
                         <Link
                             href="/"
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#172144] hover:bg-[#101730] text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-md shadow-[#172144]/25 transition-all active:scale-95 cursor-pointer"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#172144] hover:bg-[#101730] text-white font-bold text-xs sm:text-sm px-5 py-2.5 sm:py-3 rounded-xl shadow-md shadow-[#172144]/25 transition-all active:scale-95 cursor-pointer"
                         >
-                            <Ticket size={16} className="text-[#FCA311]" />
+                            <Ticket size={15} className="text-[#FCA311]" />
                             <span>Book New Journey</span>
                         </Link>
                     </div>
@@ -334,7 +367,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* ===== RIGHT TAB CONTENT AREA (8 COLS) ===== */}
-                    <div className="lg:col-span-8 xl:col-span-8">
+                    <div id="profile-tab-content" className="lg:col-span-8 xl:col-span-8 scroll-mt-6">
                         <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden min-h-[520px]">
                             {activeTab === 'profile' && (
                                 <ProfileOverviewTab
