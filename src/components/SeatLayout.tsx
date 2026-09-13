@@ -590,7 +590,7 @@ export default function SeatLayout({
               <span>
                 {selectedSeats.length === 0
                   ? "Select Seats to Proceed"
-                  : `Confirm & Proceed (৳ ${totalFare.toLocaleString()})`}
+                  : "Confirm & Proceed"}
               </span>
               <ChevronRight size={16} />
             </button>

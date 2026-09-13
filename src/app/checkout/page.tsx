@@ -827,7 +827,7 @@ function CheckoutContent() {
                                     <span>Hold Expired — Re-select Seats</span>
                                 ) : (
                                     <>
-                                        <span>Confirm & Pay ৳{grandTotal.toLocaleString()}</span>
+                                        <span>Confirm to Payment</span>
                                         <ChevronRight size={18} />
                                     </>
                                 )}
