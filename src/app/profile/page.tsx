@@ -2,6 +2,7 @@
 
 import React, { useReducer, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import GlobalLoader from '@/components/GlobalLoader';
 import {
     Bus,
@@ -18,8 +19,15 @@ import {
     Ticket,
     ChevronRight,
     AlertCircle,
-    UserCircle
+    ShieldCheck,
+    ArrowLeft,
+    Sparkles,
+    Headphones
 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { BookingItem, SidebarButton } from '@/components/ProfileSubcomponents';
+import { ProfileOverviewTab, TripsTab, EditProfileTab } from '@/components/ProfileTabs';
 
 // --- Types ---
 interface UserProfile {
@@ -29,9 +37,6 @@ interface UserProfile {
     phoneNumber: string;
     role: string;
 }
-
-import { BookingItem, SidebarButton } from '@/components/ProfileSubcomponents';
-import { ProfileOverviewTab, TripsTab, EditProfileTab } from '@/components/ProfileTabs';
 
 // --- Tab Type ---
 type ActiveTab = 'profile' | 'trips' | 'edit';
@@ -67,7 +72,19 @@ export default function ProfilePage() {
         saving: false,
         saveSuccess: false,
     });
-    const { activeTab, user, bookings, loading, loggingOut, error, editName, editPhone, saving, saveSuccess } = state;
+
+    const {
+        activeTab,
+        user,
+        bookings,
+        loading,
+        loggingOut,
+        error,
+        editName,
+        editPhone,
+        saving,
+        saveSuccess,
+    } = state;
 
     const fetchProfile = useCallback(async () => {
         try {
@@ -100,7 +117,10 @@ export default function ProfilePage() {
     }, [fetchProfile]);
 
     const handleSaveProfile = async () => {
-        if (!editName.trim()) return;
+        if (!editName.trim()) {
+            toast.error('Passenger full name is required');
+            return;
+        }
         dispatch({ saving: true, saveSuccess: false });
         try {
             const res = await fetch('/api/user/update', {
@@ -108,14 +128,16 @@ export default function ProfilePage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: editName, phoneNumber: editPhone }),
             });
-            if (!res.ok) throw new Error('Failed to update');
+            if (!res.ok) throw new Error('Failed to update profile');
             const data = await res.json();
             dispatch({ user: data.user, saveSuccess: true });
+            toast.success('Profile updated successfully!');
             setTimeout(() => {
                 dispatch({ saveSuccess: false, activeTab: 'profile' });
-            }, 1500);
+            }, 1200);
         } catch (err: any) {
             dispatch({ error: err.message });
+            toast.error(err.message || 'Failed to update profile');
         } finally {
             dispatch({ saving: false });
         }
@@ -125,16 +147,18 @@ export default function ProfilePage() {
         dispatch({ loggingOut: true });
         try {
             await fetch('/api/auth/logout', { method: 'POST' });
+            toast.success('Logged out successfully');
             router.push('/login');
             router.refresh();
         } catch (err) {
             dispatch({ error: 'Failed to logout', loggingOut: false });
+            toast.error('Failed to log out');
         }
     };
 
-    // Separate bookings into upcoming and past
-    const upcomingBookings = bookings.filter(b => b.status === 'CONFIRMED');
-    const pastBookings = bookings.filter(b => b.status !== 'CONFIRMED');
+    // Filter bookings into upcoming and past
+    const upcomingBookings = bookings.filter((b) => b.status.toUpperCase() === 'CONFIRMED');
+    const pastBookings = bookings.filter((b) => b.status.toUpperCase() !== 'CONFIRMED');
 
     if (loading) {
         return <GlobalLoader />;
@@ -142,12 +166,23 @@ export default function ProfilePage() {
 
     if (!user) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#C9CBA3' }}>
-                <div className="bg-white p-8 rounded-2xl shadow-lg text-center">
-                    <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-                    <p className="text-slate-700 font-semibold">Could not load profile.</p>
-                    <button type="button" onClick={() => router.push('/login')} className="mt-4 text-indigo-600 font-medium hover:underline">
-                        Go to Login
+            <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#C9CBA3' }}>
+                <div className="bg-white p-8 rounded-3xl shadow-md border border-black/5 text-center max-w-sm w-full space-y-4">
+                    <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto">
+                        <AlertCircle size={28} />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-black text-slate-900">Session Required</h3>
+                        <p className="text-xs text-slate-500 mt-1">
+                            Please sign in with your passenger credentials to view your profile and bookings.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => router.push('/login')}
+                        className="w-full bg-[#172144] hover:bg-[#101730] text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer"
+                    >
+                        Go to Sign In
                     </button>
                 </div>
             </div>
@@ -157,133 +192,195 @@ export default function ProfilePage() {
     const userInitial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
 
     return (
-        <div className="min-h-screen text-slate-600 flex justify-center p-4 md:p-8" style={{ backgroundColor: '#C9CBA3' }}>
-            <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 text-slate-700" style={{ backgroundColor: '#C9CBA3' }}>
+            <div className="max-w-6xl mx-auto space-y-6">
 
-                {/* ===== LEFT SIDEBAR ===== */}
-                <div className="lg:col-span-3 space-y-6">
-                    {/* Profile Card */}
-                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-center">
-                        <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-indigo-200">
-                            {userInitial}
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800">{user.name || 'User'}</h2>
-                        <p className="text-sm text-slate-400 mb-1">{user.email}</p>
-                        {user.phoneNumber && (
-                            <p className="text-sm text-slate-400">+880 {user.phoneNumber}</p>
-                        )}
-                        <span className="inline-block mt-3 px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full uppercase tracking-wider">
-                            {user.role}
+                {/* Top Action Bar */}
+                <div className="flex items-center justify-between">
+                    <Link
+                        href="/"
+                        className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-800 hover:text-black bg-white/80 hover:bg-white border border-black/10 px-3.5 py-2 rounded-xl shadow-2xs transition-all active:scale-95 cursor-pointer"
+                    >
+                        <ArrowLeft size={16} />
+                        <span>Back to Home</span>
+                    </Link>
+
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-800 bg-white/70 px-3 py-1.5 rounded-xl border border-black/5 hidden sm:inline-flex items-center gap-1.5">
+                            <Sparkles size={13} className="text-[#FCA311]" />
+                            <span>Passenger Portal</span>
                         </span>
                     </div>
-
-                    {/* Navigation */}
-                    <nav className="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 space-y-2">
-                        <SidebarButton
-                            icon={User}
-                            label="My Profile"
-                            active={activeTab === 'profile'}
-                            onClick={() => dispatch({ activeTab: 'profile' })}
-                        />
-                        <SidebarButton
-                            icon={Ticket}
-                            label="My Trips"
-                            active={activeTab === 'trips'}
-                            onClick={() => dispatch({ activeTab: 'trips' })}
-                        />
-                        <SidebarButton
-                            icon={Pencil}
-                            label="Edit Profile"
-                            active={activeTab === 'edit'}
-                            onClick={() => dispatch({ activeTab: 'edit' })}
-                        />
-                        <div className="pt-4 mt-4 border-t border-slate-100">
-                            <button
-                                type="button"
-                                onClick={handleLogout}
-                                disabled={loggingOut}
-                                className="flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-red-500 hover:bg-red-50"
-                            >
-                                <LogOut size={20} />
-                                <span className="font-medium">Log Out</span>
-                            </button>
-                        </div>
-                    </nav>
                 </div>
 
-                {/* ===== RIGHT CONTENT AREA ===== */}
-                <div className="lg:col-span-9 space-y-6">
-
-                    {/* Error Banner */}
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-2xl flex items-center gap-3">
-                            <AlertCircle size={20} />
-                            <span className="text-sm font-medium">{error}</span>
-                            <button type="button" onClick={() => dispatch({ error: '' })} className="ml-auto"><X size={18} /></button>
+                {/* Branded User Hero Banner */}
+                <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-sm border border-black/5 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-4 sm:gap-5">
+                        {/* Avatar */}
+                        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-[#172144] ring-4 ring-amber-400/40 border-2 border-[#FCA311] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shrink-0 shadow-md">
+                            {userInitial}
                         </div>
-                    )}
 
-                    {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
-                            <h1 className="text-2xl font-bold text-slate-800">
-                                {activeTab === 'profile' && `Welcome, ${user.name?.split(' ')[0] || 'User'}! 👋`}
-                                {activeTab === 'trips' && 'My Trips 🚌'}
-                                {activeTab === 'edit' && 'Edit Profile ✏️'}
-                            </h1>
-                            <p className="text-slate-500">
-                                {activeTab === 'profile' && 'Here is your account overview.'}
-                                {activeTab === 'trips' && 'View your upcoming and past journeys.'}
-                                {activeTab === 'edit' && 'Update your personal information.'}
+                        {/* User Details */}
+                        <div className="space-y-1 min-w-0">
+                            <div className="flex items-center gap-2.5 flex-wrap">
+                                <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight truncate">
+                                    {user.name || 'Northern Passenger'}
+                                </h1>
+                                <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                                    {user.role}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full">
+                                    <ShieldCheck size={11} className="text-emerald-600" />
+                                    Verified
+                                </span>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-500 font-medium pt-0.5">
+                                <span className="flex items-center gap-1.5 truncate">
+                                    <Mail size={13} className="text-slate-400 shrink-0" />
+                                    <span>{user.email}</span>
+                                </span>
+                                {user.phoneNumber && (
+                                    <span className="flex items-center gap-1.5">
+                                        <Phone size={13} className="text-slate-400 shrink-0" />
+                                        <span>+880 {user.phoneNumber}</span>
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Book New Journey Button */}
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100">
+                        <Link
+                            href="/"
+                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#172144] hover:bg-[#101730] text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-xl shadow-md shadow-[#172144]/25 transition-all active:scale-95 cursor-pointer"
+                        >
+                            <Ticket size={16} className="text-[#FCA311]" />
+                            <span>Book New Journey</span>
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Error Banner */}
+                {error && (
+                    <div className="bg-rose-50 border border-rose-200 text-rose-800 px-5 py-3.5 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold shadow-2xs">
+                        <AlertCircle size={18} className="text-rose-600 shrink-0" />
+                        <span className="flex-1">{error}</span>
+                        <button type="button" onClick={() => dispatch({ error: '' })} className="cursor-pointer text-rose-500 hover:text-rose-700">
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Main Content Grid: Sidebar (4 cols) & Tab Content (8 cols) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                    {/* ===== LEFT SIDEBAR (4 COLS) ===== */}
+                    <div className="lg:col-span-4 xl:col-span-4 space-y-4">
+                        {/* Navigation Card */}
+                        <nav className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 space-y-1.5">
+                            <SidebarButton
+                                icon={User}
+                                label="Profile Overview"
+                                active={activeTab === 'profile'}
+                                onClick={() => dispatch({ activeTab: 'profile' })}
+                            />
+                            <SidebarButton
+                                icon={Ticket}
+                                label="My Bus Trips"
+                                count={bookings.length}
+                                active={activeTab === 'trips'}
+                                onClick={() => dispatch({ activeTab: 'trips' })}
+                            />
+                            <SidebarButton
+                                icon={Pencil}
+                                label="Edit Profile"
+                                active={activeTab === 'edit'}
+                                onClick={() => dispatch({ activeTab: 'edit' })}
+                            />
+
+                            <div className="pt-2 mt-2 border-t border-slate-100">
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                    disabled={loggingOut}
+                                    className="flex items-center w-full gap-3 px-4 py-3 rounded-xl transition-all duration-150 text-rose-600 hover:bg-rose-50 font-bold text-xs sm:text-sm cursor-pointer"
+                                >
+                                    <LogOut size={17} />
+                                    <span>{loggingOut ? 'Logging Out...' : 'Sign Out Account'}</span>
+                                </button>
+                            </div>
+                        </nav>
+
+                        {/* Customer Service Support Badge */}
+                        <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-2xs space-y-3">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
+                                    <Headphones size={16} />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                                        Passenger Support
+                                    </h4>
+                                    <p className="text-[11px] text-slate-400">Available 24/7 nationwide</p>
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-600 leading-relaxed">
+                                Need to reschedule your ticket or find a boarding counter? Call Northern Central Dispatch at <strong className="text-slate-900">16222</strong>.
                             </p>
                         </div>
                     </div>
 
-                    {/* ===== TAB CONTENT ===== */}
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-h-[500px]">
+                    {/* ===== RIGHT TAB CONTENT AREA (8 COLS) ===== */}
+                    <div className="lg:col-span-8 xl:col-span-8">
+                        <div className="bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden min-h-[520px]">
+                            {activeTab === 'profile' && (
+                                <ProfileOverviewTab
+                                    user={user}
+                                    bookings={bookings}
+                                    upcomingBookings={upcomingBookings}
+                                    pastBookings={pastBookings}
+                                    onEditClick={() => dispatch({ activeTab: 'edit' })}
+                                    onViewTripsClick={() => dispatch({ activeTab: 'trips' })}
+                                />
+                            )}
 
-                        {activeTab === 'profile' && (
-                            <ProfileOverviewTab
-                                user={user}
-                                bookings={bookings}
-                                upcomingBookings={upcomingBookings}
-                                pastBookings={pastBookings}
-                                onEditClick={() => dispatch({ activeTab: 'edit' })}
-                            />
-                        )}
+                            {activeTab === 'trips' && (
+                                <TripsTab
+                                    bookings={bookings}
+                                    upcomingBookings={upcomingBookings}
+                                    pastBookings={pastBookings}
+                                    onBookClick={() => router.push('/')}
+                                />
+                            )}
 
-                        {activeTab === 'trips' && (
-                            <TripsTab
-                                bookings={bookings}
-                                upcomingBookings={upcomingBookings}
-                                pastBookings={pastBookings}
-                                onBookClick={() => router.push('/')}
-                            />
-                        )}
-
-                        {activeTab === 'edit' && (
-                            <EditProfileTab
-                                user={user}
-                                editName={editName}
-                                editPhone={editPhone}
-                                saving={saving}
-                                saveSuccess={saveSuccess}
-                                onNameChange={(val) => dispatch({ editName: val })}
-                                onPhoneChange={(val) => dispatch({ editPhone: val.replace(/\D/g, '').slice(0, 11) })}
-                                onSave={handleSaveProfile}
-                                onCancel={() => {
-                                    dispatch({
-                                        editName: user.name || '',
-                                        editPhone: user.phoneNumber || '',
-                                        activeTab: 'profile',
-                                    });
-                                }}
-                            />
-                        )}
+                            {activeTab === 'edit' && (
+                                <EditProfileTab
+                                    user={user}
+                                    editName={editName}
+                                    editPhone={editPhone}
+                                    saving={saving}
+                                    saveSuccess={saveSuccess}
+                                    onNameChange={(val) => dispatch({ editName: val })}
+                                    onPhoneChange={(val) => dispatch({ editPhone: val })}
+                                    onSave={handleSaveProfile}
+                                    onCancel={() => {
+                                        dispatch({
+                                            editName: user.name || '',
+                                            editPhone: user.phoneNumber || '',
+                                            activeTab: 'profile',
+                                        });
+                                    }}
+                                />
+                            )}
+                        </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     );
 }
-

@@ -76,6 +76,10 @@ export async function GET() {
                 busName: booking.schedule?.busName || booking.schedule?.bus?.modelName || 'Unknown Bus',
                 busType: booking.schedule?.bus?.tier || 'Standard',
                 registrationNumber: booking.schedule?.registrationNumber || 'N/A',
+                origin: booking.schedule?.origin || '',
+                destination: booking.schedule?.destination || '',
+                departureTime: booking.schedule?.departureTime || null,
+                arrivalTime: booking.schedule?.arrivalTime || null,
                 route: booking.schedule
                     ? `${booking.schedule.origin} → ${booking.schedule.destination}`
                     : '',
