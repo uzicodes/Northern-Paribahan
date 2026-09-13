@@ -12,7 +12,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Ultra-Luxury Long Haul Sleeper',
         description:
             'Flagship German-engineered sleeper coach featuring private double and single luxury berths.',
-        image: '/bus/man.png',
+        image: '/bus/man.webp',
         capacity: 40,
         features: ['Berth Beds', 'Climate AC', 'Air Suspension'],
     },
@@ -23,7 +23,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Precision Swedish Grand Touring',
         description:
             'European luxury cruiser tailored for prime intercity corridors. Features ergonomic semi-sleeper cabins.',
-        image: '/bus/scania.png',
+        image: '/bus/scania.webp',
         capacity: 46,
         features: ['Semi-Sleeper 2+2', 'Whisper Cabin', 'Air Suspension'],
     },
@@ -34,7 +34,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Iconic Star Luxury & Safety',
         description:
             'Renowned Mercedes-Benz comfort with ultra-soft leatherette upholstery and smooth electronic braking.',
-        image: '/bus/mercedes.png',
+        image: '/bus/mercedes.webp',
         capacity: 41,
         features: ['Leatherette Seats', 'Smart Climate', 'Anti-Roll System'],
     },
@@ -45,7 +45,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Smooth Highway Glider',
         description:
             'Multi-axle Swedish luxury known for supreme highway stability, reclining seats with calf supports, expansive panoramic windows.',
-        image: '/bus/volvo.png',
+        image: '/bus/volvo.webp',
         capacity: 40,
         features: ['Multi-Axle Stability', 'Calf Rest Support', 'Panoramic Views'],
     },
@@ -56,7 +56,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Modern Elegance & High Comfort',
         description:
             'Aero-styled Korean luxury coach with aerodynamic quietness, wide aisle spacing, high-density comfort cushioning.',
-        image: '/bus/volvo.png',
+        image: '/bus/volvo.webp',
         capacity: 40,
         features: ['Aerodynamic Design', 'Extra Cushioning', 'Wide Aisle'],
     },
@@ -67,7 +67,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Capital Fast Highway Express',
         description:
             'Reliable Japanese engineering designed for high-frequency. Spacious layout ensures generous passenger room.',
-        image: '/bus/hino.png',
+        image: '/bus/hino.webp',
         capacity: 36,
         features: ['Extra Legroom 36S', 'Japanese Engine', 'Fast Transit'],
     },
@@ -78,7 +78,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Everyday Champion & Economical',
         description:
             'Robust and high-efficiency workhorse well-ventilated cabins, durable cushioned seating, and budget-friendly fares.',
-        image: '/bus/ashok.png',
+        image: '/bus/ashok.webp',
         capacity: 45,
         features: ['High Ventilation', 'Padded Seating', 'Direct Point-to-Point'],
     },
@@ -89,7 +89,7 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Swift Intercity Connector',
         description:
             'Fast-turnaround regional coach with smooth air suspension for short express runs connecting the hubs faster.',
-        image: '/bus/ashok.png',
+        image: '/bus/ashok.webp',
         capacity: 45,
         features: ['Fast Commute', 'High Frequency', 'Air Suspension'],
     },
@@ -100,9 +100,9 @@ const busShowcaseData: ShowcaseBus[] = [
         tagline: 'Sturdy, Reliable & Dependable',
         description:
             'Heavy-duty non-AC fleet built for dependable all-weather highway endurance, maximum seating reliability, and punctuality.',
-        image: '/bus/hino.png',
+        image: '/bus/hino.webp',
         capacity: 45,
-        features: ['Heavy-Duty Chassis', 'Dependable Performance', ' Layout'],
+        features: ['Heavy-Duty Chassis', 'Dependable Performance', 'Standard Layout'],
     },
 ];
 

@@ -124,7 +124,7 @@ export default function UpdatePasswordPage() {
                         <div className="relative z-10 my-8 py-4">
                             <div className="relative w-full h-44 flex items-center justify-center">
                                 <Image
-                                    src="/bus/scania.png"
+                                    src="/bus/scania.webp"
                                     alt="Northern Paribahan Coach"
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 50vw"

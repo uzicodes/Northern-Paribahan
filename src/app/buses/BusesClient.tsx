@@ -7,9 +7,7 @@ import {
     Users,
     Wind,
     Shield,
-    Search,
     MapPin,
-    X,
 } from 'lucide-react';
 
 export type ShowcaseBus = {
@@ -30,27 +28,12 @@ interface BusesClientProps {
 
 export default function BusesClient({ buses }: BusesClientProps) {
     const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-    const [searchQuery, setSearchQuery] = useState<string>('');
 
-    // Filter buses based on category and search query
+    // Filter buses based on category
     const filteredBuses = useMemo(() => {
-        return buses.filter((bus) => {
-            const matchesCategory =
-                selectedCategory === 'ALL' ||
-                (selectedCategory === 'SLEEPER' && bus.type === 'SLEEPER') ||
-                (selectedCategory === 'AC' && bus.type === 'AC') ||
-                (selectedCategory === 'NON_AC' && bus.type === 'NON_AC');
-
-            const q = searchQuery.toLowerCase().trim();
-            const matchesSearch =
-                !q ||
-                bus.brand.toLowerCase().includes(q) ||
-                bus.tagline.toLowerCase().includes(q) ||
-                bus.features.some((f) => f.toLowerCase().includes(q));
-
-            return matchesCategory && matchesSearch;
-        });
-    }, [buses, selectedCategory, searchQuery]);
+        if (selectedCategory === 'ALL') return buses;
+        return buses.filter((bus) => bus.type === selectedCategory);
+    }, [buses, selectedCategory]);
 
     const counts = useMemo(() => {
         return {
@@ -118,11 +101,11 @@ export default function BusesClient({ buses }: BusesClientProps) {
                 </div>
             </div>
 
-            {/* 3. Filter & Search Controls */}
+            {/* 3. Category Filter Controls */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                <div className="bg-[#EDF5F0] rounded-2xl p-3.5 sm:p-4 shadow-sm border border-white/60 flex flex-col sm:flex-row items-center justify-between gap-3">
-                    {/* Category Filter Pills */}
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 w-full sm:w-auto">
+                <div className="bg-[#EDF5F0] rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/60">
+                    {/* Category Filter Pills - Equally Spaced */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
                         {[
                             { key: 'ALL', label: 'All Fleet', count: counts.ALL },
                             { key: 'SLEEPER', label: '🛏️ Sleeper', count: counts.SLEEPER },
@@ -135,15 +118,15 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                     key={cat.key}
                                     type="button"
                                     onClick={() => setSelectedCategory(cat.key)}
-                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-1.5 ${
+                                    className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer select-none ${
                                         isSelected
-                                            ? 'bg-[#172144] text-white shadow-sm scale-[1.02]'
+                                            ? 'bg-[#172144] text-white shadow-sm scale-[1.01]'
                                             : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
                                     }`}
                                 >
-                                    <span>{cat.label}</span>
+                                    <span className="truncate">{cat.label}</span>
                                     <span
-                                        className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
+                                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold shrink-0 ${
                                             isSelected ? 'bg-white/20 text-[#FCA311]' : 'bg-gray-100 text-gray-600'
                                         }`}
                                     >
@@ -153,33 +136,12 @@ export default function BusesClient({ buses }: BusesClientProps) {
                             );
                         })}
                     </div>
-
-                    {/* Search Bar */}
-                    <div className="relative w-full sm:w-64">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search bus model..."
-                            className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 text-xs font-medium text-gray-800 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#172144] focus:border-transparent transition-all shadow-sm"
-                        />
-                        {searchQuery && (
-                            <button
-                                type="button"
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
-                            >
-                                <X size={12} />
-                            </button>
-                        )}
-                    </div>
                 </div>
             </div>
 
             {/* 4. Fleet Grid Cards */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {filteredBuses.map((bus) => {
+                {filteredBuses.map((bus, index) => {
                     const isSleeper = bus.type === 'SLEEPER';
                     const isAC = bus.type === 'AC';
 
@@ -197,6 +159,9 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                         alt={bus.brand}
                                         width={400}
                                         height={200}
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                        priority={index < 3}
+                                        loading={index < 3 ? undefined : 'lazy'}
                                         className="h-36 sm:h-40 md:h-44 w-auto max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                                     />
                                 </div>
@@ -209,10 +174,10 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                         {bus.brand}
                                     </h3>
 
-                                    {/* Badges Under Bus Name */}
-                                    <div className="flex items-center justify-center gap-2 mt-2 mb-1">
+                                    {/* Badges Under Bus Name - Equally Spaced */}
+                                    <div className="grid grid-cols-2 gap-2 w-full max-w-[260px] mx-auto mt-2 mb-1">
                                         <span
-                                            className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border shadow-xs ${
+                                            className={`text-[10px] font-black tracking-wider uppercase py-1 px-2 rounded-full border shadow-xs text-center truncate ${
                                                 isSleeper
                                                     ? 'bg-purple-100 text-purple-800 border-purple-200'
                                                     : isAC
@@ -223,9 +188,9 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                             {bus.displayType}
                                         </span>
 
-                                        <span className="bg-white text-gray-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-gray-200 flex items-center gap-1 shadow-xs">
-                                            <Users size={11} className="text-[#FCA311]" />
-                                            {bus.capacity} Seats
+                                        <span className="bg-white text-gray-700 text-[10px] font-bold py-1 px-2 rounded-full border border-gray-200 flex items-center justify-center gap-1 shadow-xs truncate">
+                                            <Users size={11} className="text-[#FCA311] shrink-0" />
+                                            <span>{bus.capacity} Seats</span>
                                         </span>
                                     </div>
 
@@ -236,12 +201,13 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                     </p>
                                 </div>
 
-                                {/* Features Tags */}
-                                <div className="w-full flex flex-wrap justify-center gap-1.5 pt-2 border-t border-gray-200/60">
+                                {/* Features Tags - Equally Spaced */}
+                                <div className="w-full grid grid-cols-3 gap-1.5 pt-2.5 border-t border-gray-200/60">
                                     {bus.features.map((feature) => (
                                         <span
                                             key={feature}
-                                            className="bg-white/80 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-md border border-gray-200/60"
+                                            className="bg-white/80 text-slate-700 text-[10px] font-bold py-1 px-1 rounded-md border border-gray-200/60 flex items-center justify-center text-center leading-tight truncate shadow-2xs"
+                                            title={feature}
                                         >
                                             {feature}
                                         </span>
@@ -259,16 +225,13 @@ export default function BusesClient({ buses }: BusesClientProps) {
                     <div className="bg-[#EDF5F0] rounded-3xl p-8 border border-white/60 shadow-sm">
                         <Bus size={32} className="text-gray-400 mx-auto mb-3" />
                         <h4 className="text-base font-bold text-gray-800">No coaches found</h4>
-                        <p className="text-xs text-gray-500 mt-1">Try selecting another filter or clearing your search term.</p>
+                        <p className="text-xs text-gray-500 mt-1">Try selecting another fleet category filter.</p>
                         <button
                             type="button"
-                            onClick={() => {
-                                setSelectedCategory('ALL');
-                                setSearchQuery('');
-                            }}
-                            className="mt-4 px-4 py-1.5 bg-[#172144] text-white text-xs font-bold rounded-xl hover:bg-[#202e5e] transition-colors"
+                            onClick={() => setSelectedCategory('ALL')}
+                            className="mt-4 px-4 py-1.5 bg-[#172144] text-white text-xs font-bold rounded-xl hover:bg-[#202e5e] transition-colors cursor-pointer"
                         >
-                            Reset Filters
+                            View All Fleet
                         </button>
                     </div>
                 </div>
