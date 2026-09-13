@@ -142,27 +142,22 @@ export default function BusesClient({ buses }: BusesClientProps) {
             {/* 4. Fleet Grid Cards */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredBuses.map((bus, index) => {
-                    const isSleeper = bus.type === 'SLEEPER';
-                    const isAC = bus.type === 'AC';
-
                     return (
                         <div
                             key={bus.brand}
                             className="bg-[#EDF5F0] rounded-3xl shadow-sm hover:shadow-lg border border-white/70 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
                         >
-                            {/* Top Card: Bus Image */}
-                            <div className="p-4 pb-0 flex flex-col items-center">
-                                {/* Bus Image Covering More Card Area */}
-                                <div className="py-1 flex items-center justify-center w-full min-h-[150px]">
+                            {/* Top Card: Bus Image - Full width prominent showcase */}
+                            <div className="p-3 sm:p-3.5 pb-0">
+                                <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-xs bg-slate-200">
                                     <Image
                                         src={bus.image}
                                         alt={bus.brand}
-                                        width={400}
-                                        height={200}
+                                        fill
                                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                         priority={index < 3}
                                         loading={index < 3 ? undefined : 'lazy'}
-                                        className="h-36 sm:h-40 md:h-44 w-auto max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+                                        className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                                     />
                                 </div>
                             </div>
@@ -174,21 +169,9 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                         {bus.brand}
                                     </h3>
 
-                                    {/* Badges Under Bus Name - Equally Spaced */}
-                                    <div className="grid grid-cols-2 gap-2 w-full max-w-[260px] mx-auto mt-2 mb-1">
-                                        <span
-                                            className={`text-[10px] font-black tracking-wider uppercase py-1 px-2 rounded-full border shadow-xs text-center truncate ${
-                                                isSleeper
-                                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                                    : isAC
-                                                    ? 'bg-indigo-100 text-indigo-800 border-indigo-200'
-                                                    : 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                                            }`}
-                                        >
-                                            {bus.displayType}
-                                        </span>
-
-                                        <span className="bg-white text-gray-700 text-[10px] font-bold py-1 px-2 rounded-full border border-gray-200 flex items-center justify-center gap-1 shadow-xs truncate">
+                                    {/* Centered Seat Badge Under Bus Name */}
+                                    <div className="flex items-center justify-center mt-2 mb-1">
+                                        <span className="bg-white text-gray-700 text-[10px] font-bold py-1 px-2.5 rounded-full border border-gray-200 flex items-center justify-center gap-1.5 shadow-xs">
                                             <Users size={11} className="text-[#FCA311] shrink-0" />
                                             <span>{bus.capacity} Seats</span>
                                         </span>
@@ -199,19 +182,6 @@ export default function BusesClient({ buses }: BusesClientProps) {
                                     <p className="text-[11px] text-slate-600 mt-2 line-clamp-2 leading-relaxed text-center max-w-xs">
                                         {bus.description}
                                     </p>
-                                </div>
-
-                                {/* Features Tags - Equally Spaced */}
-                                <div className="w-full grid grid-cols-3 gap-1.5 pt-2.5 border-t border-gray-200/60">
-                                    {bus.features.map((feature) => (
-                                        <span
-                                            key={feature}
-                                            className="bg-white/80 text-slate-700 text-[10px] font-bold py-1 px-1 rounded-md border border-gray-200/60 flex items-center justify-center text-center leading-tight truncate shadow-2xs"
-                                            title={feature}
-                                        >
-                                            {feature}
-                                        </span>
-                                    ))}
                                 </div>
                             </div>
                         </div>
