@@ -15,7 +15,6 @@ import {
     Sparkles
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
-import Image from 'next/image';
 import Link from 'next/link';
 
 type RegisterState = {
@@ -127,16 +126,8 @@ export default function RegisterPage() {
                 <div className="w-full bg-white rounded-3xl shadow-xl p-7 sm:p-9 border border-black/5">
                     {/* Brand Header */}
                     <div className="text-center mb-6">
-                        <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-2 group">
-                            <Image 
-                                src="/logo.png" 
-                                alt="Northern Paribahan Logo" 
-                                width={38} 
-                                height={38} 
-                                className="w-9 h-auto object-contain transition-transform group-hover:scale-105" 
-                                priority
-                            />
-                            <span className={`${satisfy.className} text-[#172144] text-2xl sm:text-3xl font-bold`}>
+                        <Link href="/" className="inline-block mb-2 group">
+                            <span className={`${satisfy.className} text-[#FCA311] text-3xl sm:text-4xl font-bold transition-colors duration-200 group-hover:text-[#172144]`}>
                                 Northern Paribahan
                             </span>
                         </Link>

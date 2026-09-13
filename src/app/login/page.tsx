@@ -100,7 +100,7 @@ export default function LoginPage() {
                     {/* Brand Header */}
                     <div className="text-center mb-6">
                         <Link href="/" className="inline-block mb-2 group">
-                            <span className={`${satisfy.className} text-[#172144] text-3xl sm:text-4xl font-bold transition-colors group-hover:text-[#FCA311]`}>
+                            <span className={`${satisfy.className} text-[#FCA311] text-3xl sm:text-4xl font-bold transition-colors duration-200 group-hover:text-[#172144]`}>
                                 Northern Paribahan
                             </span>
                         </Link>
