@@ -78,6 +78,7 @@ function CheckoutContent() {
 
     // Form & submission state
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
 
     const {
         register,
@@ -256,11 +257,9 @@ function CheckoutContent() {
 
             const paymentData = await res.json();
             
-            // Clear checkout session before redirecting
-            clearCheckoutSession();
-            
             if (paymentData.url) {
-                window.location.href = paymentData.url;
+                setPaymentUrl(paymentData.url);
+                setIsSubmitting(false);
             } else {
                 throw new Error("No payment URL returned.");
             }
@@ -371,7 +370,37 @@ function CheckoutContent() {
     });
 
     return (
-        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: "#C9CBA3" }}>
+        <>
+            {paymentUrl && (
+                <div className="fixed inset-0 z-[100] bg-white flex flex-col h-[100dvh] overflow-hidden">
+                    <div className="bg-[#172144] text-white p-4 flex justify-between items-center shadow-md shrink-0">
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={() => setPaymentUrl(null)} 
+                                className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                                aria-label="Cancel Payment"
+                            >
+                                <ArrowLeft size={20} />
+                            </button>
+                            <span className="font-bold">Secure Payment Gateway</span>
+                        </div>
+                        <div className="flex items-center gap-2 sm:gap-3 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-mono font-bold text-base sm:text-lg">
+                            <Clock size={18} className={secondsLeft < 120 ? "text-rose-400 animate-pulse" : "text-amber-400"} />
+                            <span className={secondsLeft < 120 ? "text-rose-400" : ""}>
+                                {formatTimer(secondsLeft)}
+                            </span>
+                        </div>
+                    </div>
+                    <iframe 
+                        src={paymentUrl} 
+                        className="w-full flex-1 border-0 bg-slate-50"
+                        allow="payment"
+                        title="aamarPay Payment Gateway"
+                    />
+                </div>
+            )}
+
+            <div className={`min-h-screen py-8 px-4 sm:px-6 lg:px-8 ${paymentUrl ? 'hidden' : ''}`} style={{ backgroundColor: "#C9CBA3" }}>
             <div className="max-w-6xl mx-auto space-y-5">
                 
                 {/* Back Button & Action */}
@@ -937,6 +966,7 @@ function CheckoutContent() {
                 </div>
             )}
         </div>
+        </>
     );
 }
 
