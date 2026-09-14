@@ -1,5 +1,4 @@
-
-import { redirect } from 'next/navigation';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
@@ -16,21 +15,56 @@ export async function POST(request: Request) {
 
         if (status === 'success' && status_code === '2') {
             // TODO: Update the Prisma booking status to 'PAID' using mer_txnid
-            redirect(`/booking/success?tran_id=${mer_txnid}`);
+            
+            const htmlString = `
+            <!DOCTYPE html>
+            <html>
+              <body>
+                <h2>Payment Successful. Closing window...</h2>
+                <script>
+                  if (window.opener) {
+                    window.opener.postMessage({ type: 'PAYMENT_SUCCESS', tran_id: '${mer_txnid}' }, '*');
+                  }
+                  window.close();
+                </script>
+              </body>
+            </html>
+            `;
+            return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
         } else {
             // Payment failed or cancelled
-            redirect(`/booking/failed?tran_id=${mer_txnid}&reason=${pay_status || 'Unknown'}`);
+            const htmlString = `
+            <!DOCTYPE html>
+            <html>
+              <body>
+                <h2>Payment Failed. Closing window...</h2>
+                <script>
+                  if (window.opener) {
+                    window.opener.postMessage({ type: 'PAYMENT_FAILED', tran_id: '${mer_txnid}', reason: '${pay_status || 'Unknown'}' }, '*');
+                  }
+                  window.close();
+                </script>
+              </body>
+            </html>
+            `;
+            return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
         }
     } catch (error) {
-        // Handle any parsing or redirect errors gracefully
-        if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-            // Rethrow next/navigation redirects as they are expected exceptions
-            throw error;
-        }
-        
         console.error('Payment callback error:', error);
-        
-        // Fallback redirect on internal error
-        redirect('/booking/failed?tran_id=unknown&reason=Internal_Error');
+        const htmlString = `
+        <!DOCTYPE html>
+        <html>
+          <body>
+            <h2>Payment Error. Closing window...</h2>
+            <script>
+              if (window.opener) {
+                window.opener.postMessage({ type: 'PAYMENT_FAILED', tran_id: 'unknown', reason: 'Internal_Error' }, '*');
+              }
+              window.close();
+            </script>
+          </body>
+        </html>
+        `;
+        return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
     }
 }
