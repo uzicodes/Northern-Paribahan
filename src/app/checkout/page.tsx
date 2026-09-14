@@ -227,20 +227,49 @@ function CheckoutContent() {
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     };
 
-    const onValidSubmit = (data: PassengerFormData) => {
+    const onValidSubmit = async (data: PassengerFormData) => {
         if (secondsLeft <= 0 || isExpired) {
             toast.error("Your seat hold has expired. Please re-select your seats.");
             return;
         }
 
         setIsSubmitting(true);
-        setTimeout(() => {
-            setIsSubmitting(false);
-            clearCheckoutSession();
-            toast.success("Booking Order Placed Successfully!", {
-                description: `Payment gateway initialized for ৳${grandTotal.toLocaleString()} via ${data.paymentMethod.toUpperCase()}`,
+        
+        try {
+            const res = await fetch("/api/payment/init", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: data.fullName,
+                    email: data.email,
+                    phone: data.mobileNumber,
+                    totalAmount: grandTotal,
+                }),
             });
-        }, 800);
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || "Payment initialization failed.");
+            }
+
+            const paymentData = await res.json();
+            
+            // Clear checkout session before redirecting
+            clearCheckoutSession();
+            
+            if (paymentData.url) {
+                window.location.href = paymentData.url;
+            } else {
+                throw new Error("No payment URL returned.");
+            }
+        } catch (error: any) {
+            toast.error("Payment Error", {
+                description: error.message || "Something went wrong initializing the payment.",
+            });
+            setIsSubmitting(false);
+        }
     };
 
     const onInvalidSubmit = (fieldErrors: typeof errors) => {
