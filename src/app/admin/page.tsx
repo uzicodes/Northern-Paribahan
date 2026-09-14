@@ -73,7 +73,7 @@ const recentBookings = [
     {
         id: "BK-7840",
         name: "Kamal Hossain",
-        route: "Dhaka → Rangpur",
+        route: "Dhaka → Dinajpur",
         date: "Feb 13, 2026 — 8:00 PM",
         status: "Pending",
         amount: "৳ 1,100",

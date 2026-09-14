@@ -20,7 +20,6 @@ import {
 const LOCATIONS = [
     'Dhaka',
     'Bogura',
-    'Rangpur',
     'Dinajpur',
     'Rajshahi',
     'Sylhet',

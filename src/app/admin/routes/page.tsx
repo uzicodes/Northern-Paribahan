@@ -14,10 +14,10 @@ import {
 const routesData = [
     { id: 1, from: "Dhaka", to: "Bogura", distance: "220 km", duration: "5h 30m", fare: "৳ 850", buses: 3, departures: 6, status: "Active" },
     { id: 2, from: "Bogura", to: "Dhaka", distance: "220 km", duration: "5h 30m", fare: "৳ 900", buses: 3, departures: 6, status: "Active" },
-    { id: 3, from: "Dhaka", to: "Rangpur", distance: "310 km", duration: "7h 00m", fare: "৳ 1,100", buses: 2, departures: 4, status: "Active" },
-    { id: 4, from: "Rangpur", to: "Dhaka", distance: "310 km", duration: "7h 00m", fare: "৳ 1,100", buses: 2, departures: 4, status: "Active" },
+    { id: 3, from: "Dhaka", to: "Dinajpur", distance: "310 km", duration: "7h 00m", fare: "৳ 1,100", buses: 2, departures: 4, status: "Active" },
+    { id: 4, from: "Dinajpur", to: "Dhaka", distance: "310 km", duration: "7h 00m", fare: "৳ 1,100", buses: 2, departures: 4, status: "Active" },
     { id: 5, from: "Rajshahi", to: "Dhaka", distance: "260 km", duration: "6h 00m", fare: "৳ 750", buses: 1, departures: 2, status: "Active" },
-    { id: 6, from: "Bogura", to: "Rangpur", distance: "150 km", duration: "3h 30m", fare: "৳ 600", buses: 1, departures: 2, status: "Active" },
+    { id: 6, from: "Bogura", to: "Dinajpur", distance: "150 km", duration: "3h 30m", fare: "৳ 600", buses: 1, departures: 2, status: "Active" },
     { id: 7, from: "Dhaka", to: "Rajshahi", distance: "260 km", duration: "6h 00m", fare: "৳ 800", buses: 1, departures: 2, status: "Inactive" },
 ];
 

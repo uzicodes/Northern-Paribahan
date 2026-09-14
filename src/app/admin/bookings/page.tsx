@@ -14,12 +14,12 @@ import {
 const bookingsData = [
     { id: "BK-7842", name: "Rahim Uddin", email: "rahim@email.com", route: "Dhaka → Bogura", bus: "Shyamoli NR-101", seat: "A4", date: "Feb 13, 2026", time: "10:30 PM", status: "Confirmed", amount: "৳ 850", payment: "bKash" },
     { id: "BK-7841", name: "Fatima Akter", email: "fatima@email.com", route: "Bogura → Dhaka", bus: "Shyamoli NR-102", seat: "B2", date: "Feb 13, 2026", time: "9:15 PM", status: "Confirmed", amount: "৳ 900", payment: "Nagad" },
-    { id: "BK-7840", name: "Kamal Hossain", email: "kamal@email.com", route: "Dhaka → Rangpur", bus: "Northern NR-201", seat: "C1", date: "Feb 13, 2026", time: "8:00 PM", status: "Pending", amount: "৳ 1,100", payment: "Card" },
+    { id: "BK-7840", name: "Kamal Hossain", email: "kamal@email.com", route: "Dhaka → Dinajpur", bus: "Northern NR-201", seat: "C1", date: "Feb 13, 2026", time: "8:00 PM", status: "Pending", amount: "৳ 1,100", payment: "Card" },
     { id: "BK-7839", name: "Nusrat Jahan", email: "nusrat@email.com", route: "Rajshahi → Dhaka", bus: "Northern NR-103", seat: "A1", date: "Feb 13, 2026", time: "6:45 PM", status: "Confirmed", amount: "৳ 750", payment: "bKash" },
     { id: "BK-7838", name: "Arif Rahman", email: "arif@email.com", route: "Dhaka → Bogura", bus: "Shyamoli NR-101", seat: "D3", date: "Feb 13, 2026", time: "5:30 PM", status: "Cancelled", amount: "৳ 850", payment: "Nagad" },
-    { id: "BK-7837", name: "Sumaiya Islam", email: "sumaiya@email.com", route: "Bogura → Rangpur", bus: "Northern NR-301", seat: "B4", date: "Feb 12, 2026", time: "11:00 PM", status: "Confirmed", amount: "৳ 600", payment: "Cash" },
+    { id: "BK-7837", name: "Sumaiya Islam", email: "sumaiya@email.com", route: "Bogura → Dinajpur", bus: "Northern NR-301", seat: "B4", date: "Feb 12, 2026", time: "11:00 PM", status: "Confirmed", amount: "৳ 600", payment: "Cash" },
     { id: "BK-7836", name: "Tanvir Ahmed", email: "tanvir@email.com", route: "Dhaka → Bogura", bus: "Shyamoli NR-102", seat: "A2", date: "Feb 12, 2026", time: "10:00 PM", status: "Confirmed", amount: "৳ 850", payment: "bKash" },
-    { id: "BK-7835", name: "Minhaz Kabir", email: "minhaz@email.com", route: "Rangpur → Dhaka", bus: "Northern NR-202", seat: "C3", date: "Feb 12, 2026", time: "9:00 PM", status: "Refunded", amount: "৳ 1,100", payment: "Card" },
+    { id: "BK-7835", name: "Minhaz Kabir", email: "minhaz@email.com", route: "Dinajpur → Dhaka", bus: "Northern NR-202", seat: "C3", date: "Feb 12, 2026", time: "9:00 PM", status: "Refunded", amount: "৳ 1,100", payment: "Card" },
 ];
 
 const statusBadge: Record<string, string> = {

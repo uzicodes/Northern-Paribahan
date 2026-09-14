@@ -33,7 +33,6 @@ const LOCATIONS = [
     'Khulna',
     'Barisal',
     'Rajshahi',
-    'Rangpur',
     'Chittagong',
     "Cox's Bazar"
 ];
@@ -46,14 +45,6 @@ const POPULAR_ROUTES = [
         fare: 850,
         type: 'AC & Non-AC',
         departures: '18 Daily Departures',
-    },
-    {
-        from: 'Dhaka',
-        to: 'Rangpur',
-        duration: '7h 00m',
-        fare: 1100,
-        type: 'AC Sleeper / Luxury',
-        departures: '12 Daily Departures',
     },
     {
         from: 'Rajshahi',
@@ -70,14 +61,6 @@ const POPULAR_ROUTES = [
         fare: 900,
         type: 'Multi-Axle Volvo',
         departures: '16 Daily Departures',
-    },
-    {
-        from: 'Bogura',
-        to: 'Rangpur',
-        duration: '3h 30m',
-        fare: 600,
-        type: 'Intercity Express',
-        departures: '10 Daily Departures',
     },
     {
         from: 'Dhaka',
@@ -159,7 +142,7 @@ const TESTIMONIALS = [
     },
     {
         name: 'Dr. Nusrat Jahan',
-        route: 'Dhaka to Rangpur',
+        route: 'Dhaka to Dinajpur',
         rating: 5,
         comment: 'Booked the AC Sleeper with my family. Spotlessly clean bedding, quiet cabin, and courteous staff. The online seat booking was effortless!',
         date: 'Travelled Jan 2026',

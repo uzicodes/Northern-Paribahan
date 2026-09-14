@@ -16,9 +16,9 @@ const busesData = [
     { id: "NR-101", name: "Shyamoli Express", type: "AC", capacity: 40, route: "Dhaka → Bogura", driver: "Habibur Rahman", status: "Active", departures: "6:00 AM, 10:30 PM", fuel: "Diesel" },
     { id: "NR-102", name: "Shyamoli Deluxe", type: "AC", capacity: 36, route: "Bogura → Dhaka", driver: "Mizanur Rahman", status: "Active", departures: "7:00 AM, 9:15 PM", fuel: "Diesel" },
     { id: "NR-103", name: "Northern Classic", type: "Non-AC", capacity: 44, route: "Rajshahi → Dhaka", driver: "Abdur Rahim", status: "Active", departures: "8:00 AM, 6:45 PM", fuel: "CNG" },
-    { id: "NR-201", name: "Northern Premium", type: "AC", capacity: 36, route: "Dhaka → Rangpur", driver: "Karim Mia", status: "Active", departures: "9:00 AM, 8:00 PM", fuel: "Diesel" },
-    { id: "NR-202", name: "Northern Express", type: "AC", capacity: 40, route: "Rangpur → Dhaka", driver: "Salim Ahmed", status: "Maintenance", departures: "10:00 AM, 9:00 PM", fuel: "Diesel" },
-    { id: "NR-301", name: "Northern Local", type: "Non-AC", capacity: 50, route: "Bogura → Rangpur", driver: "Jalal Uddin", status: "Active", departures: "6:30 AM, 11:00 PM", fuel: "CNG" },
+    { id: "NR-201", name: "Northern Premium", type: "AC", capacity: 36, route: "Dhaka → Dinajpur", driver: "Karim Mia", status: "Active", departures: "9:00 AM, 8:00 PM", fuel: "Diesel" },
+    { id: "NR-202", name: "Northern Express", type: "AC", capacity: 40, route: "Dinajpur → Dhaka", driver: "Salim Ahmed", status: "Maintenance", departures: "10:00 AM, 9:00 PM", fuel: "Diesel" },
+    { id: "NR-301", name: "Northern Local", type: "Non-AC", capacity: 50, route: "Bogura → Dinajpur", driver: "Jalal Uddin", status: "Active", departures: "6:30 AM, 11:00 PM", fuel: "CNG" },
     { id: "NR-302", name: "Shyamoli Night", type: "AC Sleeper", capacity: 28, route: "Dhaka → Bogura", driver: "Rafiq Islam", status: "Inactive", departures: "11:30 PM", fuel: "Diesel" },
 ];
 
