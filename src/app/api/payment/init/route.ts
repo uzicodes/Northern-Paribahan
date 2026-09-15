@@ -1,11 +1,41 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
     const body = await request.json();
+
+    if (!user || !user.id) {
+        return NextResponse.json({ error: 'Not authenticated. Please log in.' }, { status: 401 });
+    }
+
+    if (!body.scheduleId) {
+        return NextResponse.json({ error: 'Missing scheduleId in request body.' }, { status: 400 });
+    }
     
     // The transactionID must be unique for every payment
     const tran_id = `NP_${Date.now()}_${Math.floor(Math.random() * 1000)}`; 
+
+    await prisma.booking.create({
+        data: {
+            userId: user.id,
+            scheduleId: body.scheduleId,
+            totalFare: body.totalAmount,
+            transactionId: tran_id,
+            status: 'PENDING',
+            tickets: {
+                create: (body.selectedSeats || []).map((seat: string) => ({
+                    seatNumber: seat,
+                    scheduleId: body.scheduleId
+                }))
+            }
+        }
+    });
+
     
     const paymentData = {
       store_id: process.env.AAMARPAY_STORE_ID,

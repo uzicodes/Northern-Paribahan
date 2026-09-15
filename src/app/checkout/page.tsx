@@ -262,6 +262,8 @@ function CheckoutContent() {
                     email: data.email,
                     phone: data.mobileNumber,
                     totalAmount: grandTotal,
+                    scheduleId: scheduleId,
+                    selectedSeats: selectedSeats
                 }),
             });
 

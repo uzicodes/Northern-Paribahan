@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/db';
 
 export async function POST(request: Request) {
     try {
@@ -14,23 +15,45 @@ export async function POST(request: Request) {
         const mer_txnid = formData.get('mer_txnid') as string;
 
         if (status === 'success' && status_code === '2') {
-            // TODO: Update the Prisma booking status to 'PAID' using mer_txnid
-            
-            const htmlString = `
-            <!DOCTYPE html>
-            <html>
-              <body>
-                <h2>Payment Successful. Closing window...</h2>
-                <script>
-                  if (window.opener) {
-                    window.opener.postMessage({ type: 'PAYMENT_SUCCESS', tran_id: '${mer_txnid}' }, '*');
-                  }
-                  window.close();
-                </script>
-              </body>
-            </html>
-            `;
-            return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
+            try {
+                await prisma.booking.updateMany({
+                    where: { transactionId: mer_txnid },
+                    data: { status: 'CONFIRMED' }
+                });
+                
+                const htmlString = `
+                <!DOCTYPE html>
+                <html>
+                  <body>
+                    <h2>Payment Successful. Closing window...</h2>
+                    <script>
+                      if (window.opener) {
+                        window.opener.postMessage({ type: 'PAYMENT_SUCCESS', tran_id: '${mer_txnid}' }, '*');
+                      }
+                      window.close();
+                    </script>
+                  </body>
+                </html>
+                `;
+                return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
+            } catch (dbError) {
+                console.error('DB Error updating booking:', dbError);
+                const htmlString = `
+                <!DOCTYPE html>
+                <html>
+                  <body>
+                    <h2>Payment Failed. Closing window...</h2>
+                    <script>
+                      if (window.opener) {
+                        window.opener.postMessage({ type: 'PAYMENT_FAILED', tran_id: '${mer_txnid}', reason: 'Database_Update_Failed' }, '*');
+                      }
+                      window.close();
+                    </script>
+                  </body>
+                </html>
+                `;
+                return new NextResponse(htmlString, { headers: { 'Content-Type': 'text/html' } });
+            }
         } else {
             // Payment failed or cancelled
             const htmlString = `
