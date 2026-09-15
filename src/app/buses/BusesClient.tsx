@@ -101,45 +101,8 @@ export default function BusesClient({ buses }: BusesClientProps) {
                 </div>
             </div>
 
-            {/* 3. Category Filter Controls */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                <div className="bg-[#EDF5F0] rounded-2xl p-3 sm:p-3.5 shadow-sm border border-white/60">
-                    {/* Category Filter Pills - Equally Spaced */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
-                        {[
-                            { key: 'ALL', label: 'All Fleet', count: counts.ALL },
-                            { key: 'SLEEPER', label: '🛏️ Sleeper', count: counts.SLEEPER },
-                            { key: 'AC', label: '❄️ Executive AC', count: counts.AC },
-                            { key: 'NON_AC', label: '🪟 Non-AC', count: counts.NON_AC },
-                        ].map((cat) => {
-                            const isSelected = selectedCategory === cat.key;
-                            return (
-                                <button
-                                    key={cat.key}
-                                    type="button"
-                                    onClick={() => setSelectedCategory(cat.key)}
-                                    className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer select-none ${
-                                        isSelected
-                                            ? 'bg-[#172144] text-white shadow-sm scale-[1.01]'
-                                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                                    }`}
-                                >
-                                    <span className="truncate">{cat.label}</span>
-                                    <span
-                                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-bold shrink-0 ${
-                                            isSelected ? 'bg-white/20 text-[#FCA311]' : 'bg-gray-100 text-gray-600'
-                                        }`}
-                                    >
-                                        {cat.count}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-            </div>
 
-            {/* 4. Fleet Grid Cards */}
+            {/* Fleet Grid Cards */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredBuses.map((bus, index) => {
                     return (
