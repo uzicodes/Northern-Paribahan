@@ -20,6 +20,8 @@ import { StatCard, ProfileField, BookingItem, BookingCard } from './ProfileSubco
 import { TripsTab } from './TripsTab';
 import { EditProfileTab } from './EditProfileTab';
 
+import { getAccountPrivilege } from '@/utils/privileges';
+
 export function ProfileOverviewTab({
     user,
     bookings,
@@ -36,6 +38,8 @@ export function ProfileOverviewTab({
     onViewTripsClick?: () => void;
 }) {
     const nextUpcoming = upcomingBookings[0] || null;
+    const validBookingCount = user?.confirmedBookingsCount ?? bookings.filter((b) => b.status?.toUpperCase() === 'CONFIRMED').length;
+    const privilege = getAccountPrivilege(validBookingCount);
 
     return (
         <div className="p-5 sm:p-7 space-y-6">
@@ -62,6 +66,32 @@ export function ProfileOverviewTab({
                     badgeText="Past journeys"
                     theme="amber"
                 />
+            </div>
+
+            {/* Account Privileges */}
+            <div className="p-5 sm:p-6 bg-white rounded-2xl shadow-xs border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-[#172144] text-[#FCA311] flex items-center justify-center font-bold shadow-xs">
+                            <Sparkles size={16} />
+                        </div>
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-800">Account Privileges</h2>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-400">Loyalty Tier</span>
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                    <div className={`px-4 py-1.5 rounded-full font-bold border text-xs sm:text-sm ${privilege.color}`}>
+                        {privilege.name} Member
+                    </div>
+                    <p className="text-gray-600 font-medium text-xs sm:text-sm">
+                        {validBookingCount} Total Trips
+                    </p>
+                </div>
+                
+                <p className="mt-4 text-xs sm:text-sm text-gray-500">
+                    Current Benefit: <span className="font-semibold text-gray-800">{privilege.benefits}</span>
+                </p>
             </div>
 
             {/* Next Scheduled Journey Spotlight (if exists) */}

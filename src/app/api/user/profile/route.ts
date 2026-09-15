@@ -6,6 +6,13 @@ import { Prisma } from '@prisma/client';
 export const dynamic = 'force-dynamic';
 
 const profileInclude = {
+    _count: {
+        select: {
+            bookings: {
+                where: { status: 'CONFIRMED' }
+            }
+        }
+    },
     bookings: {
         include: {
             tickets: true,
@@ -66,6 +73,7 @@ export async function GET() {
                 email: profile.email,
                 phoneNumber: profile.phoneNumber || user.user_metadata?.phone_number || '',
                 role: profile.role,
+                confirmedBookingsCount: profile._count?.bookings || 0,
             },
             bookings: profile.bookings.map((booking: BookingWithDetails) => ({
                 id: booking.id,

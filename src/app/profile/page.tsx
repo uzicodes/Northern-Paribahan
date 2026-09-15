@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 
 import { BookingItem, SidebarButton } from '@/components/ProfileSubcomponents';
 import { ProfileOverviewTab, TripsTab, EditProfileTab } from '@/components/ProfileTabs';
+import { getAccountPrivilege } from '@/utils/privileges';
 
 // --- Types ---
 interface UserProfile {
@@ -36,6 +37,7 @@ interface UserProfile {
     email: string;
     phoneNumber: string;
     role: string;
+    confirmedBookingsCount?: number;
 }
 
 // --- Tab Type ---
@@ -190,6 +192,8 @@ export default function ProfilePage() {
     }
 
     const userInitial = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    const validBookingCount = user.confirmedBookingsCount ?? bookings.filter((b) => b.status?.toUpperCase() === 'CONFIRMED').length;
+    const privilege = getAccountPrivilege(validBookingCount);
 
     return (
         <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 text-slate-700" style={{ backgroundColor: '#C9CBA3' }}>
@@ -227,6 +231,10 @@ export default function ProfilePage() {
                                 <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
                                     <span className="inline-block px-2.5 py-0.5 bg-slate-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
                                         {user.role}
+                                    </span>
+                                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full border ${privilege.color}`}>
+                                        <Sparkles size={11} />
+                                        {privilege.name} Member
                                     </span>
                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-full">
                                         <ShieldCheck size={11} className="text-emerald-600" />
