@@ -52,17 +52,9 @@ export async function GET() {
             include: profileInclude,
         });
 
-        // Safe lazy fallback: only creates the Prisma record if the user exists in Supabase Auth but not in Prisma DB
+        // Return 404 if profile is missing so client knows to sync via POST
         if (!profile) {
-            profile = await prisma.user.create({
-                data: {
-                    id: user.id,
-                    email: user.email!,
-                    name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
-                    phoneNumber: user.user_metadata?.phone_number || null,
-                },
-                include: profileInclude,
-            });
+            return NextResponse.json({ error: 'PROFILE_NOT_FOUND' }, { status: 404 });
         }
 
         // Return the shape the frontend expects: { user, bookings }
@@ -98,3 +90,32 @@ export async function GET() {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function POST() {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    try {
+        const profile = await prisma.user.upsert({
+            where: { id: user.id },
+            update: {}, // No updates, just ensure it exists
+            create: {
+                id: user.id,
+                email: user.email!,
+                name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || null,
+                phoneNumber: user.user_metadata?.phone_number || null,
+            },
+            include: profileInclude,
+        });
+        
+        return NextResponse.json({ success: true, profile });
+    } catch (error) {
+        console.error('Profile sync error:', error);
+        return NextResponse.json({ error: 'Failed to sync profile' }, { status: 500 });
+    }
+}
+

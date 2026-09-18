@@ -91,7 +91,15 @@ export default function ProfilePage() {
     const fetchProfile = useCallback(async () => {
         try {
             dispatch({ loading: true });
-            const res = await fetch('/api/user/profile');
+            let res = await fetch('/api/user/profile');
+            
+            // If profile does not exist in Prisma yet, trigger a POST sync and re-fetch
+            if (res.status === 404) {
+                const syncRes = await fetch('/api/user/profile', { method: 'POST' });
+                if (!syncRes.ok) throw new Error('Failed to create profile');
+                res = await fetch('/api/user/profile'); // Refetch after creation
+            }
+
             if (!res.ok) {
                 if (res.status === 401) {
                     router.push('/login');
