@@ -24,28 +24,32 @@ interface PageProps {
     }>;
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+});
+
 const formatDate = (dateInput: Date | string) => {
     try {
         const d = new Date(dateInput);
-        return new Intl.DateTimeFormat('en-US', {
-            weekday: 'short',
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        }).format(d);
+        return dateFormatter.format(d);
     } catch {
         return String(dateInput);
     }
 };
 
+const timeFormatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+});
+
 const formatTime = (dateInput: Date | string) => {
     try {
         const d = new Date(dateInput);
-        return new Intl.DateTimeFormat('en-US', {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true,
-        }).format(d);
+        return timeFormatter.format(d);
     } catch {
         return String(dateInput);
     }

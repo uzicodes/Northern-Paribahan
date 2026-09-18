@@ -12,12 +12,14 @@ interface PageProps {
     }>;
 }
 
+const timeFormatter = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).format(date);
+    return timeFormatter.format(date);
 };
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+    return dateFormatter.format(date);
 };
 
 export default async function BookingPage(props: PageProps) {
