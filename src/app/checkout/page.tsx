@@ -24,6 +24,66 @@ import { toast } from "sonner";
 import GlobalLoader from "@/components/GlobalLoader";
 
 // Step 1: Define strict Passenger Details validation schema with exact regex
+const formatTimer = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+};
+
+const handleFullNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+        ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+        e.ctrlKey ||
+        e.metaKey
+    ) {
+        return;
+    }
+    // Disallow numbers, symbols, and special characters
+    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+        e.preventDefault();
+    }
+};
+
+const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+        ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+        e.ctrlKey ||
+        e.metaKey
+    ) {
+        return;
+    }
+    // Disallow alphabets, spaces, +, -, and symbols
+    if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        return;
+    }
+    // First digit must strictly be '0'
+    const target = e.currentTarget;
+    if ((target.selectionStart === 0 || target.value.length === 0) && e.key !== "0") {
+        e.preventDefault();
+    }
+};
+
+const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+        ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
+        e.ctrlKey ||
+        e.metaKey
+    ) {
+        return;
+    }
+    // Disallow spaces and symbols like +, #, !, $, %, &, *, etc.
+    if (!/^[a-zA-Z0-9.@\-_]$/.test(e.key)) {
+        e.preventDefault();
+        return;
+    }
+    // Only allow a single '@'
+    if (e.key === "@" && e.currentTarget.value.includes("@")) {
+        e.preventDefault();
+    }
+};
+
+// Step 1: Define strict Passenger Details validation schema with exact regex
 const passengerSchema = z.object({
     fullName: z
         .string()
@@ -237,11 +297,7 @@ function CheckoutContent() {
         return () => window.removeEventListener('message', handleMessage);
     }, [router, clearCheckoutSession]);
 
-    const formatTimer = (totalSeconds: number) => {
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    };
+
 
     const onValidSubmit = async (data: PassengerFormData) => {
         if (secondsLeft <= 0 || isExpired) {
@@ -309,75 +365,7 @@ function CheckoutContent() {
         }
     };
 
-    // Strict input filter: Full Name (alphabets and spaces only, max 50 chars)
-    const handleFullNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
-            e.ctrlKey ||
-            e.metaKey
-        ) {
-            return;
-        }
-        // Disallow numbers, symbols, and special characters
-        if (!/^[a-zA-Z\s]$/.test(e.key)) {
-            e.preventDefault();
-        }
-    };
 
-    const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const sanitized = e.target.value.replace(/[^A-Za-z\s]/g, "").slice(0, 50);
-        setValue("fullName", sanitized, { shouldValidate: true, shouldDirty: true });
-    };
-
-    // Strict input filter: Mobile Number (numbers only, exactly 11 digits, must start with 0)
-    const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
-            e.ctrlKey ||
-            e.metaKey
-        ) {
-            return;
-        }
-        // Disallow alphabets, spaces, +, -, and symbols
-        if (!/^[0-9]$/.test(e.key)) {
-            e.preventDefault();
-            return;
-        }
-        // First digit must strictly be '0'
-        const target = e.currentTarget;
-        if ((target.selectionStart === 0 || target.value.length === 0) && e.key !== "0") {
-            e.preventDefault();
-        }
-    };
-
-    const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let digits = e.target.value.replace(/\D/g, "");
-        if (digits.length > 0 && !digits.startsWith("0")) {
-            digits = "0" + digits.replace(/^[^0]+/, "");
-        }
-        digits = digits.slice(0, 11);
-        setValue("mobileNumber", digits, { shouldValidate: true, shouldDirty: true });
-    };
-
-    // Strict input filter: Email (no spaces, no +, #, !, only valid email characters and max one @)
-    const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-            ["Backspace", "Tab", "Enter", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key) ||
-            e.ctrlKey ||
-            e.metaKey
-        ) {
-            return;
-        }
-        // Disallow spaces and symbols like +, #, !, $, %, &, *, etc.
-        if (!/^[a-zA-Z0-9.@\-_]$/.test(e.key)) {
-            e.preventDefault();
-            return;
-        }
-        // Only allow a single '@'
-        if (e.key === "@" && e.currentTarget.value.includes("@")) {
-            e.preventDefault();
-        }
-    };
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/[^a-zA-Z0-9.@\-_]/g, "");

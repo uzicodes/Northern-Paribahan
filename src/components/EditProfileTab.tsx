@@ -3,6 +3,39 @@
 import React from 'react';
 import { Pencil, Check, User, Phone, Mail, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
+// Name keydown handler: only alphabets and spaces
+const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+        ['Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
+        e.ctrlKey ||
+        e.metaKey
+    ) {
+        return;
+    }
+    if (!/^[a-zA-Z\s]$/.test(e.key)) {
+        e.preventDefault();
+    }
+};
+
+// Phone keydown handler: digits only, starts with 0
+const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (
+        ['Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
+        e.ctrlKey ||
+        e.metaKey
+    ) {
+        return;
+    }
+    if (!/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        return;
+    }
+    const target = e.currentTarget;
+    if ((target.selectionStart === 0 || target.value.length === 0) && e.key !== '0') {
+        e.preventDefault();
+    }
+};
+
 export function EditProfileTab({
     user,
     editName,
@@ -24,38 +57,7 @@ export function EditProfileTab({
     onSave: () => void;
     onCancel: () => void;
 }) {
-    // Name keydown handler: only alphabets and spaces
-    const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-            ['Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
-            e.ctrlKey ||
-            e.metaKey
-        ) {
-            return;
-        }
-        if (!/^[a-zA-Z\s]$/.test(e.key)) {
-            e.preventDefault();
-        }
-    };
 
-    // Phone keydown handler: digits only, starts with 0
-    const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (
-            ['Backspace', 'Tab', 'Enter', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) ||
-            e.ctrlKey ||
-            e.metaKey
-        ) {
-            return;
-        }
-        if (!/^[0-9]$/.test(e.key)) {
-            e.preventDefault();
-            return;
-        }
-        const target = e.currentTarget;
-        if ((target.selectionStart === 0 || target.value.length === 0) && e.key !== '0') {
-            e.preventDefault();
-        }
-    };
 
     return (
         <div className="p-5 sm:p-7 max-w-xl space-y-6">

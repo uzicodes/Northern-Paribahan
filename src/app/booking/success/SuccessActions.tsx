@@ -4,12 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { Printer, Home, Compass } from 'lucide-react';
 
+const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+        window.print();
+    }
+};
+
 export default function SuccessActions() {
-    const handlePrint = () => {
-        if (typeof window !== 'undefined') {
-            window.print();
-        }
-    };
 
     return (
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-lg mx-auto pt-2 print:hidden">

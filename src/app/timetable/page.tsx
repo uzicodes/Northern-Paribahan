@@ -29,6 +29,15 @@ const LOCATIONS = [
     "Cox's Bazar"
 ];
 
+// Format ISO date into 12-hour AM/PM time
+const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
+};
+
 export default function TimetablePage() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -98,14 +107,7 @@ export default function TimetablePage() {
         fetchSchedules();
     }, [origin, destination, date]);
 
-    // Format ISO date into 12-hour AM/PM time
-    const formatTime = (dateString: string) => {
-        return new Date(dateString).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-        });
-    };
+
 
     // Swap From and To locations
     const handleSwapLocations = () => {

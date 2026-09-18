@@ -179,6 +179,13 @@ const FAQS = [
     },
 ];
 
+const formatToLocalDateString = (d: Date): string => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 export default function Page() {
     const router = useRouter();
     const [state, dispatch] = React.useReducer(searchReducer, {
@@ -190,13 +197,6 @@ export default function Page() {
     });
     const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
     const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-    const formatToLocalDateString = (d: Date): string => {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
 
     const handleQuickRouteSelect = (from: string, to: string) => {
         dispatch({ fromValue: from, toValue: to });
