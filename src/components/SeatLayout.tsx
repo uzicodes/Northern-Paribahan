@@ -105,8 +105,6 @@ export default function SeatLayout({
   onProceed,
   proceedUrl,
 }: SeatLayoutProps) {
-  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-
   // Parse dynamic grid layout architecture from bus model and tier
   const config = useMemo(() => getLayoutConfig(busModel, tier), [busModel, tier]);
 
@@ -116,7 +114,11 @@ export default function SeatLayout({
     if (propBookedSeats !== undefined) {
       propBookedSeats.forEach((s) => set.add(s.toUpperCase()));
     } else if (legacySeats && legacySeats.length > 0) {
-      legacySeats.filter((s) => s.isBooked).forEach((s) => set.add(s.seatNumber.toUpperCase()));
+      for (const s of legacySeats) {
+        if (s.isBooked) {
+          set.add(s.seatNumber.toUpperCase());
+        }
+      }
     } else {
       // Default mock booked seats as requested in specifications
       set.add("A1");
@@ -127,54 +129,25 @@ export default function SeatLayout({
   }, [propBookedSeats, legacySeats]);
 
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
-  const isInitialMount = useRef(true);
 
-  // Restore saved seats from sessionStorage on mount (survives page reloads)
-  useEffect(() => {
-    if (!storageKey || typeof window === "undefined") return;
-
+  // Lazily initialize state to avoid derived state warnings and extra renders (React Compiler fix)
+  const [selectedSeats, setSelectedSeats] = useState<string[]>(() => {
+    if (typeof window === "undefined" || !storageKey) return [];
     try {
       const saved = sessionStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          // Filter out any seats that are now booked or invalid, capped at 4
-          const validSeats = parsed.filter(
+          return parsed.filter(
             (seat): seat is string => typeof seat === "string" && !bookedSet.has(seat.toUpperCase())
           ).slice(0, 4);
-
-          if (validSeats.length > 0) {
-            setSelectedSeats(validSeats);
-            onSeatSelect?.(validSeats);
-          } else {
-            sessionStorage.removeItem(storageKey);
-          }
         }
       }
     } catch {
       // Ignore parse errors
     }
-  }, [storageKey, bookedSet, onSeatSelect]);
-
-  // Persist selected seats to sessionStorage when selection changes
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    if (!storageKey || typeof window === "undefined") return;
-
-    try {
-      if (selectedSeats.length > 0) {
-        sessionStorage.setItem(storageKey, JSON.stringify(selectedSeats));
-      } else {
-        sessionStorage.removeItem(storageKey);
-      }
-    } catch {
-      // Ignore storage errors
-    }
-  }, [selectedSeats, storageKey]);
+    return [];
+  });
 
   // Generate grid rows based on architecture
   const rows = useMemo(() => {
@@ -212,6 +185,14 @@ export default function SeatLayout({
       const updated = selectedSeats.filter((s) => s !== seatNumber);
       setSelectedSeats(updated);
       onSeatSelect?.(updated);
+      
+      if (storageKey && typeof window !== "undefined") {
+        if (updated.length > 0) {
+          sessionStorage.setItem(storageKey, JSON.stringify(updated));
+        } else {
+          sessionStorage.removeItem(storageKey);
+        }
+      }
     } else {
       if (selectedSeats.length >= 4) {
         toast.error("Maximum 4 seats allowed per booking", {
@@ -223,6 +204,10 @@ export default function SeatLayout({
       const updated = [...selectedSeats, seatNumber];
       setSelectedSeats(updated);
       onSeatSelect?.(updated);
+      
+      if (storageKey && typeof window !== "undefined") {
+        sessionStorage.setItem(storageKey, JSON.stringify(updated));
+      }
     }
   };
 
