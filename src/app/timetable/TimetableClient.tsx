@@ -1,363 +1,668 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import {
-    Clock,
-    MapPin,
-    ArrowRight,
-    Bus,
-    Filter,
-    RotateCcw,
-    Sunrise,
-    Sun,
-    Sunset,
-    Moon,
-    ChevronDown,
-    ArrowUpDown,
-    SlidersHorizontal,
-} from 'lucide-react';
+import { useEffect, useState, useRef, useReducer } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { toast } from "sonner";
+import { getCurrentBSTDate } from "@/lib/dateUtils";
+import { 
+    ArrowRight, 
+    ArrowLeftRight,
+    Bus, 
+    MapPin, 
+    Calendar,
+    Search,
+    ChevronDown
+} from "lucide-react";
 
-interface ScheduleData {
-    id: string;
-    bus: string;
-    code: string;
-    from: string;
-    to: string;
-    departure: string;
-    arrival: string;
-    duration: string;
-    type: string;
-    fare: string;
-    rawFare?: number;
-    seats: number;
-    period: string;
-    rawDeparture?: string;
-}
+const LOCATIONS = [
+    'Dhaka',
+    'Bogura',
+    'Dinajpur',
+    'Rajshahi',
+    'Sylhet',
+    'Khulna',
+    'Barisal',
+    'Chittagong',
+    "Cox's Bazar"
+];
 
-const periodIcon: Record<string, React.ReactNode> = {
-    morning: <Sunrise size={14} className="text-amber-500" />,
-    afternoon: <Sun size={14} className="text-orange-500" />,
-    evening: <Sunset size={14} className="text-indigo-500" />,
-    night: <Moon size={14} className="text-slate-500" />,
-};
-
-const typeColor: Record<string, string> = {
-    PREMIUM: "bg-purple-50 text-purple-700 border-purple-100",
-    BUSINESS: "bg-indigo-50 text-indigo-700 border-indigo-100",
-    ECONOMY: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    AC: "bg-indigo-50 text-indigo-700 border-indigo-100",
-    "NON AC": "bg-gray-100 text-gray-700 border-gray-200",
-    SLEEPER: "bg-purple-50 text-purple-700 border-purple-100",
+// Format ISO date into 12-hour AM/PM time
+const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+    });
 };
 
 interface TimetableClientProps {
-    schedules: ScheduleData[];
-    routes: string[];
-    initialRoute?: string;
+    initialOrigin?: string;
+    initialDestination?: string;
     initialDate?: string;
+    initialSchedules: any[];
 }
 
-export default function TimetableClient({ schedules, routes, initialRoute, initialDate }: TimetableClientProps) {
-    const [selectedRoute, setSelectedRoute] = useState<string>(
-        initialRoute && routes.includes(initialRoute) ? initialRoute : "All Routes"
+export default function TimetableClient({
+    initialOrigin,
+    initialDestination,
+    initialDate,
+    initialSchedules
+}: TimetableClientProps) {
+    const router = useRouter();
+
+    const origin = initialOrigin || "";
+    const destination = initialDestination || "";
+    const date = initialDate || "";
+    const schedules = initialSchedules;
+
+    // Search filter bar state - Fixed Issue 2 (Multiple setState calls in one effect)
+    const [filterState, dispatch] = useReducer(
+        (state: any, action: any) => ({ ...state, ...action }),
+        {
+            filterFrom: origin || "",
+            filterTo: destination || "",
+            filterDate: date || getCurrentBSTDate()
+        }
     );
-    const [selectedType, setSelectedType] = useState<string>("All Types");
-    const [selectedPeriod, setSelectedPeriod] = useState<string>("all");
-    const [sortBy, setSortBy] = useState<string>("earliest");
+    const { filterFrom, filterTo, filterDate } = filterState;
 
-    // Filter and sort schedules with memoization for performance
-    const filteredSchedules = useMemo(() => {
-        const filtered = schedules.filter((t) => {
-            const routeStr = `${t.from} → ${t.to}`;
-            const matchesRoute = selectedRoute === "All Routes" || routeStr === selectedRoute;
-            const matchesType =
-                selectedType === "All Types" ||
-                t.type.toUpperCase() === selectedType.toUpperCase();
-            const matchesPeriod = selectedPeriod === "all" || t.period === selectedPeriod;
-            return matchesRoute && matchesType && matchesPeriod;
-        });
+    // Custom centered dropdown menu states
+    const [openFromDropdown, setOpenFromDropdown] = useState(false);
+    const [openToDropdown, setOpenToDropdown] = useState(false);
+    const fromRef = useRef<HTMLDivElement>(null);
+    const toRef = useRef<HTMLDivElement>(null);
 
-        return filtered.sort((a, b) => {
-            if (sortBy === "fare_asc") {
-                const fareA = a.rawFare ?? (Number(a.fare.replace(/[^0-9.]/g, "")) || 0);
-                const fareB = b.rawFare ?? (Number(b.fare.replace(/[^0-9.]/g, "")) || 0);
-                return fareA - fareB;
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (fromRef.current && !fromRef.current.contains(e.target as Node)) {
+                setOpenFromDropdown(false);
             }
-            if (sortBy === "seats_desc") {
-                return b.seats - a.seats;
+            if (toRef.current && !toRef.current.contains(e.target as Node)) {
+                setOpenToDropdown(false);
             }
-            // Default: Earliest departure time
-            const timeA = a.rawDeparture ? new Date(a.rawDeparture).getTime() : 0;
-            const timeB = b.rawDeparture ? new Date(b.rawDeparture).getTime() : 0;
-            return timeA - timeB;
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Synchronize filter fields when searchParams (props) change
+    useEffect(() => {
+        dispatch({
+            filterFrom: origin || "",
+            filterTo: destination || "",
+            filterDate: date || getCurrentBSTDate()
         });
-    }, [schedules, selectedRoute, selectedType, selectedPeriod, sortBy]);
+    }, [origin, destination, date]);
 
-    const isFiltered =
-        selectedRoute !== "All Routes" ||
-        selectedType !== "All Types" ||
-        selectedPeriod !== "all" ||
-        sortBy !== "earliest";
-
-    const handleResetFilters = () => {
-        setSelectedRoute("All Routes");
-        setSelectedType("All Types");
-        setSelectedPeriod("all");
-        setSortBy("earliest");
+    // Swap From and To locations
+    const handleSwapLocations = () => {
+        dispatch({
+            filterFrom: filterTo,
+            filterTo: filterFrom
+        });
     };
 
-    return (
-        <div style={{ backgroundColor: "#C9CBA3" }} className="min-h-screen pb-10">
-            {/* Hero Header Banner */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-7 pb-1">
-                <div className="bg-[#172144] rounded-2xl py-3 px-5 sm:py-3.5 sm:px-6 text-white shadow-md border border-[#223062] flex flex-col items-center justify-center text-center gap-1">
-                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Live Timetable</h1>
-                    <p className="text-indigo-100 text-xs sm:text-sm max-w-xl leading-relaxed mx-auto">
-                        View real-time departure and arrival schedules for Northern Paribahan.
+    // Handle Search Filter Form Submission
+    const handleFilterSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!filterFrom || !filterTo) {
+            toast.error("Please select both From and To locations.");
+            return;
+        }
+        if (filterFrom.toLowerCase() === filterTo.toLowerCase()) {
+            toast.error("Origin and Destination cannot be the same.");
+            return;
+        }
+        if (!filterDate) {
+            toast.error("Please select a travel date.");
+            return;
+        }
+
+        const params = new URLSearchParams();
+        params.set("from", filterFrom);
+        params.set("to", filterTo);
+        params.set("origin", filterFrom);
+        params.set("destination", filterTo);
+        params.set("date", filterDate);
+        router.push(`/timetable?${params.toString()}`);
+    };
+
+    const minDate = getCurrentBSTDate();
+
+    // Missing Search Parameters State
+    if (!origin || !destination || !date) {
+        return (
+            <div 
+                className="min-h-[calc(100vh-140px)] py-12 px-4 flex items-center justify-center"
+                style={{ backgroundColor: "#C9CBA3" }}
+            >
+                <div className="max-w-xl w-full bg-white rounded-3xl p-8 shadow-xl border border-black/5">
+                    <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-200">
+                        <Bus className="w-7 h-7 text-[#FCA311]" />
+                    </div>
+                    <h2 className="text-2xl font-black text-gray-900 text-center mb-2">Search Bus Schedules</h2>
+                    <p className="text-gray-600 text-sm text-center mb-6">
+                        Select an origin, destination, and travel date to find available buses.
                     </p>
 
-                    {initialDate && (() => {
-                        const parts = initialDate.split('-');
-                        const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : initialDate;
-                        return (
-                            <div className="mt-0.5">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[11px] font-bold border border-[#FCA311] text-[#FCA311] bg-[#FCA311]/10">
-                                    📅 Journey Date: {formattedDate}
-                                </span>
-                            </div>
-                        );
-                    })()}
-                </div>
-            </div>
-
-            {/* Filter Card */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 relative z-10">
-                <div className="bg-[#EDF5F0] rounded-2xl shadow-md border border-white/60 p-4 sm:p-5 space-y-4">
-                    
-                    {/* Top Row: Dropdown Filters Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-                        {/* 1. Route Filter */}
-                        <div>
-                            <label htmlFor="route-filter" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                                <MapPin size={12} className="text-indigo-500" />
-                                Select Route
-                            </label>
-                            <div className="relative">
-                                <select
-                                    id="route-filter"
-                                    value={selectedRoute}
-                                    onChange={(e) => setSelectedRoute(e.target.value)}
-                                    className="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white hover:bg-gray-50/80 transition-colors cursor-pointer shadow-sm"
-                                >
-                                    <option value="All Routes">🌍 All Routes</option>
-                                    {routes.map((r) => (
-                                        <option key={r} value={r}>
-                                            {r}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        {/* 2. Bus Type Filter */}
-                        <div>
-                            <label htmlFor="type-filter" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                                <Bus size={12} className="text-indigo-500" />
-                                Bus Type
-                            </label>
-                            <div className="relative">
-                                <select
-                                    id="type-filter"
-                                    value={selectedType}
-                                    onChange={(e) => setSelectedType(e.target.value)}
-                                    className="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white hover:bg-gray-50/80 transition-colors cursor-pointer shadow-sm"
-                                >
-                                    <option value="All Types">🚍 All Types</option>
-                                    <option value="AC">❄️ AC</option>
-                                    <option value="NON AC">🪟 NON AC</option>
-                                    <option value="SLEEPER">🛏️ SLEEPER</option>
-                                </select>
-                                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        {/* 3. Sort By Dropdown */}
-                        <div>
-                            <label htmlFor="sort-filter" className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-                                <ArrowUpDown size={12} className="text-indigo-500" />
-                                Sort By
-                            </label>
-                            <div className="relative">
-                                <select
-                                    id="sort-filter"
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="w-full pl-3.5 pr-8 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white hover:bg-gray-50/80 transition-colors cursor-pointer shadow-sm"
-                                >
-                                    <option value="earliest">⏰ Earliest Departure</option>
-                                    <option value="fare_asc">💰 Lowest Fare</option>
-                                    <option value="seats_desc">💺 Most Seats Available</option>
-                                </select>
-                                <ChevronDown size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom Row: Time of Day Filter & Quick Actions */}
-                    <div className="pt-3 border-t border-gray-200/60 flex flex-col md:flex-row items-center justify-between gap-3">
-                        <div className="w-full flex flex-col items-center justify-center text-center">
-                            <div id="time-period-label" className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5 flex items-center justify-center gap-1">
-                                <SlidersHorizontal size={12} className="text-indigo-500" />
-                                Time of Day
-                            </div>
-                            <div role="group" aria-labelledby="time-period-label" className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2">
-                                {[
-                                    { key: "all", label: "All Day", icon: <Filter size={13} /> },
-                                    { key: "morning", label: "Morning (6:00 AM - 12:00 PM)", icon: <Sunrise size={13} className="text-amber-500" /> },
-                                    { key: "afternoon", label: "Afternoon (12:00 PM - 5:00 PM)", icon: <Sun size={13} className="text-orange-500" /> },
-                                    { key: "evening", label: "Evening (5:00 PM - 8:00 PM)", icon: <Sunset size={13} className="text-indigo-500" /> },
-                                    { key: "night", label: "Night (8:00 PM+)", icon: <Moon size={13} className="text-slate-500" /> },
-                                ].map((p) => {
-                                    const isActive = selectedPeriod === p.key;
-                                    return (
-                                        <button
-                                            type="button"
-                                            key={p.key}
-                                            onClick={() => setSelectedPeriod(p.key)}
-                                            className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-150 ${
-                                                isActive
-                                                    ? "bg-[#172144] text-white shadow-sm"
-                                                    : "bg-white border border-gray-200 text-gray-600 hover:border-indigo-200 hover:bg-gray-50"
-                                            }`}
-                                        >
-                                            {p.icon}
-                                            <span>{p.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Reset Filters Button */}
-                        {isFiltered && (
-                            <div className="flex justify-center w-full md:w-auto shrink-0">
+                    {/* Integrated Search Filter */}
+                    <form onSubmit={handleFilterSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-2 items-end">
+                            {/* FROM Custom Centered Dropdown */}
+                            <div className={`relative ${openFromDropdown ? "z-50" : "z-20"}`} ref={fromRef}>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                    <MapPin size={13} className="text-emerald-600" />
+                                    <span>FROM</span>
+                                </label>
+                                
                                 <button
                                     type="button"
-                                    onClick={handleResetFilters}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-100 shadow-sm whitespace-nowrap"
+                                    onClick={() => {
+                                        setOpenFromDropdown((prev) => !prev);
+                                        setOpenToDropdown(false);
+                                    }}
+                                    className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                        openFromDropdown
+                                            ? "border-emerald-600 ring-2 ring-emerald-500/20 text-slate-900 bg-white"
+                                            : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                    }`}
                                 >
-                                    <RotateCcw size={12} />
-                                    Reset Filters
+                                    <span className="truncate text-center w-full px-4">
+                                        {filterFrom || "Select FROM"}
+                                    </span>
+                                    <ChevronDown 
+                                        size={16} 
+                                        className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                            openFromDropdown ? "rotate-180 text-emerald-600" : ""
+                                        }`} 
+                                    />
+                                </button>
+
+                                {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                                {openFromDropdown && (
+                                    <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                        {LOCATIONS.map((loc) => {
+                                            const isSelected = loc === filterFrom;
+                                            const isDisabled = loc === filterTo;
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={loc}
+                                                    disabled={isDisabled}
+                                                    onClick={() => {
+                                                        dispatch({ filterFrom: loc });
+                                                        setOpenFromDropdown(false);
+                                                    }}
+                                                    className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-emerald-50 text-emerald-800 font-bold"
+                                                            : isDisabled
+                                                            ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                    }`}
+                                                >
+                                                    {loc}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Swap Button */}
+                            <div className="flex items-center justify-center">
+                                <button
+                                    type="button"
+                                    onClick={handleSwapLocations}
+                                    title="Swap FROM & TO"
+                                    aria-label="Swap FROM and TO"
+                                    className="w-11 h-11 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-200/90 hover:border-amber-300 shadow-2xs flex items-center justify-center transition-all duration-150 active:scale-95 active:rotate-180 cursor-pointer"
+                                >
+                                    <ArrowLeftRight size={17} className="stroke-[2.2]" />
                                 </button>
                             </div>
-                        )}
-                    </div>
 
-                </div>
-            </div>
-
-            {/* Timetable List Section */}
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-3">
-                <div className="flex items-center justify-between px-1">
-                    <p className="text-xs text-gray-700 font-semibold">
-                        Showing <span className="font-bold text-gray-900">{filteredSchedules.length}</span> of {schedules.length} schedules
-                    </p>
-                </div>
-
-                {filteredSchedules.map((trip) => (
-                    <div
-                        key={trip.id}
-                        className="bg-white rounded-2xl shadow-sm border border-gray-100/80 hover:shadow-md hover:border-indigo-100 transition-all duration-150 overflow-hidden group"
-                    >
-                        <div className="p-3.5 sm:p-4 lg:p-4.5">
-                            <div className="flex flex-col lg:flex-row lg:items-center gap-3.5 lg:gap-5">
+                            {/* TO Custom Centered Dropdown */}
+                            <div className={`relative ${openToDropdown ? "z-50" : "z-20"}`} ref={toRef}>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-amber-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                    <MapPin size={13} className="text-amber-600" />
+                                    <span>TO</span>
+                                </label>
                                 
-                                {/* Bus Info */}
-                                <div className="lg:w-44 shrink-0">
-                                    <h3 className="font-extrabold text-base sm:text-[17px] leading-snug truncate" style={{ color: "#470BB0" }}>{trip.bus}</h3>
-                                    <p className="text-[9px] sm:text-[10px] text-gray-500 font-mono mt-0.5 bg-gray-50/80 inline-block px-1.5 py-0.5 rounded border border-gray-200/60 leading-none">
-                                        {trip.code}
-                                    </p>
-                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setOpenToDropdown((prev) => !prev);
+                                        setOpenFromDropdown(false);
+                                    }}
+                                    className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                        openToDropdown
+                                            ? "border-amber-600 ring-2 ring-amber-500/20 text-slate-900 bg-white"
+                                            : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                    }`}
+                                >
+                                    <span className="truncate text-center w-full px-4">
+                                        {filterTo || "Select TO"}
+                                    </span>
+                                    <ChevronDown 
+                                        size={16} 
+                                        className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                            openToDropdown ? "rotate-180 text-amber-600" : ""
+                                        }`} 
+                                    />
+                                </button>
 
-                                {/* Route & Time */}
-                                <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 bg-gray-50/40 p-2.5 sm:p-0 sm:bg-transparent rounded-xl">
-                                    {/* Departure */}
-                                    <div className="text-center sm:text-left min-w-[105px]">
-                                        <p className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">{trip.departure}</p>
-                                        <p className="text-xs font-medium text-gray-500 flex items-center justify-center sm:justify-start gap-1 mt-0.5">
-                                            <MapPin size={12} className="text-indigo-400" />
-                                            {trip.from}
-                                        </p>
+                                {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                                {openToDropdown && (
+                                    <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                        {LOCATIONS.map((loc) => {
+                                            const isSelected = loc === filterTo;
+                                            const isDisabled = loc === filterFrom;
+                                            return (
+                                                <button
+                                                    type="button"
+                                                    key={loc}
+                                                    disabled={isDisabled}
+                                                    onClick={() => {
+                                                        dispatch({ filterTo: loc });
+                                                        setOpenToDropdown(false);
+                                                    }}
+                                                    className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                        isSelected
+                                                            ? "bg-amber-50 text-amber-900 font-bold"
+                                                            : isDisabled
+                                                            ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                    }`}
+                                                >
+                                                    {loc}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
-
-                                    {/* Arrow & Duration */}
-                                    <div className="flex items-center gap-2 justify-center flex-1">
-                                        <div className="h-[1px] bg-gray-200 flex-1 hidden sm:block"></div>
-                                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-200/80 shadow-xs text-[11px] font-bold text-gray-600">
-                                            {periodIcon[trip.period]}
-                                            {trip.duration}
-                                        </div>
-                                        <div className="h-[1px] bg-gray-200 flex-1 hidden sm:block"></div>
-                                        <ArrowRight size={16} className="text-gray-300 sm:hidden" />
-                                    </div>
-
-                                    {/* Arrival */}
-                                    <div className="text-center sm:text-right min-w-[105px]">
-                                        <p className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">{trip.arrival}</p>
-                                        <p className="text-xs font-medium text-gray-500 flex items-center justify-center sm:justify-end gap-1 mt-0.5">
-                                            <MapPin size={12} className="text-[#FCA311]" />
-                                            {trip.to}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Price, Type & Available Seats */}
-                                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 lg:w-36 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 sm:border-l border-gray-100 sm:pl-4">
-                                    <div className="text-right">
-                                        <p className="text-xl sm:text-2xl font-black leading-tight" style={{ color: "#B00B21" }}>{trip.fare}</p>
-                                        <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Per Seat</p>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wide border ${typeColor[trip.type] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
-                                            {trip.type}
-                                        </span>
-                                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${
-                                            trip.seats === 0
-                                                ? "bg-red-50 text-red-600 border border-red-100"
-                                                : trip.seats <= 5
-                                                ? "bg-orange-50 text-orange-600 border border-orange-100"
-                                                : "bg-emerald-50 text-emerald-600 border border-emerald-100"
-                                        }`}>
-                                            {trip.seats > 0 ? `${trip.seats} Left` : "Full"}
-                                        </span>
-                                    </div>
-                                </div>
-                                
+                                )}
                             </div>
                         </div>
-                    </div>
-                ))}
 
-                {/* Empty State */}
-                {filteredSchedules.length === 0 && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
-                        <div className="bg-gray-50 w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Bus size={24} className="text-gray-400" />
+                        <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-indigo-800 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                <Calendar size={13} className="text-indigo-600" />
+                                <span>Travel Date</span>
+                            </label>
+                            <input
+                                type="date"
+                                min={minDate}
+                                value={filterDate}
+                                onChange={(e) => dispatch({ filterDate: e.target.value })}
+                                aria-label="Travel Date"
+                                className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all cursor-pointer"
+                            />
                         </div>
-                        <h3 className="text-base font-bold text-gray-900 mb-0.5">No schedules found</h3>
-                        <p className="text-xs text-gray-500 font-medium">We couldn't find any buses matching your current filter selection.</p>
-                        <button 
-                            onClick={handleResetFilters}
-                            className="mt-4 px-4 py-2 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-xl hover:bg-indigo-100 transition-colors inline-flex items-center gap-1.5"
+
+                        <button
+                            type="submit"
+                            className="w-full h-11 bg-[#172144] hover:bg-[#101730] text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
                         >
-                            <RotateCcw size={14} />
-                            Reset All Filters
+                            <Search size={16} />
+                            <span>Search Available Buses</span>
                         </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div 
+            className="min-h-[calc(100vh-140px)] py-8 px-4 sm:px-6 lg:px-8"
+            style={{ backgroundColor: "#C9CBA3" }}
+        >
+            <div className="max-w-5xl mx-auto space-y-5">
+                
+                {/* Header Route Banner with Departure and Arrival Terminals */}
+                <div className="bg-white/90 backdrop-blur-md rounded-2xl p-5 sm:p-6 shadow-sm border border-black/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    {/* Left: Departure Terminal Location */}
+                    <div className="flex-1">
+                        <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                            <MapPin size={14} className="text-emerald-600" />
+                            <span>FROM</span>
+                        </div>
+                        <h1 className="text-2xl sm:text-3xl font-black text-emerald-800 tracking-tight">
+                            {origin}
+                        </h1>
+                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                            Departure Terminal
+                        </p>
+                    </div>
+
+                    {/* Middle: Route Indicator & Departing Date */}
+                    <div className="flex flex-col items-center justify-center px-2 sm:px-6 order-last sm:order-none w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                        <span className="text-[10px] font-bold text-indigo-800 bg-indigo-50 border border-indigo-150 px-3 py-0.5 rounded-full uppercase tracking-wider mb-2">
+                            Direct Route Intercity 
+                        </span>
+                        
+                        {/* Extended route arrow indicator */}
+                        <div className="flex items-center gap-2 text-[#FCA311] my-1 w-full min-w-[200px] sm:min-w-[280px] md:min-w-[340px]">
+                            <div className="flex-1 h-[2px] bg-gradient-to-r from-emerald-400 via-slate-300 to-[#FCA311]" />
+                            <div className="w-7 h-7 rounded-full bg-amber-50 border border-amber-300/80 flex items-center justify-center shrink-0 shadow-2xs">
+                                <ArrowRight size={16} className="text-[#FCA311]" />
+                            </div>
+                            <div className="flex-1 h-[2px] bg-gradient-to-r from-[#FCA311] via-slate-300 to-amber-400" />
+                        </div>
+
+                        <p className="text-slate-600 text-xs mt-1.5 font-medium whitespace-nowrap">
+                            Departing on <strong className="text-indigo-950 font-bold">{new Date(date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</strong> (BST)
+                        </p>
+                    </div>
+
+                    {/* Right: Arrival Terminal Location */}
+                    <div className="flex-1 text-left sm:text-right">
+                        <div className="flex items-center sm:justify-end gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-700 mb-1">
+                            <MapPin size={14} className="text-amber-600" />
+                            <span>TO</span>
+                        </div>
+                        <div className="text-2xl sm:text-3xl font-black text-amber-800 tracking-tight">
+                            {destination}
+                        </div>
+                        <p className="text-slate-500 text-xs sm:text-sm mt-1 font-medium">
+                            Arrival Terminal
+                        </p>
+                    </div>
+                </div>
+
+                {/* On-Page Search Filter Bar */}
+                <form 
+                    onSubmit={handleFilterSubmit}
+                    className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-black/5 relative z-30"
+                >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-end">
+                        {/* From Select */}
+                        <div className={`lg:col-span-3 relative ${openFromDropdown ? "z-50" : "z-20"}`} ref={fromRef}>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-emerald-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                <MapPin size={12} className="text-emerald-600" />
+                                <span>FROM</span>
+                            </label>
+                            
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpenFromDropdown((prev) => !prev);
+                                    setOpenToDropdown(false);
+                                }}
+                                className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                    openFromDropdown
+                                        ? "border-emerald-600 ring-2 ring-emerald-500/20 text-slate-900 bg-white"
+                                        : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                }`}
+                            >
+                                <span className="truncate text-center w-full px-4">
+                                    {filterFrom || "Select FROM"}
+                                </span>
+                                <ChevronDown 
+                                    size={16} 
+                                    className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                        openFromDropdown ? "rotate-180 text-emerald-600" : ""
+                                    }`} 
+                                />
+                            </button>
+
+                            {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                            {openFromDropdown && (
+                                <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                    {LOCATIONS.map((loc) => {
+                                        const isSelected = loc === filterFrom;
+                                        const isDisabled = loc === filterTo;
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={loc}
+                                                disabled={isDisabled}
+                                                onClick={() => {
+                                                    dispatch({ filterFrom: loc });
+                                                    setOpenFromDropdown(false);
+                                                }}
+                                                className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-emerald-50 text-emerald-800 font-bold"
+                                                        : isDisabled
+                                                        ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                }`}
+                                            >
+                                                {loc}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Swap Button */}
+                        <div className="lg:col-span-1 flex flex-col justify-end">
+                            <span className="hidden lg:block text-[11px] font-bold uppercase tracking-wider text-transparent select-none mb-1.5" aria-hidden="true">
+                                Swap
+                            </span>
+                            <button
+                                type="button"
+                                onClick={handleSwapLocations}
+                                title="Swap FROM & TO"
+                                aria-label="Swap FROM and TO"
+                                className="w-full h-11 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 hover:text-amber-900 border border-amber-200/90 hover:border-amber-300 shadow-2xs flex items-center justify-center transition-all duration-150 active:scale-95 active:rotate-180 cursor-pointer"
+                            >
+                                <ArrowLeftRight size={17} className="stroke-[2.2]" />
+                            </button>
+                        </div>
+
+                        {/* To Select */}
+                        <div className={`lg:col-span-3 relative ${openToDropdown ? "z-50" : "z-20"}`} ref={toRef}>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-amber-700 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                <MapPin size={12} className="text-amber-600" />
+                                <span>TO</span>
+                            </label>
+                            
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpenToDropdown((prev) => !prev);
+                                    setOpenFromDropdown(false);
+                                }}
+                                className={`w-full h-11 bg-slate-50 border rounded-xl px-3.5 text-sm font-semibold transition-all cursor-pointer flex items-center justify-center relative ${
+                                    openToDropdown
+                                        ? "border-amber-600 ring-2 ring-amber-500/20 text-slate-900 bg-white"
+                                        : "border-slate-200 text-slate-800 hover:border-slate-300"
+                                }`}
+                            >
+                                <span className="truncate text-center w-full px-4">
+                                    {filterTo || "Select TO"}
+                                </span>
+                                <ChevronDown 
+                                    size={16} 
+                                    className={`absolute right-3.5 text-slate-400 transition-transform duration-200 ${
+                                        openToDropdown ? "rotate-180 text-amber-600" : ""
+                                    }`} 
+                                />
+                            </button>
+
+                            {/* Dropdown Menu when opened - perfectly centered & solid overlay */}
+                            {openToDropdown && (
+                                <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-white rounded-2xl shadow-2xl border border-slate-200 py-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+                                    {LOCATIONS.map((loc) => {
+                                        const isSelected = loc === filterTo;
+                                        const isDisabled = loc === filterFrom;
+                                        return (
+                                            <button
+                                                type="button"
+                                                key={loc}
+                                                disabled={isDisabled}
+                                                onClick={() => {
+                                                    dispatch({ filterTo: loc });
+                                                    setOpenToDropdown(false);
+                                                }}
+                                                className={`w-full py-2.5 px-3 text-sm font-semibold text-center transition-colors block cursor-pointer ${
+                                                    isSelected
+                                                        ? "bg-amber-50 text-amber-900 font-bold"
+                                                        : isDisabled
+                                                        ? "text-slate-300 cursor-not-allowed bg-slate-50/50"
+                                                        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                                                }`}
+                                            >
+                                                {loc}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Date Input */}
+                        <div className="lg:col-span-3">
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-indigo-800 mb-1.5 flex items-center justify-center gap-1.5 text-center">
+                                <Calendar size={12} className="text-indigo-600" />
+                                <span>Travel Date</span>
+                            </label>
+                            <input
+                                type="date"
+                                min={minDate}
+                                value={filterDate}
+                                onChange={(e) => dispatch({ filterDate: e.target.value })}
+                                aria-label="Travel Date"
+                                className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3.5 text-sm font-semibold text-slate-800 text-center outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Search / Update Button */}
+                        <div className="lg:col-span-2 flex flex-col justify-end">
+                            <span className="hidden lg:block text-[11px] font-bold uppercase tracking-wider text-transparent select-none mb-1.5" aria-hidden="true">
+                                Action
+                            </span>
+                            <button
+                                type="submit"
+                                className="w-full h-11 px-4 bg-[#172144] hover:bg-[#101730] text-white font-bold rounded-xl text-sm transition-all shadow-sm shadow-[#172144]/20 hover:shadow-md flex items-center justify-center gap-2 active:scale-[0.99]"
+                            >
+                                <Search size={15} />
+                                <span>Update</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                {/* Schedules list */}
+                {schedules.length === 0 ? (
+                    <div className="bg-white rounded-3xl border border-black/5 p-12 text-center shadow-lg">
+                        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
+                            <Bus size={28} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">No Buses Available</h3>
+                        <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
+                            There are no remaining trips found from Departure Terminal (<span className="font-bold text-emerald-700">{origin}</span>) to Arrival Terminal (<span className="font-bold text-amber-700">{destination}</span>) on the selected date. Past or departing buses within the 30-minute operational window are filtered out.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-4 relative z-0">
+                        {schedules.map((schedule) => {
+                            const applicableFare = schedule.route?.fares?.find(
+                                (f: any) => f.tier === schedule.bus?.tier
+                            );
+                            const farePrice = applicableFare?.price || schedule.fare || 0;
+                            const busModelName = schedule.bus?.modelName || schedule.busName || "Volvo B9R";
+
+                            // Tier badges with distinct color palettes
+                            const tierBadgeColor = 
+                                schedule.bus?.tier === 'PREMIUM' ? 'bg-amber-50 text-amber-900 border-amber-200' :
+                                schedule.bus?.tier === 'BUSINESS' ? 'bg-indigo-50 text-indigo-900 border-indigo-200' :
+                                'bg-emerald-50 text-emerald-900 border-emerald-200';
+
+                            return (
+                                <div 
+                                    key={schedule.id} 
+                                    className="bg-white border border-black/10 rounded-2xl p-3.5 sm:py-4 sm:px-5 shadow-sm transition-all duration-200 hover:shadow-md"
+                                >
+                                    {/* Card Summary Row */}
+                                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3.5 sm:gap-4 lg:gap-6">
+                                        
+                                        {/* Left Section: Bus & Coach Info (Bus Name in distinct royal indigo) */}
+                                        <div className="flex-1 min-w-[200px]">
+                                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                <h2 className="text-base sm:text-lg font-black text-[#881337] tracking-tight">
+                                                    {busModelName}
+                                                </h2>
+                                                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold tracking-wide border ${tierBadgeColor}`}>
+                                                    {schedule.bus?.tier || 'ECONOMY'}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 font-medium flex items-center gap-2">
+                                                {/* Coach Registration in clean mono tag */}
+                                                <span className="font-mono font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 text-[10.5px]">
+                                                    {schedule.bus?.registrationNumber || schedule.registrationNumber}
+                                                </span>
+                                                <span>•</span>
+                                                {/* Seat count in distinct sky badge */}
+                                                <span className="text-sky-800 font-bold bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded text-[10.5px]">
+                                                    {schedule.bus?.capacity || 40} Total Seats
+                                                </span>
+                                            </p>
+                                        </div>
+
+                                        {/* Middle Section: Departure & Arrival Timing with Departure & Arrival Terminal Labels */}
+                                        <div className="flex-initial sm:flex-1 lg:flex-[1.4] flex items-center justify-between sm:justify-center w-full lg:w-auto min-w-[310px] sm:min-w-[360px] md:min-w-[390px] gap-3 sm:gap-5 md:gap-6 bg-slate-50/90 py-2.5 px-3.5 sm:py-2.5 sm:px-5 rounded-xl border border-slate-200/70 shrink-0">
+                                            {/* Departure Time & FROM Origin Location */}
+                                            <div className="text-center min-w-[95px] sm:min-w-[110px] shrink-0">
+                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight whitespace-nowrap">
+                                                    {formatTime(schedule.departureTime)}
+                                                </p>
+                                                <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50/90 border border-emerald-200/80 px-2.5 py-0.5 rounded-md mt-1 shadow-2xs whitespace-nowrap">
+                                                    {origin}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Visual Progress Connector */}
+                                            <div className="flex flex-col items-center px-1 sm:px-2 flex-1 min-w-[44px] max-w-[80px] sm:max-w-[120px]">
+                                                <div className="h-[2px] bg-slate-300 w-full relative flex items-center justify-between">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 -ml-0.5 border border-white shadow-2xs" />
+                                                    <ArrowRight size={10} className="text-slate-400 absolute left-1/2 -translate-x-1/2" />
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-amber-600 -mr-0.5 border border-white shadow-2xs" />
+                                                </div>
+                                            </div>
+
+                                            {/* Arrival Time & TO Destination Location */}
+                                            <div className="text-center min-w-[95px] sm:min-w-[110px] shrink-0">
+                                                <p className="text-base sm:text-lg font-black text-slate-900 tracking-tight whitespace-nowrap">
+                                                    {formatTime(schedule.arrivalTime)}
+                                                </p>
+                                                <span className="inline-block text-[11px] font-bold text-amber-800 bg-amber-50/90 border border-amber-200/80 px-2.5 py-0.5 rounded-md mt-1 shadow-2xs whitespace-nowrap">
+                                                    {destination}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Right Section: Fare & Navigation Action */}
+                                        <div className="flex-initial sm:flex-1 lg:flex-initial lg:min-w-[170px] flex flex-row lg:flex-col items-center lg:items-end justify-between w-full lg:w-auto gap-2.5 shrink-0">
+                                            <div className="text-left lg:text-right">
+                                                <span className="text-[11px] text-slate-400 font-medium block">Starting from</span>
+                                                <p className="text-xl sm:text-2xl font-black text-rose-600 tracking-tight leading-tight">
+                                                    <span className="text-red-500 text-lg sm:text-xl mr-0.5">৳</span>
+                                                    {farePrice.toLocaleString()}
+                                                </p>
+                                            </div>
+
+                                            <Link
+                                                href={`/booking/${schedule.bus?.id || schedule.busId}?scheduleId=${schedule.id}`}
+                                                className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl font-bold text-xs sm:text-sm bg-[#172144] hover:bg-[#101730] text-white shadow-sm shadow-[#172144]/20 hover:shadow-md transition-all duration-150 active:scale-[0.99]"
+                                            >
+                                                <span>Select Seats</span>
+                                                <ArrowRight size={14} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
         </div>
     );
 }
+
