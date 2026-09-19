@@ -367,6 +367,19 @@ function CheckoutContent() {
 
 
 
+    const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value.replace(/[^a-zA-Z\s]/g, "");
+        setValue("fullName", val, { shouldValidate: true, shouldDirty: true });
+    };
+
+    const handleMobileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/[^0-9]/g, "");
+        if (val.length > 0 && val[0] !== "0") {
+            val = "0" + val.substring(1);
+        }
+        setValue("mobileNumber", val, { shouldValidate: true, shouldDirty: true });
+    };
+
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/[^a-zA-Z0-9.@\-_]/g, "");
         const parts = val.split("@");
