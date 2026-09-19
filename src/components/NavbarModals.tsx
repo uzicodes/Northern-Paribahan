@@ -1,8 +1,12 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { Mail } from 'lucide-react';
+
+const subscribeToNothing = () => () => {};
+const getClientMountedSnapshot = () => true;
+const getServerMountedSnapshot = () => false;
 
 function GithubIcon({ className = "h-5 w-5" }: { className?: string }) {
     return (
@@ -41,11 +45,11 @@ export function MobileMenu({
     onContactClick,
     satisfyClassName,
 }: MobileMenuProps) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useSyncExternalStore(
+        subscribeToNothing,
+        getClientMountedSnapshot,
+        getServerMountedSnapshot,
+    );
 
     // Prevent body scrolling when mobile menu is open
     useEffect(() => {
@@ -264,11 +268,11 @@ export function ContactPopup({
     showContactPopup: boolean;
     setShowContactPopup: (val: boolean) => void;
 }) {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const mounted = useSyncExternalStore(
+        subscribeToNothing,
+        getClientMountedSnapshot,
+        getServerMountedSnapshot,
+    );
 
     if (!mounted || !showContactPopup) return null;
 
