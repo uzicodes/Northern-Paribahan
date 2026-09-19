@@ -196,7 +196,7 @@ export default function Page() {
         showToDropdown: false,
     });
     const { dateOfJourney, fromValue, toValue, showFromDropdown, showToDropdown } = state;
-    const [openFaq, setOpenFaq] = useState<number | null>(null);
+    const [openFaq, setOpenFaq] = useState<string | null>(null);
 
     const handleQuickRouteSelect = (from: string, to: string) => {
         dispatch({ fromValue: from, toValue: to });
@@ -471,9 +471,9 @@ export default function Page() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        {POPULAR_ROUTES.map((route, idx) => (
+                        {POPULAR_ROUTES.map((route) => (
                             <div
-                                key={idx}
+                                key={`${route.from}-${route.to}-${route.type}`}
                                 className="bg-gradient-to-br from-[#172144] to-[#212c58] rounded-2xl p-5 shadow-lg border border-[#2c3a72] hover:border-[#FCA311]/60 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group text-white"
                             >
                                 <div>
@@ -525,11 +525,11 @@ export default function Page() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {WHY_CHOOSE_US.map((item, idx) => {
+                        {WHY_CHOOSE_US.map((item) => {
                             const IconComponent = item.icon;
                             return (
                                 <div
-                                    key={idx}
+                                    key={item.title}
                                     className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-all flex flex-col justify-between"
                                 >
                                     <div>
@@ -562,11 +562,11 @@ export default function Page() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {BOOKING_STEPS.map((step, idx) => {
+                            {BOOKING_STEPS.map((step) => {
                                 const StepIcon = step.icon;
                                 return (
                                     <div
-                                        key={idx}
+                                        key={step.step}
                                         className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/15 relative flex flex-col justify-between"
                                     >
                                         <span className="text-4xl font-black text-white/20 absolute top-4 right-6 select-none font-mono">
@@ -599,15 +599,15 @@ export default function Page() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {TESTIMONIALS.map((review, idx) => (
+                        {TESTIMONIALS.map((review) => (
                             <div
-                                key={idx}
+                                key={`${review.name}-${review.route}`}
                                 className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-all flex flex-col justify-between"
                             >
                                 <div>
                                     <div className="flex items-center gap-1 mb-3 text-amber-400">
-                                        {[...Array(review.rating)].map((_, i) => (
-                                            <Star key={i} size={16} fill="currentColor" />
+                                        {[1, 2, 3, 4, 5].slice(0, review.rating).map((starNumber) => (
+                                            <Star key={`${review.name}-star-${starNumber}`} size={16} fill="currentColor" />
                                         ))}
                                     </div>
                                     <p className="text-sm text-slate-700 italic leading-relaxed mb-6">
@@ -637,16 +637,16 @@ export default function Page() {
                     </div>
 
                     <div className="space-y-3">
-                        {FAQS.map((faq, idx) => {
-                            const isOpen = openFaq === idx;
+                        {FAQS.map((faq) => {
+                            const isOpen = openFaq === faq.q;
                             return (
                                 <div
-                                    key={idx}
+                                    key={faq.q}
                                     className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-all"
                                 >
                                     <button
                                         type="button"
-                                        onClick={() => setOpenFaq(isOpen ? null : idx)}
+                                        onClick={() => setOpenFaq(isOpen ? null : faq.q)}
                                         className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-800 hover:text-[#c44d4d] transition-colors"
                                     >
                                         <span className="text-base">{faq.q}</span>
