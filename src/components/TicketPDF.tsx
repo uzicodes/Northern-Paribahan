@@ -1,5 +1,5 @@
 import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
@@ -102,6 +102,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1d4ed8",
   },
+  passengerSection: {
+    marginBottom: 20,
+  },
+  passengerText: {
+    fontSize: 11,
+    marginBottom: 4,
+  },
+  totalPaid: {
+    fontSize: 11,
+    fontWeight: "bold",
+    marginTop: 6,
+  },
   footer: {
     marginTop: "auto",
     borderTopWidth: 1,
@@ -131,85 +143,109 @@ export interface TicketData {
 }
 
 export function createTicketDocument(data: TicketData) {
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.companyName}>Northern Paribahan</Text>
-            <Text style={styles.ticketBadge}>E-Ticket & Boarding Pass</Text>
-          </View>
-          <View style={{ alignItems: "flex-end" }}>
-            <Text style={styles.ticketBadge}>Booking Reference</Text>
-            <Text style={styles.bookingId}>{data.ticketId.toUpperCase()}</Text>
-          </View>
-        </View>
+  return React.createElement(
+    Document,
+    null,
+    React.createElement(
+      Page,
+      { size: "A4", style: styles.page },
+      // Header
+      React.createElement(
+        View,
+        { style: styles.header },
+        React.createElement(
+          View,
+          null,
+          React.createElement(Text, { style: styles.companyName }, "Northern Paribahan"),
+          React.createElement(Text, { style: styles.ticketBadge }, "E-Ticket & Boarding Pass")
+        ),
+        React.createElement(
+          View,
+          { style: { alignItems: "flex-end" } },
+          React.createElement(Text, { style: styles.ticketBadge }, "Booking Reference"),
+          React.createElement(Text, { style: styles.bookingId }, String(data.ticketId).toUpperCase())
+        )
+      ),
 
-        {/* Route & Schedule Card */}
-        <View style={styles.tripBox}>
-          <View style={styles.routeRow}>
-            <Text style={styles.city}>{data.origin}</Text>
-            <Text style={styles.arrow}>➔</Text>
-            <Text style={styles.city}>{data.destination}</Text>
-          </View>
-          <View style={styles.detailsGrid}>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Departure</Text>
-              <Text style={styles.detailValue}>{data.departureTime}</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Arrival</Text>
-              <Text style={styles.detailValue}>{data.arrivalTime}</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Bus / Tier</Text>
-              <Text style={styles.detailValue}>
-                {data.busModel} ({data.busTier})
-              </Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Coach No.</Text>
-              <Text style={styles.detailValue}>{data.busReg}</Text>
-            </View>
-          </View>
-        </View>
+      // Trip Box
+      React.createElement(
+        View,
+        { style: styles.tripBox },
+        React.createElement(
+          View,
+          { style: styles.routeRow },
+          React.createElement(Text, { style: styles.city }, String(data.origin)),
+          React.createElement(Text, { style: styles.arrow }, "to"),
+          React.createElement(Text, { style: styles.city }, String(data.destination))
+        ),
+        React.createElement(
+          View,
+          { style: styles.detailsGrid },
+          React.createElement(
+            View,
+            { style: styles.detailItem },
+            React.createElement(Text, { style: styles.detailLabel }, "Departure"),
+            React.createElement(Text, { style: styles.detailValue }, String(data.departureTime))
+          ),
+          React.createElement(
+            View,
+            { style: styles.detailItem },
+            React.createElement(Text, { style: styles.detailLabel }, "Arrival"),
+            React.createElement(Text, { style: styles.detailValue }, String(data.arrivalTime))
+          ),
+          React.createElement(
+            View,
+            { style: styles.detailItem },
+            React.createElement(Text, { style: styles.detailLabel }, "Bus / Tier"),
+            React.createElement(Text, { style: styles.detailValue }, `${data.busModel} (${data.busTier})`)
+          ),
+          React.createElement(
+            View,
+            { style: styles.detailItem },
+            React.createElement(Text, { style: styles.detailLabel }, "Coach No."),
+            React.createElement(Text, { style: styles.detailValue }, String(data.busReg))
+          )
+        )
+      ),
 
-        {/* Passenger & Seats Info */}
-        <View style={styles.seatsSection}>
-          <Text style={styles.sectionTitle}>Reserved Seats</Text>
-          <View style={styles.seatBadgeContainer}>
-            {data.seats.map((seat) => (
-              <View key={seat} style={styles.seatBadge}>
-                <Text style={styles.seatText}>{seat}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
+      // Seats Section
+      React.createElement(
+        View,
+        { style: styles.seatsSection },
+        React.createElement(Text, { style: styles.sectionTitle }, "Reserved Seats"),
+        React.createElement(
+          View,
+          { style: styles.seatBadgeContainer },
+          ...data.seats.map((seat) =>
+            React.createElement(
+              View,
+              { key: seat, style: styles.seatBadge },
+              React.createElement(Text, { style: styles.seatText }, String(seat))
+            )
+          )
+        )
+      ),
 
-        <View style={{ marginBottom: 20 }}>
-          <Text style={styles.sectionTitle}>Passenger Details</Text>
-          <Text style={{ fontSize: 11, marginBottom: 4 }}>
-            Name: {data.passengerName}
-          </Text>
-          <Text style={{ fontSize: 11, marginBottom: 4 }}>
-            Email: {data.passengerEmail}
-          </Text>
-          <Text style={{ fontSize: 11, fontWeight: "bold", marginTop: 6 }}>
-            Total Paid: ৳{data.totalFare}
-          </Text>
-        </View>
+      // Passenger Details
+      React.createElement(
+        View,
+        { style: styles.passengerSection },
+        React.createElement(Text, { style: styles.sectionTitle }, "Passenger Details"),
+        React.createElement(Text, { style: styles.passengerText }, `Name: ${data.passengerName}`),
+        React.createElement(Text, { style: styles.passengerText }, `Email: ${data.passengerEmail}`),
+        React.createElement(Text, { style: styles.totalPaid }, `Total Paid: BDT ${data.totalFare}`)
+      ),
 
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Please arrive at the boarding counter at least 15 minutes prior to
-            departure.
-          </Text>
-        </View>
-      </Page>
-    </Document>
+      // Footer
+      React.createElement(
+        View,
+        { style: styles.footer },
+        React.createElement(
+          Text,
+          { style: styles.footerText },
+          "Please arrive at the boarding counter at least 15 minutes prior to departure."
+        )
+      )
+    )
   );
 }
-
-export const TicketPDF: React.FC<{ data: TicketData }> = ({ data }) => createTicketDocument(data);
