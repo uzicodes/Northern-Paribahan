@@ -32,7 +32,7 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
       const buffers: Buffer[] = [];
       doc.on("data", (chunk: Buffer) => buffers.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(buffers)));
-      doc.on("error", (err) => reject(err));
+      doc.on("error", (err: Error | any) => reject(err));
 
       const startX = 40;
       const contentWidth = 515;
