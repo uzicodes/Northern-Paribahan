@@ -15,10 +15,7 @@ export interface TicketData {
   totalFare: number;
 }
 
-/**
- * Generates an official Northern Paribahan E-Ticket PDF as a Node.js Buffer
- * using pure PDFKit (eliminating React Server Component JSX bundling issues).
- */
+
 export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer> {
   return new Promise<Buffer>((resolve, reject) => {
     try {
@@ -40,9 +37,8 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
       const startX = 40;
       const contentWidth = 515;
 
-      // -------------------------------------------------------------
-      // 1. BRANDED HEADER SECTION
-      // -------------------------------------------------------------
+
+      // BRANDED HEADER 
       const headerY = 40;
       const headerHeight = 65;
 
@@ -64,7 +60,7 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
         .fillColor("#FCA311")
         .text("OFFICIAL E-TICKET & BOARDING PASS", startX + 16, headerY + 39);
 
-      // PNR / Booking Reference Badge (Right Aligned)
+      // PNR / Booking Reference Badge 
       const badgeWidth = 140;
       const badgeHeight = 42;
       const badgeX = startX + contentWidth - badgeWidth - 14;
@@ -92,9 +88,9 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
           align: "center",
         });
 
-      // -------------------------------------------------------------
-      // 2. ROUTE & SCHEDULE CARD
-      // -------------------------------------------------------------
+
+
+      // ROUTE & SCHEDULE CARD
       const routeY = 120;
       const routeHeight = 135;
 
@@ -215,9 +211,9 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
           width: colWidth - 8,
         });
 
-      // -------------------------------------------------------------
-      // 3. PASSENGER DETAILS & SEAT ALLOCATION
-      // -------------------------------------------------------------
+
+
+      // PASSENGER DETAILS & SEAT ALLOCATION
       const splitY = 270;
       const splitHeight = 125;
       const leftColWidth = 305;
@@ -317,9 +313,9 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
         pillX += pillWidth + 8;
       }
 
-      // -------------------------------------------------------------
-      // 4. FARE SUMMARY CARD
-      // -------------------------------------------------------------
+
+
+      // FARE SUMMARY CARD
       const fareY = 410;
       const fareHeight = 52;
 
@@ -349,9 +345,9 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
           align: "right",
         });
 
-      // -------------------------------------------------------------
-      // 5. IMPORTANT TRAVEL POLICIES
-      // -------------------------------------------------------------
+
+
+      // IMPORTANT TRAVEL POLICIES
       const policyY = 478;
       const policyHeight = 100;
 
@@ -382,9 +378,9 @@ export async function generateTicketPdfBuffer(data: TicketData): Promise<Buffer>
         policyLineY += 15;
       }
 
-      // -------------------------------------------------------------
-      // 6. FOOTER
-      // -------------------------------------------------------------
+
+
+      // FOOTER
       const footerY = 750;
 
       doc
