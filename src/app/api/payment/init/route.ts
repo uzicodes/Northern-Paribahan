@@ -36,6 +36,13 @@ export async function POST(request: Request) {
         }
     });
 
+    // Dynamically resolve base URL to work across localhost, ngrok, and production
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = forwardedHost 
+      ? `${forwardedProto}://${forwardedHost}` 
+      : new URL(request.url).origin;
+    const appUrl = (process.env.NEXT_PUBLIC_APP_URL || baseUrl).replace(/\/$/, '');
     
     const paymentData = {
       store_id: process.env.AAMARPAY_STORE_ID,
@@ -50,9 +57,9 @@ export async function POST(request: Request) {
       amount: body.totalAmount, // e.g., "2950"
       tran_id: tran_id,
       currency: "BDT",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback?status=success`,
-      fail_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback?status=fail`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/payment/callback?status=cancel`,
+      success_url: `${appUrl}/api/payment/callback?status=success`,
+      fail_url: `${appUrl}/api/payment/callback?status=fail`,
+      cancel_url: `${appUrl}/api/payment/callback?status=cancel`,
       desc: "Bus Ticket Booking - Northern Paribahan",
       type: "json"
     };
