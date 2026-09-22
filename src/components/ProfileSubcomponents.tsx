@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { 
     ChevronRight, 
     Bus, 
@@ -9,7 +10,8 @@ import {
     Clock, 
     CheckCircle2, 
     ShieldCheck, 
-    Ticket 
+    Ticket,
+    Download
 } from 'lucide-react';
 
 export interface BookingItem {
@@ -272,25 +274,48 @@ export function BookingCard({
                     </div>
                 </div>
 
-                {/* Seats List Footer */}
-                <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-                            <Ticket size={14} className="text-slate-500" />
-                            Reserved Seats:
-                        </span>
-                        {booking.seatNumbers.map((seat) => (
-                            <span
-                                key={seat}
-                                className="px-2.5 py-0.5 bg-[#172144] text-white font-bold text-xs rounded-lg shadow-2xs"
-                            >
-                                {seat}
+                {/* Seats List & Action Footer */}
+                <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-3 space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                                <Ticket size={14} className="text-slate-500" />
+                                Reserved Seats:
                             </span>
-                        ))}
+                            {booking.seatNumbers.map((seat) => (
+                                <span
+                                    key={seat}
+                                    className="px-2.5 py-0.5 bg-[#172144] text-white font-bold text-xs rounded-lg shadow-2xs"
+                                >
+                                    {seat}
+                                </span>
+                            ))}
+                        </div>
+                        <span className="text-[11px] font-mono text-slate-400">
+                            Ticket Ref: #{booking.id.slice(-8).toUpperCase()}
+                        </span>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-400">
-                        Ticket Ref: #{booking.id.slice(-8).toUpperCase()}
-                    </span>
+
+                    {/* Quick Verification & E-Ticket Actions */}
+                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/70">
+                        <Link
+                            href={`/verify-ticket?pnr=${encodeURIComponent(booking.id)}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-[#172144] bg-white hover:bg-slate-100 border border-slate-200 shadow-2xs transition-colors"
+                        >
+                            <ShieldCheck size={14} className="text-[#FCA311]" />
+                            <span>Verify Ticket</span>
+                        </Link>
+                        {isConfirmed && (
+                            <a
+                                href={`/api/ticket/download?pnr=${encodeURIComponent(booking.id)}`}
+                                download={`Ticket-${booking.id.slice(-8).toUpperCase()}.pdf`}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors"
+                            >
+                                <Download size={14} className="text-emerald-600" />
+                                <span>Download E-Ticket</span>
+                            </a>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

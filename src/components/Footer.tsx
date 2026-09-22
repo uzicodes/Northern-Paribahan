@@ -80,6 +80,14 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
+                                <Link href="/verify-ticket" className="text-sm hover:underline transition-all flex items-center gap-1.5" style={{ color: '#2ad474' }}>
+                                    <span>Verify Ticket / PNR</span>
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#FCA311] text-[#172144] uppercase tracking-wider">
+                                        Check
+                                    </span>
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/login" className="text-sm hover:underline transition-all" style={{ color: '#2ad474' }}>
                                     Login
                                 </Link>

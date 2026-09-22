@@ -380,7 +380,7 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
                 </div>
 
                 {/* 3. Action Buttons */}
-                <SuccessActions />
+                <SuccessActions bookingId={booking.id} tranId={booking.transactionId || undefined} />
 
             </div>
         </div>
