@@ -158,19 +158,19 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
     const arrivalTime = booking.schedule?.arrivalTime;
 
     return (
-        <div className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-2xl mx-auto space-y-6">
+        <div className="py-6 sm:py-8 px-4 sm:px-6">
+            <div className="max-w-xl mx-auto space-y-4">
 
                 {/* 1. Header Confirmation Banner */}
-                <div className="text-center space-y-3 print:hidden">
-                    <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-100 border-4 border-white shadow-md text-emerald-600 animate-in zoom-in-75 duration-300">
-                        <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 stroke-[2.2]" />
+                <div className="text-center space-y-2 print:hidden">
+                    <div className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-100 border-2 border-white shadow-xs text-emerald-600 animate-in zoom-in-75 duration-300">
+                        <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8 stroke-[2.2]" />
                     </div>
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-[#172144] tracking-tight">
+                        <h1 className="text-xl sm:text-2xl font-black text-[#172144] tracking-tight">
                             Payment Successful
                         </h1>
-                        <p className="text-sm sm:text-base font-semibold text-emerald-900 mt-1">
+                        <p className="text-xs sm:text-sm font-semibold text-emerald-900 mt-0.5">
                             Your seats are confirmed!
                         </p>
                     </div>
@@ -178,13 +178,13 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
 
                 {/* Warning banner if status is still pending verification */}
                 {!isConfirmed && (
-                    <div className="bg-amber-50 border border-amber-200/80 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-xs animate-in fade-in duration-200">
-                        <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3.5 flex items-start gap-3 shadow-xs animate-in fade-in duration-200">
+                        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                         <div className="text-left space-y-0.5">
-                            <p className="text-sm font-bold text-amber-900">
+                            <p className="text-xs font-bold text-amber-900">
                                 Payment Verification in Progress
                             </p>
-                            <p className="text-xs sm:text-sm text-amber-700">
+                            <p className="text-[11px] text-amber-700">
                                 Your payment is being verified, please check your email shortly.
                             </p>
                         </div>
@@ -192,25 +192,25 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
                 )}
 
                 {/* 2. Authentic Tear-off Ticket Card */}
-                <div className="relative bg-white rounded-3xl shadow-xl border border-white/70 overflow-hidden print:shadow-none print:border-slate-300">
+                <div className="relative bg-white rounded-2xl shadow-lg border border-white/70 overflow-hidden print:shadow-none print:border-slate-300">
                     
                     {/* Ticket Header Brand Bar */}
-                    <div className="bg-[#172144] text-white px-6 sm:px-8 py-4 sm:py-5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-[#FCA311] text-[#172144] flex items-center justify-center font-black">
-                                <Bus size={20} />
+                    <div className="bg-[#172144] text-white px-5 py-3 sm:py-3.5 flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#FCA311] text-[#172144] flex items-center justify-center font-black shrink-0">
+                                <Bus size={17} />
                             </div>
                             <div>
-                                <h2 className="text-base sm:text-lg font-black tracking-wide leading-tight text-white">
+                                <h2 className="text-sm sm:text-base font-black tracking-wide leading-tight text-white">
                                     NORTHERN PARIBAHAN
                                 </h2>
-                                <p className="text-[10px] text-[#FCA311] font-bold tracking-wider uppercase">
+                                <p className="text-[9px] text-[#FCA311] font-bold tracking-wider uppercase">
                                     Official Boarding Pass
                                 </p>
                             </div>
                         </div>
 
-                        <span className={`text-[10px] font-black uppercase tracking-wider py-1 px-3 rounded-full border ${
+                        <span className={`text-[9px] font-black uppercase tracking-wider py-0.5 px-2.5 rounded-full border ${
                             isConfirmed
                                 ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
                                 : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
@@ -219,83 +219,95 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
                         </span>
                     </div>
 
-                    {/* Top Section: Passenger Name, Transaction ID, Total Paid */}
-                    <div className="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-slate-100 bg-[#FAFCFB]">
-                        <div>
-                            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                Passenger Name
-                            </p>
-                            <p className="text-base font-extrabold text-slate-900 mt-1 truncate">
-                                {passengerName}
-                            </p>
-                            {passengerPhone && (
-                                <p className="text-xs text-slate-500 font-medium">{passengerPhone}</p>
+                    {/* Top Section: Passenger Name, Reference Info, Total Paid */}
+                    <div className="p-4 sm:p-5 border-b border-slate-100 bg-[#FAFCFB] space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            {/* Passenger Info */}
+                            <div className="space-y-0.5 flex-1 min-w-0">
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                    <User size={12} className="text-[#172144]" />
+                                    <span>Passenger Name</span>
+                                </p>
+                                <p className="text-base sm:text-lg font-extrabold text-slate-900 break-words leading-snug">
+                                    {passengerName}
+                                </p>
+                                {passengerPhone && (
+                                    <p className="text-[11px] text-slate-600 font-medium">
+                                        Phone: <span className="font-mono font-semibold">{passengerPhone}</span>
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Total Fare Paid */}
+                            <div className="sm:text-right shrink-0 bg-white sm:bg-transparent p-2.5 sm:p-0 rounded-lg border sm:border-0 border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                    Total Fare Paid
+                                </p>
+                                <p className="text-xl sm:text-2xl font-black text-rose-600">
+                                    ৳ {booking.totalFare.toLocaleString()}
+                                </p>
+                                <p className="text-[10px] text-emerald-700 font-bold flex sm:justify-end items-center gap-1">
+                                    <ShieldCheck size={12} className="text-emerald-600" />
+                                    <span>100% Guaranteed Seat</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Reference badges bar */}
+                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-200/60 text-xs">
+                            <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">PNR:</span>
+                                <span className="font-mono font-black text-slate-900 text-xs">#{booking.id.toUpperCase()}</span>
+                            </div>
+                            {(booking.transactionId || tran_id) && (
+                                <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
+                                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Txn ID:</span>
+                                    <span className="font-mono font-bold text-slate-800 text-xs break-all">{booking.transactionId || tran_id}</span>
+                                </div>
                             )}
-                        </div>
-
-                        <div>
-                            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                Transaction ID
-                            </p>
-                            <p className="font-mono text-xs font-bold text-slate-800 bg-slate-100 py-1 px-2.5 rounded-lg border border-slate-200 mt-1 inline-block truncate max-w-full">
-                                {booking.transactionId || tran_id}
-                            </p>
-                        </div>
-
-                        <div className="sm:text-right">
-                            <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
-                                Total Fare Paid
-                            </p>
-                            <p className="text-xl font-black text-rose-600 mt-0.5">
-                                ৳ {booking.totalFare.toLocaleString()}
-                            </p>
-                            <p className="text-[10px] text-emerald-600 font-semibold flex sm:justify-end items-center gap-1 mt-0.5">
-                                <ShieldCheck size={12} />
-                                <span>100% Guaranteed Seat</span>
-                            </p>
                         </div>
                     </div>
 
                     {/* Middle Section: Route, Date, Time & Bus Model */}
-                    <div className="p-6 sm:p-8 space-y-6">
+                    <div className="p-4 sm:p-5 space-y-3.5">
                         {/* Origin -> Destination Route Showcase */}
-                        <div className="bg-[#EDF5F0] rounded-2xl p-5 border border-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="bg-[#EDF5F0] rounded-xl p-3.5 sm:p-4 border border-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                             <div>
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Departure</p>
-                                <p className="text-lg sm:text-xl font-black text-slate-900">{origin}</p>
-                                <p className="text-xs text-slate-500 font-medium">Northern Counter</p>
+                                <p className="text-[9px] font-bold text-red-600 uppercase tracking-wider">Departure</p>
+                                <p className="text-base sm:text-lg font-black text-slate-900">{origin}</p>
+                                <p className="text-[11px] text-slate-500 font-medium">Northern Counter</p>
                             </div>
 
-                            <div className="flex flex-col items-center justify-center px-2 w-full sm:w-auto">
-                                <div className="flex items-center gap-2 text-[#172144] font-extrabold text-xs">
-                                    <div className="h-0.5 w-10 sm:w-16 bg-[#172144]/30"></div>
-                                    <ArrowRight size={18} className="text-[#FCA311]" />
-                                    <div className="h-0.5 w-10 sm:w-16 bg-[#172144]/30"></div>
+                            <div className="flex flex-col items-center justify-center px-1 w-full sm:w-auto">
+                                <div className="flex items-center gap-1.5 text-[#172144] font-extrabold text-xs">
+                                    <div className="h-0.5 w-8 sm:w-12 bg-[#172144]/30"></div>
+                                    <ArrowRight size={15} className="text-[#FCA311]" />
+                                    <div className="h-0.5 w-8 sm:w-12 bg-[#172144]/30"></div>
                                 </div>
-                                <span className="text-[10px] font-bold text-slate-600 mt-1">Direct Express</span>
+                                <span className="text-[9px] font-bold text-slate-600 mt-0.5">Direct Express</span>
                             </div>
 
                             <div className="sm:text-right">
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Destination</p>
-                                <p className="text-lg sm:text-xl font-black text-slate-900">{destination}</p>
-                                <p className="text-xs text-slate-500 font-medium">Terminal Drop</p>
+                                <p className="text-[9px] font-bold text-green-600 uppercase tracking-wider">Destination</p>
+                                <p className="text-base sm:text-lg font-black text-slate-900">{destination}</p>
+                                <p className="text-[11px] text-slate-500 font-medium">Terminal Drop</p>
                             </div>
                         </div>
 
-                        {/* Trip Timing & Bus Details Grid */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                        {/* Trip Timing Grid: 3 columns */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
+                            <div className="bg-slate-50 p-2.5 sm:p-3 rounded-lg border border-slate-200/80 space-y-0.5">
+                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                     <Calendar size={11} className="text-[#FCA311]" />
-                                    <span>Date</span>
+                                    <span>Travel Date</span>
                                 </p>
                                 <p className="text-xs sm:text-sm font-black text-slate-900">
                                     {departureTime ? formatDate(departureTime) : 'Today'}
                                 </p>
                             </div>
 
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                            <div className="bg-slate-50 p-2.5 sm:p-3 rounded-lg border border-slate-200/80 space-y-0.5">
+                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                     <Clock size={11} className="text-[#FCA311]" />
                                     <span>Departure</span>
                                 </p>
@@ -304,65 +316,78 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
                                 </p>
                             </div>
 
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
+                            <div className="bg-slate-50 p-2.5 sm:p-3 rounded-lg border border-slate-200/80 space-y-0.5">
+                                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                                     <Clock size={11} className="text-slate-400" />
-                                    <span>Arrival (Est.)</span>
+                                    <span>Est. Arrival</span>
                                 </p>
                                 <p className="text-xs sm:text-sm font-black text-slate-900">
                                     {arrivalTime ? formatTime(arrivalTime) : '02:00 PM'}
                                 </p>
                             </div>
+                        </div>
 
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1">
-                                    <Bus size={11} className="text-[#FCA311]" />
-                                    <span>Coach</span>
-                                </p>
-                                <p className="text-xs sm:text-sm font-black text-slate-900 truncate" title={busModel}>
-                                    {busModel}
-                                </p>
+                        {/* Dedicated Full-Width Coach & Bus Details Banner */}
+                        <div className="bg-slate-50 p-3 sm:p-3.5 rounded-lg border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-[#172144] flex items-center justify-center shrink-0 shadow-2xs">
+                                    <Bus size={17} className="text-[#FCA311]" />
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Coach Assignment & Model</p>
+                                    <p className="text-xs sm:text-sm font-black text-slate-900 break-words leading-snug">
+                                        {busModel}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 flex-wrap self-start sm:self-auto shrink-0">
+                                <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-900 font-extrabold text-[11px] border border-amber-300">
+                                    {tier} CLASS
+                                </span>
                                 {regNumber && (
-                                    <p className="text-[10px] text-slate-500 font-mono">{regNumber}</p>
+                                    <span className="font-mono text-[11px] font-bold text-slate-700 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                                        {regNumber}
+                                    </span>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {/* Tear-off Ticket Dashed Divider with Notches */}
-                    <div className="relative w-full py-1">
-                        <div className="border-b-2 border-dashed border-slate-300 mx-4 sm:mx-6"></div>
+                    <div className="relative w-full py-0.5">
+                        <div className="border-b-2 border-dashed border-slate-300 mx-4 sm:mx-5"></div>
                         {/* Left Cutout Circle */}
-                        <div className="absolute -left-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-[#C9CBA3] shadow-inner"></div>
+                        <div className="absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#C9CBA3] shadow-inner"></div>
                         {/* Right Cutout Circle */}
-                        <div className="absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-[#C9CBA3] shadow-inner"></div>
+                        <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-[#C9CBA3] shadow-inner"></div>
                     </div>
 
                     {/* Bottom Section: Highlight Exact Seat Numbers */}
-                    <div className="p-6 sm:p-8 bg-[#FAFCFB] flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <div className="text-center sm:text-left space-y-1">
-                            <p className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1.5">
-                                <Armchair size={14} className="text-[#172144]" />
+                    <div className="p-4 sm:p-5 bg-[#FAFCFB] flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="text-center sm:text-left space-y-0.5">
+                            <p className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-center sm:justify-start gap-1">
+                                <Armchair size={13} className="text-[#172144]" />
                                 <span>Confirmed Seat Numbers</span>
                             </p>
-                            <p className="text-[11px] text-slate-500">
+                            <p className="text-[10px] text-slate-500">
                                 Reserved exclusively under booking ref <span className="font-mono font-bold text-slate-700">{booking.id.slice(0, 8).toUpperCase()}</span>
                             </p>
                         </div>
 
-                        {/* Large Highlighted Seat Badges */}
-                        <div className="flex flex-wrap items-center justify-center gap-2">
+                        {/* Highlighted Seat Badges */}
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
                             {seatList.length > 0 ? (
                                 seatList.map((seat) => (
                                     <div
                                         key={seat}
-                                        className="px-4 py-2 bg-[#172144] text-[#FCA311] rounded-2xl font-black text-lg sm:text-xl shadow-md tracking-tight min-w-[54px] text-center border border-[#233163]"
+                                        className="px-3 py-1.5 bg-[#172144] text-[#FCA311] rounded-xl font-black text-base sm:text-lg shadow-sm tracking-tight min-w-[46px] text-center border border-[#233163]"
                                     >
                                         {seat}
                                     </div>
                                 ))
                             ) : (
-                                <span className="text-sm font-bold text-slate-600">
+                                <span className="text-xs font-bold text-slate-600">
                                     Seats Assigned at Counter
                                 </span>
                             )}
@@ -370,9 +395,9 @@ async function TicketData({ tran_id }: { tran_id?: string }) {
                     </div>
 
                     {/* Ticket Footer Security Badge */}
-                    <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 text-center">
-                        <p className="text-[11px] text-slate-600 flex items-center justify-center gap-1.5">
-                            <ShieldCheck size={13} className="text-emerald-700" />
+                    <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                        <p className="text-[10px] text-slate-600 flex items-center justify-center gap-1">
+                            <ShieldCheck size={12} className="text-emerald-700" />
                             <span>Present this digital pass or SMS confirmation when boarding the coach.</span>
                         </p>
                     </div>
