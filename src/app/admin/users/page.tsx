@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
     Users,
     Search,
@@ -133,7 +134,18 @@ export default async function AdminUsersPage({
                                                 <span className="text-sm">{u.phoneNumber || "—"}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-700 font-medium">{u._count.bookings}</td>
+                                        <td className="px-6 py-4">
+                                            {u._count.bookings > 0 ? (
+                                                <Link
+                                                    href={`/admin/bookings?userId=${u.id}`}
+                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+                                                >
+                                                    View {u._count.bookings} booking{u._count.bookings === 1 ? "" : "s"}
+                                                </Link>
+                                            ) : (
+                                                <span className="text-xs text-gray-400 font-medium">None</span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${roleBadge[u.role] || ""}`}>
                                                 {u.role === "ADMIN" && <ShieldCheck size={12} />}
@@ -184,8 +196,19 @@ export default async function AdminUsersPage({
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-500">{u._count.bookings} bookings</span>
-                                    <span className="text-gray-500">{u.phoneNumber || "—"}</span>
+                                    <div>
+                                        {u._count.bookings > 0 ? (
+                                            <Link
+                                                href={`/admin/bookings?userId=${u.id}`}
+                                                className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline"
+                                            >
+                                                View {u._count.bookings} booking{u._count.bookings === 1 ? "" : "s"}
+                                            </Link>
+                                        ) : (
+                                            <span className="text-xs text-gray-400">0 bookings</span>
+                                        )}
+                                    </div>
+                                    <span className="text-gray-500 text-xs">{u.phoneNumber || "—"}</span>
                                 </div>
                             </div>
                         );
