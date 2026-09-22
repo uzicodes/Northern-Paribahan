@@ -9,11 +9,14 @@ export const dynamic = "force-dynamic";
 export default async function TimetablePage({
     searchParams
 }: {
-    searchParams: { [key: string]: string | undefined }
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const origin = searchParams.from || searchParams.origin;
-    const destination = searchParams.to || searchParams.destination;
-    const date = searchParams.date;
+    const resolvedParams = await searchParams;
+    const origin = (typeof resolvedParams.from === "string" ? resolvedParams.from : undefined) 
+        || (typeof resolvedParams.origin === "string" ? resolvedParams.origin : undefined);
+    const destination = (typeof resolvedParams.to === "string" ? resolvedParams.to : undefined) 
+        || (typeof resolvedParams.destination === "string" ? resolvedParams.destination : undefined);
+    const date = typeof resolvedParams.date === "string" ? resolvedParams.date : undefined;
 
     let initialSchedules: any[] = [];
     
