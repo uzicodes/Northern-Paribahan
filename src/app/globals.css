@@ -9,8 +9,28 @@ html {
 
 body {
   font-family: 'Satoshi', sans-serif;
-  background-color: #C9CBA3;
   color: #1f2937;
+}
+
+/* Admin Dashboard Overrides: remove reserved scrollbar gutter & adjust background */
+html:has(.admin-layout),
+html.admin-layout {
+  scrollbar-gutter: auto !important;
+  background-color: #f9fafb !important;
+}
+
+html:has(.admin-layout) body,
+html.admin-layout body {
+  background-color: #f9fafb !important;
+}
+
+html:has(.admin-layout.dark),
+html.dark:has(.admin-layout),
+html.admin-layout.dark,
+html:has(.admin-layout.dark) body,
+html.dark:has(.admin-layout) body,
+html.admin-layout.dark body {
+  background-color: #0f172a !important;
 }
 
 .loader {

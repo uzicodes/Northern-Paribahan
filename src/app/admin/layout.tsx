@@ -37,6 +37,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setTheme(theme === "light" ? "dark" : "light");
     };
 
+    // Synchronize HTML root classes for admin layout & dark mode
+    React.useEffect(() => {
+        document.documentElement.classList.add("admin-layout");
+        if (theme === "dark") {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+        return () => {
+            document.documentElement.classList.remove("admin-layout", "dark");
+        };
+    }, [theme]);
+
     // Don't render the admin layout on the login page
     if (pathname === "/admin/login") {
         return <>{children}</>;
@@ -54,8 +67,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     return (
-        <div className={`${theme === "dark" ? "dark" : ""}`}>
-            <div className={`fixed inset-0 z-[100] flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300`}>
+        <div className={`admin-layout ${theme === "dark" ? "dark" : ""}`}>
+            <div
+                data-lenis-prevent
+                className="fixed inset-0 z-[100] flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300 w-full h-full overflow-hidden"
+            >
                 {/* Mobile overlay */}
                 {mobileOpen && (
                     <button
@@ -145,7 +161,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </aside>
 
                 {/* Main Content Area */}
-                <div className="flex-1 flex flex-col min-h-screen overflow-auto relative">
+                <div
+                    data-lenis-prevent
+                    tabIndex={0}
+                    className="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden relative bg-gray-50 dark:bg-gray-900 outline-none"
+                >
                     {/* Theme Toggle Button */}
                     <div className="absolute top-4 right-6 z-[101]">
                         <button
