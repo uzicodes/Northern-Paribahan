@@ -3,9 +3,7 @@
 import React, { useState, useMemo } from "react";
 import type { Bus } from "@prisma/client";
 import {
-    Bus as BusIcon,
     Search,
-    MapPin,
     Clock,
     Users,
     Building,
@@ -192,46 +190,41 @@ export default function AdminBusesClient({ initialBuses }: AdminBusesClientProps
                             {/* Collapsible Bus Cards Grid */}
                             {open && (
                                 <div className="px-4 pb-5 sm:px-5 border-t border-gray-100 dark:border-gray-700/60 pt-4 bg-gray-50/40 dark:bg-gray-850/40">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3.5">
                                         {buses.map((bus) => (
                                             <div
                                                 key={bus.id}
-                                                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/90 dark:border-gray-700 p-4 sm:p-5 hover:shadow-md hover:border-emerald-300/70 dark:hover:border-emerald-700/70 transition-all"
+                                                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200/90 dark:border-gray-700 p-3 sm:p-3.5 hover:shadow-md hover:border-emerald-300/70 dark:hover:border-emerald-700/70 transition-all flex flex-col justify-between"
                                             >
-                                                <div className="flex items-start justify-between mb-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="bg-emerald-50 dark:bg-emerald-950/60 p-2.5 rounded-xl">
-                                                            <BusIcon size={22} className="text-emerald-600 dark:text-emerald-400" />
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="font-bold text-gray-900 dark:text-white">{bus.modelName}</h3>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">{bus.registrationNumber}</p>
-                                                        </div>
+                                                <div>
+                                                    {/* Name and Tier badge close together */}
+                                                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                                                        <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-white">
+                                                            {bus.modelName}
+                                                        </h3>
+                                                        <span
+                                                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border shrink-0 ${
+                                                                tierColorMap[bus.tier] || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700"
+                                                            }`}
+                                                        >
+                                                            {bus.tier}
+                                                        </span>
                                                     </div>
-                                                    <span
-                                                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${
-                                                            tierColorMap[bus.tier] || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700"
-                                                        }`}
-                                                    >
-                                                        {bus.tier}
-                                                    </span>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mb-2.5">
+                                                        {bus.registrationNumber}
+                                                    </p>
                                                 </div>
 
-                                                <div className="space-y-2.5 mb-2">
-                                                    {/* Info 1: MapPin (Emerald Green) */}
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                        <MapPin size={15} className="text-emerald-500 dark:text-emerald-400 shrink-0" />
-                                                        <span>Assigned to: {bus.depot.name}</span>
-                                                    </div>
-                                                    {/* Info 2: Users (Sky Blue) */}
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                        <Users size={15} className="text-blue-500 dark:text-blue-400 shrink-0" />
+                                                {/* Seats and Schedules close together */}
+                                                <div className="flex items-center gap-2.5 pt-2 border-t border-gray-100 dark:border-gray-700/70 text-xs">
+                                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                                                        <Users size={13} className="text-blue-500 dark:text-blue-400 shrink-0" />
                                                         <span>{bus.capacity} Seats</span>
                                                     </div>
-                                                    {/* Info 3: Clock (Warm Amber) */}
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                                                        <Clock size={15} className="text-amber-500 dark:text-amber-400 shrink-0" />
-                                                        <span>{bus._count.schedules} Total Schedules</span>
+                                                    <span className="text-gray-300 dark:text-gray-600">•</span>
+                                                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                                                        <Clock size={13} className="text-amber-500 dark:text-amber-400 shrink-0" />
+                                                        <span>{bus._count.schedules} Schedules</span>
                                                     </div>
                                                 </div>
                                             </div>
