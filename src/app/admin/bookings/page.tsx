@@ -14,7 +14,9 @@ import {
     Bus,
     Armchair,
 } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { getAllBookings, getUserById } from "@/lib/admin-queries";
+
+export const revalidate = 30;
 
 const bstDateFormatter = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Dhaka",
@@ -51,60 +53,11 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
     const searchQuery = params.q?.trim() || "";
     const filterStatus = params.status?.trim() || "All";
 
-    // 1. If userId is present, optionally retrieve target user details for the active filter banner
-    let targetUser = null;
-    if (userId) {
-        targetUser = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { id: true, name: true, email: true },
-        });
-    }
-
-    // 2. Query bookings from Prisma with optional userId filter
-    const whereClause: any = {};
-    if (userId) {
-        whereClause.userId = userId;
-    }
-
-    const bookings = await prisma.booking.findMany({
-        where: whereClause,
-        include: {
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    phoneNumber: true,
-                },
-            },
-            tickets: {
-                select: {
-                    seatNumber: true,
-                },
-                orderBy: {
-                    seatNumber: "asc",
-                },
-            },
-            schedule: {
-                include: {
-                    bus: {
-                        select: {
-                            modelName: true,
-                            registrationNumber: true,
-                            tier: true,
-                        },
-                    },
-                    route: {
-                        select: {
-                            origin: true,
-                            destination: true,
-                        },
-                    },
-                },
-            },
-        },
-        orderBy: { createdAt: "desc" },
-    });
+    // 1. Fetch data using cached queries (parallel when both needed)
+    const [bookings, targetUser] = await Promise.all([
+        getAllBookings(userId),
+        userId ? getUserById(userId) : Promise.resolve(null),
+    ]);
 
     // 3. Apply search query and status filter
     const filtered = bookings.filter((b) => {

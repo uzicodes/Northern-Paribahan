@@ -11,7 +11,9 @@ import {
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
-import { prisma } from "@/lib/db";
+import { getAllUsers } from "@/lib/admin-queries";
+
+export const revalidate = 30;
 
 const roleBadge: Record<string, string> = {
     USER: "bg-gray-100 text-gray-600",
@@ -27,15 +29,8 @@ export default async function AdminUsersPage({
     const searchQuery = params.q || "";
     const filterRole = params.role || "All";
 
-    /* ── Fetch real users from database ── */
-    const users = await prisma.user.findMany({
-        include: {
-            _count: {
-                select: { bookings: true },
-            },
-        },
-        orderBy: { email: "asc" },
-    });
+    /* ── Fetch real users from cached layer ── */
+    const users = await getAllUsers();
 
     /* ── Client-side-style filtering done on server ── */
     const filtered = users.filter((u) => {

@@ -1,35 +1,10 @@
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import { getAllBuses } from "@/lib/admin-queries";
 import AdminBusesClient from "./AdminBusesClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function AdminBusesPage() {
-    const buses = await prisma.bus.findMany({
-        orderBy: { createdAt: "desc" },
-        include: {
-            depot: {
-                select: {
-                    name: true,
-                    city: true,
-                },
-            },
-            _count: {
-                select: {
-                    schedules: true,
-                },
-            },
-        },
-    });
-
-    const formattedBuses = buses.map((bus) => ({
-        ...bus,
-        depot: {
-            name: bus.depot.name,
-            location: bus.depot.city,
-            city: bus.depot.city,
-        },
-    }));
-
+    const formattedBuses = await getAllBuses();
     return <AdminBusesClient initialBuses={formattedBuses} />;
 }

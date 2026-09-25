@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { getDashboardStats, getTodaySchedules } from "@/lib/admin-queries";
 import {
     Banknote,
     Ticket,
@@ -10,50 +10,15 @@ import {
     ArrowRight,
 } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 30;
 
 export default async function AdminDashboardPage() {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
-    const [revenueAgg, todayBookings, activeBuses, totalUsers, todaySchedules] = await Promise.all([
-        prisma.booking.aggregate({
-            _sum: { totalFare: true },
-            where: { status: "CONFIRMED" },
-        }),
-        prisma.booking.count({
-            where: { createdAt: { gte: startOfToday } },
-        }),
-        prisma.bus.count(),
-        prisma.user.count({
-            where: { role: "USER" },
-        }),
-        prisma.schedule.findMany({
-            where: {
-                departureTime: {
-                    gte: startOfToday,
-                    lte: endOfToday,
-                },
-            },
-            include: {
-                bus: {
-                    select: {
-                        capacity: true,
-                        tier: true,
-                        registrationNumber: true,
-                        modelName: true,
-                    },
-                },
-                _count: {
-                    select: { tickets: true },
-                },
-            },
-            orderBy: { departureTime: "asc" },
-        }),
+    const [{ totalRevenue, todayBookings, activeBuses, totalUsers }, todaySchedules] = await Promise.all([
+        getDashboardStats(),
+        getTodaySchedules(),
     ]);
 
-    const totalRevenue = revenueAgg._sum.totalFare ?? 0;
+    const now = new Date();
 
     const stats = [
         {
