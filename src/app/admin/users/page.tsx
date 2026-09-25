@@ -100,10 +100,10 @@ export default async function AdminUsersPage({
                     <table className="w-full text-left text-sm">
                         <thead>
                             <tr className="bg-gray-50/80">
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bookings</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">User</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Contact</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Bookings</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Role</th>
                                 <th className="px-6 py-3"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>

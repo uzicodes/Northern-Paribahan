@@ -221,13 +221,13 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                     <table className="w-full text-left text-sm">
                         <thead>
                             <tr className="bg-gray-50/80">
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Booking Ref</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Passenger</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Route</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Coach / Seats</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Departure Date</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Amount</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Booking Ref</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Passenger</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Route</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach / Seats</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure Date</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider text-right">Amount</th>
                                 <th className="px-6 py-3 text-right"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>

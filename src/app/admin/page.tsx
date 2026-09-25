@@ -200,11 +200,11 @@ export default async function AdminDashboardPage() {
                             <table className="w-full text-left text-sm">
                                 <thead>
                                     <tr className="bg-gray-50/80 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700/60">
-                                        <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Departure</th>
-                                        <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Route</th>
-                                        <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Coach Info</th>
-                                        <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Occupancy</th>
-                                        <th className="px-6 py-3.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure</th>
+                                        <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Route</th>
+                                        <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach Info</th>
+                                        <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Occupancy</th>
+                                        <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700/60">

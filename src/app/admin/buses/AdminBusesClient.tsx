@@ -128,7 +128,6 @@ export default function AdminBusesClient({ initialBuses }: AdminBusesClientProps
                 {depotKeys.map((depotName) => {
                     const buses = groupedBuses[depotName];
                     const open = isDepotOpen(depotName);
-                    const depotCity = buses[0]?.depot?.city || buses[0]?.depot?.location;
 
                     return (
                         <div
@@ -157,16 +156,9 @@ export default function AdminBusesClient({ initialBuses }: AdminBusesClientProps
                                         <Building size={22} />
                                     </div>
                                     <div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                                                {depotName}
-                                            </h2>
-                                            {depotCity && (
-                                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-900/60 font-medium">
-                                                    {depotCity}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                                            {depotName}
+                                        </h2>
                                         <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                                             {open ? "Click to collapse fleet" : "Click to view assigned fleet"}
                                         </p>
