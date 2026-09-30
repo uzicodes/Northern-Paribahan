@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db';
 import { VerifiedTicket, VerifyTicketResponse, BookingStatus } from '@/types/ticket';
+import { createClient } from '@/utils/supabase/server';
 
 const bstDateFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Asia/Dhaka',
@@ -38,9 +39,27 @@ function normalizeBookingStatus(status: string): BookingStatus {
 /**
  * Server action to verify a booking and retrieve its full journey and passenger details
  * using either the Booking ID (PNR) or Payment Transaction ID.
+ *
+ * Enforces authentication and authorization to prevent unauthenticated access
+ * and IDOR data leaks over public server action endpoints.
  */
 export async function verifyTicketAction(rawPnr: string): Promise<VerifyTicketResponse> {
   try {
+    // 1. Mandatory Authentication Check
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        error: 'Authentication required. Please log in to verify ticket details.',
+      };
+    }
+
+    // 2. Input Validation
     if (!rawPnr || typeof rawPnr !== 'string') {
       return {
         success: false,
@@ -49,7 +68,6 @@ export async function verifyTicketAction(rawPnr: string): Promise<VerifyTicketRe
     }
 
     const trimmedRef = rawPnr.trim();
-
     if (!trimmedRef) {
       return {
         success: false,
@@ -57,7 +75,7 @@ export async function verifyTicketAction(rawPnr: string): Promise<VerifyTicketRe
       };
     }
 
-    // Query booking by either Booking ID or Payment Transaction ID
+    // 3. Query booking by either Booking ID or Payment Transaction ID
     const booking = await prisma.booking.findFirst({
       where: {
         OR: [
@@ -106,6 +124,22 @@ export async function verifyTicketAction(rawPnr: string): Promise<VerifyTicketRe
       return {
         success: false,
         error: `No ticket found for reference "${trimmedRef}". Please verify the PNR or Transaction ID and try again.`,
+      };
+    }
+
+    // 4. Mandatory Authorization / IDOR Protection
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+
+    const isOwner = booking.userId === user.id;
+    const isAdmin = dbUser?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return {
+        success: false,
+        error: 'Unauthorized. You do not have permission to view this ticket.',
       };
     }
 

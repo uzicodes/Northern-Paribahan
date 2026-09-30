@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db';
 import { sendTicketEmail, TicketData } from '@/lib/email';
+import { createClient } from '@/utils/supabase/server';
 
 const bstDateTimeFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Asia/Dhaka',
@@ -14,15 +15,42 @@ const bstDateTimeFormatter = new Intl.DateTimeFormat('en-US', {
   hour12: true,
 });
 
+export type ResendTicketEmailResult =
+  | { success: true; message: string }
+  | { success: false; error: string };
+
+/**
+ * Server action to resend the e-ticket confirmation email.
+ * Requires user authentication and booking ownership/admin privileges.
+ */
 export async function resendTicketEmailAction(
   pnrOrTxnId: string
-): Promise<{ success: boolean; error?: string; message?: string }> {
+): Promise<ResendTicketEmailResult> {
   try {
-    const trimmed = pnrOrTxnId?.trim();
-    if (!trimmed) {
-      return { success: false, error: 'Booking Reference or Transaction ID is required.' };
+    // 1. Mandatory Authentication Check
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return {
+        success: false,
+        error: 'Authentication required. Please log in to perform this action.',
+      };
     }
 
+    // 2. Input Validation
+    const trimmed = pnrOrTxnId?.trim();
+    if (!trimmed) {
+      return {
+        success: false,
+        error: 'Booking Reference or Transaction ID is required.',
+      };
+    }
+
+    // 3. Query Booking Record
     const booking = await prisma.booking.findFirst({
       where: {
         OR: [
@@ -46,10 +74,27 @@ export async function resendTicketEmailAction(
       return { success: false, error: `No booking found for "${trimmed}".` };
     }
 
+    // 4. Mandatory Authorization / IDOR Protection
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { role: true },
+    });
+
+    const isOwner = booking.userId === user.id;
+    const isAdmin = dbUser?.role === 'ADMIN';
+
+    if (!isOwner && !isAdmin) {
+      return {
+        success: false,
+        error: 'Unauthorized. You do not have permission to resend confirmation for this ticket.',
+      };
+    }
+
     if (!booking.user?.email) {
       return { success: false, error: 'No passenger email associated with this booking.' };
     }
 
+    // 5. Build E-Ticket Payload and Dispatch Email
     const ticketData: TicketData = {
       ticketId: booking.id,
       passengerName: booking.user.name || 'Valued Passenger',
