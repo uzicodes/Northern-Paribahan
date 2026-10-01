@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, Suspense, useCallback } from "react";
+import React, { useState, useEffect, Suspense, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -213,7 +213,7 @@ function CheckoutContent() {
 
     // 10-minute seat hold countdown timer (persisted across reloads via target timestamp)
     const [secondsLeft, setSecondsLeft] = useState(600);
-    const [isExpired, setIsExpired] = useState(false);
+    const isExpiredRef = useRef(false);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -243,7 +243,7 @@ function CheckoutContent() {
             const remaining = Math.max(0, Math.floor((targetExpiresAt - Date.now()) / 1000));
             setSecondsLeft(remaining);
             if (remaining <= 0) {
-                setIsExpired(true);
+                isExpiredRef.current = true;
             }
         };
 
@@ -300,7 +300,7 @@ function CheckoutContent() {
 
 
     const onValidSubmit = async (data: PassengerFormData) => {
-        if (secondsLeft <= 0 || isExpired) {
+        if (secondsLeft <= 0 || isExpiredRef.current) {
             toast.error("Your seat hold has expired. Please re-select your seats.");
             return;
         }
