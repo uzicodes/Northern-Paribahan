@@ -44,26 +44,51 @@ export async function GET(request: Request) {
                 )
             }
 
-            // If it's a new user, create their record in Prisma
-            if (!existingUser) {
-                try {
-                    await prisma.user.create({
-                        data: {
-                            id: data.user.id,
-                            email: userEmail,
-                            name: data.user.user_metadata?.full_name || data.user.user_metadata?.name || null,
-                            phoneNumber: data.user.user_metadata?.phone || null,
-                        },
-                    })
-                } catch (e) {
-                    console.error('Failed to create new user in Prisma during Google signup:', e)
-                }
-            }
-
             return NextResponse.redirect(`${redirectBase}${next}`)
         }
     }
 
     // Error handling
     return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+}
+
+/**
+ * POST handler to safely execute side effects (user database provisioning / sync).
+ * Moves mutating operations out of GET to eliminate CSRF and prefetching vulnerabilities.
+ */
+export async function POST() {
+    const supabase = await createClient()
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser()
+
+    if (authError || !user || !user.email) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userEmail = user.email.toLowerCase().trim()
+
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: { email: userEmail },
+        })
+
+        if (!existingUser) {
+            const newUser = await prisma.user.create({
+                data: {
+                    id: user.id,
+                    email: userEmail,
+                    name: user.user_metadata?.full_name || user.user_metadata?.name || null,
+                    phoneNumber: user.user_metadata?.phone || null,
+                },
+            })
+            return NextResponse.json({ success: true, user: newUser }, { status: 201 })
+        }
+
+        return NextResponse.json({ success: true, user: existingUser }, { status: 200 })
+    } catch (e) {
+        console.error('Failed to create user record in Prisma via POST:', e)
+        return NextResponse.json({ error: 'Failed to provision user' }, { status: 500 })
+    }
 }

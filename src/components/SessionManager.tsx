@@ -117,6 +117,8 @@ export default function SessionManager() {
                         LOGIN_TIMESTAMP_KEY,
                         Date.now().toString()
                     );
+                    // Securely provision user record via POST without GET side effects
+                    fetch('/api/auth/callback', { method: 'POST' }).catch(() => {});
                 }
 
                 // Start both timers
