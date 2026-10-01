@@ -6,9 +6,29 @@ export async function POST(request: Request) {
     const [supabase, body] = await Promise.all([createClient(), request.json()])
     const { email, password, name, phoneNumber } = body
 
-    // Sign up user in Supabase Auth
+    const normalizedEmail = email?.toLowerCase().trim()
+    if (!normalizedEmail) {
+        return NextResponse.json({ error: 'Email address is required.' }, { status: 400 })
+    }
+
+    // 1. Check if user already exists in our database
+    const existingDbUser = await prisma.user.findUnique({
+        where: { email: normalizedEmail },
+    })
+
+    if (existingDbUser) {
+        return NextResponse.json(
+            {
+                alreadyRegistered: true,
+                error: 'This email has already been registered on our system. Please log in.',
+            },
+            { status: 409 }
+        )
+    }
+
+    // 2. Sign up user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
             data: {
@@ -19,17 +39,33 @@ export async function POST(request: Request) {
     })
 
     if (error) {
-        console.error('--- SUPABASE SIGNUP ERROR ---')
-        console.error('Message:', error.message)
-        console.error('Status:', error.status)
-        console.error('Name:', error.name)
-        console.error('Cause:', error.cause)
-        console.error('Full Error:', JSON.stringify(error, null, 2))
-        console.error('--- END ERROR ---')
+        const errorMsg = error.message?.toLowerCase() || ''
+        if (errorMsg.includes('already') || errorMsg.includes('registered') || error.status === 422) {
+            return NextResponse.json(
+                {
+                    alreadyRegistered: true,
+                    error: 'This email has already been registered on our system. Please log in.',
+                },
+                { status: 409 }
+            )
+        }
+
+        console.error('--- SUPABASE SIGNUP ERROR ---', error)
         return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    // Create the corresponding Prisma User record
+    // 3. Supabase identity check (Supabase returns empty identities array if email already registered)
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        return NextResponse.json(
+            {
+                alreadyRegistered: true,
+                error: 'This email has already been registered on our system. Please log in.',
+            },
+            { status: 409 }
+        )
+    }
+
+    // 4. Create the corresponding Prisma User record
     if (data.user) {
         try {
             await prisma.user.upsert({
@@ -37,13 +73,12 @@ export async function POST(request: Request) {
                 update: {},
                 create: {
                     id: data.user.id,
-                    email: email,
+                    email: normalizedEmail,
                     name: name || null,
                     phoneNumber: phoneNumber || null,
                 },
             })
         } catch (syncError) {
-            // Log but don't fail the registration — profile route will auto-upsert as fallback
             console.error('User DB sync error after registration:', syncError)
         }
     }

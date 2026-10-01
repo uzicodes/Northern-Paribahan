@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useReducer } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useReducer, useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { satisfy } from '@/lib/fonts';
 import { 
     Loader2, 
@@ -12,7 +12,7 @@ import {
     Mail, 
     Phone, 
     Lock, 
-    Sparkles
+    ArrowRight
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -43,10 +43,47 @@ function registerReducer(state: RegisterState, action: Partial<RegisterState>): 
     return { ...state, ...action };
 }
 
-export default function RegisterPage() {
+function RegisterContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [state, dispatch] = useReducer(registerReducer, initialState);
     const { name, email, phoneNumber, password, showPassword, loading, googleLoading, error } = state;
+
+    // Already registered popup modal state
+    const [showAlreadyRegisteredModal, setShowAlreadyRegisteredModal] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState('');
+    const [countdown, setCountdown] = useState(3);
+
+    const triggerAlreadyRegisteredModal = (targetEmail: string) => {
+        setRegisteredEmail(targetEmail);
+        setShowAlreadyRegisteredModal(true);
+        setCountdown(3);
+    };
+
+    // Check if redirected from Google OAuth with alreadyRegistered flag
+    useEffect(() => {
+        const isAlreadyRegistered = searchParams.get('alreadyRegistered');
+        const emailFromQuery = searchParams.get('email');
+        if (isAlreadyRegistered === 'true') {
+            triggerAlreadyRegisteredModal(emailFromQuery || '');
+        }
+    }, [searchParams]);
+
+    // Handle countdown timer and auto-redirect to login
+    useEffect(() => {
+        if (!showAlreadyRegisteredModal) return;
+
+        if (countdown <= 0) {
+            router.push(`/login?email=${encodeURIComponent(registeredEmail)}`);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setCountdown((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [showAlreadyRegisteredModal, countdown, registeredEmail, router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,6 +108,17 @@ export default function RegisterPage() {
         dispatch({ loading: true });
 
         try {
+            // 1. First check if the email is already registered on the system
+            const checkRes = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email.trim())}`);
+            const checkData = await checkRes.json();
+
+            if (checkData.exists) {
+                dispatch({ loading: false });
+                triggerAlreadyRegisteredModal(email.trim());
+                return;
+            }
+
+            // 2. Submit registration
             const response = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -86,6 +134,8 @@ export default function RegisterPage() {
 
             if (response.ok) {
                 router.push('/login');
+            } else if (data.alreadyRegistered || response.status === 409) {
+                triggerAlreadyRegisteredModal(email.trim());
             } else {
                 dispatch({ error: data.error || 'Registration failed. Please try again.' });
             }
@@ -101,10 +151,11 @@ export default function RegisterPage() {
 
         try {
             const supabase = createClient();
+            // Pass from=register in redirect URL so callback detects if account already exists
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${location.origin}/api/auth/callback`,
+                    redirectTo: `${location.origin}/api/auth/callback?from=register`,
                 },
             });
 
@@ -148,7 +199,7 @@ export default function RegisterPage() {
                         type="button"
                         onClick={handleGoogleSignUp}
                         disabled={googleLoading}
-                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] cursor-pointer ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {googleLoading ? (
                             <Loader2 className="animate-spin h-4 w-4 text-gray-500" />
@@ -272,12 +323,12 @@ export default function RegisterPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full mt-2 bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`w-full mt-2 bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {loading ? (
                                 <>
                                     <Loader2 className="animate-spin h-4 w-4" />
-                                    <span>Creating Account...</span>
+                                    <span>Checking & Creating...</span>
                                 </>
                             ) : (
                                 <span>Create Account</span>
@@ -296,6 +347,60 @@ export default function RegisterPage() {
                     </form>
                 </div>
             </div>
+
+            {/* Account Already Registered Popup Modal */}
+            {showAlreadyRegisteredModal && (
+                <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-amber-200/70 text-center animate-in zoom-in-95 duration-200 relative">
+                        <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-200 text-amber-600 shadow-xs">
+                            <AlertCircle className="w-7 h-7" />
+                        </div>
+
+                        <h3 className="text-xl font-black text-gray-900 mb-1.5">
+                            Account Already Exists
+                        </h3>
+
+                        <p className="text-xs sm:text-sm text-gray-600 mb-3 leading-relaxed">
+                            This email has already been registered on our system. Please log in with your credentials.
+                        </p>
+
+                        {registeredEmail && (
+                            <div className="mb-4 py-1.5 px-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-800 text-xs font-semibold break-all">
+                                {registeredEmail}
+                            </div>
+                        )}
+
+                        <div className="text-xs text-amber-700 font-semibold mb-5 flex items-center justify-center gap-1.5">
+                            <Loader2 className="animate-spin w-3.5 h-3.5 text-amber-600" />
+                            <span>Redirecting to login in {countdown}s...</span>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => router.push(`/login?email=${encodeURIComponent(registeredEmail)}`)}
+                            className="w-full bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                        >
+                            <span>Log In Now</span>
+                            <ArrowRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={
+            <div 
+                className="min-h-[calc(100vh-140px)] flex items-center justify-center"
+                style={{ backgroundColor: '#C9CBA3' }}
+            >
+                <Loader2 className="animate-spin h-8 w-8 text-[#172144]" />
+            </div>
+        }>
+            <RegisterContent />
+        </Suspense>
     );
 }

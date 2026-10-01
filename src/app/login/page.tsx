@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useReducer } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useReducer, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { satisfy } from '@/lib/fonts';
 import { 
     Loader2, 
@@ -37,10 +37,19 @@ function loginReducer(state: LoginState, action: Partial<LoginState>): LoginStat
     return { ...state, ...action };
 }
 
-export default function LoginPage() {
+function LoginContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [state, dispatch] = useReducer(loginReducer, initialState);
     const { email, password, showPassword, loading, googleLoading, error } = state;
+
+    // Prefill email if provided in query params (e.g. from registration redirect)
+    useEffect(() => {
+        const emailFromQuery = searchParams.get('email');
+        if (emailFromQuery) {
+            dispatch({ email: emailFromQuery });
+        }
+    }, [searchParams]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -121,7 +130,7 @@ export default function LoginPage() {
                         type="button"
                         onClick={handleGoogleLogin}
                         disabled={googleLoading}
-                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] cursor-pointer ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {googleLoading ? (
                             <Loader2 className="animate-spin h-4 w-4 text-gray-500" />
@@ -204,7 +213,7 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full mt-2 bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`w-full mt-2 bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {loading ? (
                                 <>
@@ -229,5 +238,20 @@ export default function LoginPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div 
+                className="min-h-[calc(100vh-140px)] flex items-center justify-center"
+                style={{ backgroundColor: '#C9CBA3' }}
+            >
+                <Loader2 className="animate-spin h-8 w-8 text-[#172144]" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }
