@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { 
   getCurrentBSTDate, 
+  getMaxBSTDate,
   getBSTDayBoundaries, 
   OPERATIONAL_BUFFER_MINUTES 
 } from '@/lib/dateUtils';
@@ -60,7 +61,7 @@ interface EnrichedSchedule extends ScheduleWithDetails {
  * 1. Operational Buffer: 30-minute ticket visibility cutoff prior to departure.
  * 2. Same-Day Searches: Only returns schedules departing >= (Current Time + 30m).
  * 3. Future-Date Searches: Returns all schedules between 00:00:00 and 23:59:59.999 BST.
- * 4. Historical Dates: Returns [] immediately without throwing an error.
+ * 4. 31-Day Rolling Window: Historical dates (< today) or dates beyond 31 days return [] immediately.
  * 5. Timezone Integrity: Uses Bangladesh Standard Time (UTC+6 / Asia/Dhaka) for all calculations.
  */
 export async function getSchedules({
@@ -88,9 +89,10 @@ export async function getSchedules({
 
   const now = new Date();
   const todayInBST = getCurrentBSTDate(now);
+  const maxAllowedDateBST = getMaxBSTDate(now);
 
-  // Rule 4: Historical Dates -> Return empty array immediately
-  if (cleanTravelDate < todayInBST) {
+  // Rule 4: Historical dates or dates beyond the 31-day rolling booking window -> Return empty array
+  if (cleanTravelDate < todayInBST || cleanTravelDate > maxAllowedDateBST) {
     return [];
   }
 
@@ -108,6 +110,7 @@ export async function getSchedules({
   }
 
   try {
+    // Pure query: Retrieve pre-generated schedules directly from database
     const rawSchedules = await prisma.schedule.findMany({
       where: {
         origin: { equals: origin.trim(), mode: 'insensitive' },

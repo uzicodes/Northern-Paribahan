@@ -325,17 +325,26 @@ export default function Page() {
                     <button
                         type="button"
                         onClick={() => {
-                            if (fromValue && toValue) {
-                                const params = new URLSearchParams();
-                                params.set('from', fromValue);
-                                params.set('to', toValue);
-                                params.set('origin', fromValue);
-                                params.set('destination', toValue);
-                                params.set('date', formatToLocalDateString(dateOfJourney));
-                                router.push(`/timetable?${params.toString()}`);
-                            } else {
+                            if (!fromValue || !toValue) {
                                 toast.error('Please select both From and To locations');
+                                return;
                             }
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            const maxAllowed = new Date(today);
+                            maxAllowed.setDate(today.getDate() + 31);
+                            if (dateOfJourney < today || dateOfJourney > maxAllowed) {
+                                toast.error('Please select a travel date within the 31-day booking window.');
+                                return;
+                            }
+
+                            const params = new URLSearchParams();
+                            params.set('from', fromValue);
+                            params.set('to', toValue);
+                            params.set('origin', fromValue);
+                            params.set('destination', toValue);
+                            params.set('date', formatToLocalDateString(dateOfJourney));
+                            router.push(`/timetable?${params.toString()}`);
                         }}
                         className="bg-[#c44d4d] text-white font-semibold text-lg rounded-3xl px-6 py-3 shadow flex items-center gap-3"
                         style={{ fontSize: 22 }}

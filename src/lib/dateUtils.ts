@@ -4,6 +4,7 @@
 
 export const BST_TIMEZONE = 'Asia/Dhaka';
 export const OPERATIONAL_BUFFER_MINUTES = 30;
+export const ROLLING_WINDOW_DAYS = 31;
 
 const BST_FORMATTER = new Intl.DateTimeFormat('en-US', {
   timeZone: BST_TIMEZONE,
@@ -26,6 +27,15 @@ export function getCurrentBSTDate(now: Date = new Date()): string {
 }
 
 /**
+ * Returns the maximum allowed booking date in Bangladesh Standard Time (BST, UTC+6)
+ * exactly daysAhead (default ROLLING_WINDOW_DAYS = 31) from today, formatted as "YYYY-MM-DD".
+ */
+export function getMaxBSTDate(now: Date = new Date(), daysAhead: number = ROLLING_WINDOW_DAYS): string {
+  const future = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
+  return getCurrentBSTDate(future);
+}
+
+/**
  * Returns the UTC Date objects representing the exact start (00:00:00.000)
  * and end (23:59:59.999) of a calendar day in Bangladesh Standard Time (+06:00).
  */
@@ -38,4 +48,3 @@ export function getBSTDayBoundaries(dateStr: string): {
 
   return { startOfDayBST, endOfDayBST };
 }
-

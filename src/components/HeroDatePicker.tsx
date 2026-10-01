@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { ROLLING_WINDOW_DAYS } from '@/lib/dateUtils';
 
 const ChevronLeft = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
@@ -134,6 +135,15 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
     };
 
     const handleDateClick = (date: Date) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const maxDate = new Date(today);
+        maxDate.setDate(today.getDate() + ROLLING_WINDOW_DAYS);
+
+        if (date < today || date > maxDate) {
+            return;
+        }
+
         onDateChange(date);
         setCurrentMonth(date);
         setOpen(false);
@@ -204,7 +214,7 @@ const HeroDatePicker: React.FC<HeroDatePickerProps> = ({ selectedDate, onDateCha
                                     const today = new Date();
                                     today.setHours(0, 0, 0, 0);
                                     const maxDate = new Date(today);
-                                    maxDate.setDate(today.getDate() + 30);
+                                    maxDate.setDate(today.getDate() + ROLLING_WINDOW_DAYS);
 
                                     const isSelected = isSameDay(dayObj.date, selectedDate);
                                     const isTodayDate = isToday(dayObj.date);

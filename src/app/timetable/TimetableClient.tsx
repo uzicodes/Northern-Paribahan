@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useReducer } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
-import { getCurrentBSTDate } from "@/lib/dateUtils";
+import { getCurrentBSTDate, getMaxBSTDate } from "@/lib/dateUtils";
 import { 
     ArrowRight, 
     ArrowLeftRight,
@@ -120,6 +120,13 @@ export default function TimetableClient({
             return;
         }
 
+        const minAllowed = getCurrentBSTDate();
+        const maxAllowed = getMaxBSTDate();
+        if (filterDate < minAllowed || filterDate > maxAllowed) {
+            toast.error("Please select a travel date within the 31-day booking window.");
+            return;
+        }
+
         const params = new URLSearchParams();
         params.set("from", filterFrom);
         params.set("to", filterTo);
@@ -130,6 +137,7 @@ export default function TimetableClient({
     };
 
     const minDate = getCurrentBSTDate();
+    const maxDate = getMaxBSTDate();
 
     // Missing Search Parameters State
     if (!origin || !destination || !date) {
@@ -294,6 +302,7 @@ export default function TimetableClient({
                             <input
                                 type="date"
                                 min={minDate}
+                                max={maxDate}
                                 value={filterDate}
                                 onChange={(e) => dispatch({ filterDate: e.target.value })}
                                 aria-label="Travel Date"
@@ -525,6 +534,7 @@ export default function TimetableClient({
                             <input
                                 type="date"
                                 min={minDate}
+                                max={maxDate}
                                 value={filterDate}
                                 onChange={(e) => dispatch({ filterDate: e.target.value })}
                                 aria-label="Travel Date"
