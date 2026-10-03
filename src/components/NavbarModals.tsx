@@ -200,7 +200,7 @@ export function MobileMenu({
                                         setIsMobileMenuOpen(false);
                                     }}
                                     className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${
-                                        isLoggedIn || isActive('/profile')
+                                        isActive('/profile')
                                             ? 'bg-[#FCA311] text-[#172144] font-bold shadow-lg shadow-[#FCA311]/20'
                                             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                                     }`}

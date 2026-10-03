@@ -1,10 +1,9 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { MobileMenu, ContactPopup } from './NavbarModals';
-import { toast } from 'sonner';
 import { satisfy } from '@/lib/fonts';
 import { createClient } from '@/utils/supabase/client';
 
@@ -67,31 +66,8 @@ export default function NavbarClient() {
         router.refresh();
     }
 
-    const isRedirectingRef = useRef(false);
-
     const handleProfileClick = () => {
-        if (isLoggedIn) {
-            router.push('/profile');
-            return;
-        }
-
-        if (isRedirectingRef.current) return;
-        isRedirectingRef.current = true;
-
-        const duration = 2500;
-        const doRedirect = () => {
-            isRedirectingRef.current = false;
-            router.push('/login');
-        };
-
-        toast.error('Please Login First', {
-            description: 'Redirecting to login page...',
-            duration: duration,
-            onAutoClose: doRedirect,
-            onDismiss: doRedirect,
-        });
-
-        setTimeout(doRedirect, duration);
+        router.push('/profile');
     };
 
     const isActive = (path: string) => pathname === path;
@@ -134,7 +110,7 @@ export default function NavbarClient() {
                         Admin
                     </Link>
                 )}
-                {!isLoggedIn && (
+                {!isLoggedIn ? (
                     <>
                         <Link
                             href="/login"
@@ -157,21 +133,21 @@ export default function NavbarClient() {
                             Register
                         </Link>
                     </>
+                ) : (
+                    <Link
+                        href="/profile"
+                        aria-label="User Profile"
+                        className={`p-2 rounded-full transition-all duration-200 border ${
+                            isActive('/profile')
+                                ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 shadow-sm'
+                                : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
+                        }`}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </Link>
                 )}
-                <button
-                    type="button"
-                    aria-label="User Profile"
-                    onClick={handleProfileClick}
-                    className={`p-2 rounded-full transition-all duration-200 border ${
-                        (isLoggedIn || isActive('/profile'))
-                            ? 'bg-[#FCA311]/20 text-[#FCA311] border-[#FCA311]/50 shadow-sm'
-                            : 'text-white border-transparent hover:text-[#FCA311] hover:bg-white/10'
-                    }`}
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </button>
                 {!isLoggedIn ? (
                     <button
                         type="button"
