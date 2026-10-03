@@ -176,7 +176,7 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                             <tr className="bg-gray-50/80">
                                 <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Booking Ref</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Passenger</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Route</th>
+                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider min-w-[260px] whitespace-nowrap">Route</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach / Seats</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure Date</th>
                                 <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
@@ -188,10 +188,18 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                             {filtered.map((b) => {
                                 const origin = b.schedule?.origin || b.schedule?.route?.origin || "Origin";
                                 const destination = b.schedule?.destination || b.schedule?.route?.destination || "Destination";
+                                const isHighlighted = Boolean(userId && (b.user?.id === userId || (b as any).userId === userId));
 
                                 return (
-                                    <tr key={b.id} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-6 py-4">
+                                    <tr
+                                        key={b.id}
+                                        className={`transition-colors ${
+                                            isHighlighted
+                                                ? "bg-amber-50/80 hover:bg-amber-100/70"
+                                                : "hover:bg-gray-50/50"
+                                        }`}
+                                    >
+                                        <td className={`px-6 py-4 ${isHighlighted ? "border-l-4 border-l-amber-500" : ""}`}>
                                             <span className="font-mono font-bold text-indigo-600 text-xs">
                                                 #{b.id.slice(-8).toUpperCase()}
                                             </span>
@@ -205,8 +213,8 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                                             <p className="font-medium text-gray-900">{b.user?.name || "Valued Passenger"}</p>
                                             <p className="text-xs text-gray-400">{b.user?.email || "—"}</p>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="text-gray-900 font-medium">
+                                        <td className="px-6 py-4 whitespace-nowrap min-w-[260px]">
+                                            <span className="text-gray-900 font-medium whitespace-nowrap">
                                                 {origin} → {destination}
                                             </span>
                                         </td>
@@ -282,9 +290,17 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                     {filtered.map((b) => {
                         const origin = b.schedule?.origin || b.schedule?.route?.origin || "Origin";
                         const destination = b.schedule?.destination || b.schedule?.route?.destination || "Destination";
+                        const isHighlighted = Boolean(userId && (b.user?.id === userId || (b as any).userId === userId));
 
                         return (
-                            <div key={b.id} className="p-4 space-y-2.5">
+                            <div
+                                key={b.id}
+                                className={`p-4 space-y-2.5 transition-colors ${
+                                    isHighlighted
+                                        ? "bg-amber-50/80 border-l-4 border-l-amber-500"
+                                        : ""
+                                }`}
+                            >
                                 <div className="flex items-center justify-between">
                                     <span className="font-mono font-bold text-indigo-600 text-xs">
                                         #{b.id.slice(-8).toUpperCase()}
