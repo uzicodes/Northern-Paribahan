@@ -80,9 +80,8 @@ export default async function BookingPage(props: PageProps) {
     const applicableFare = schedule.route?.fares?.find((f) => f.tier === bus.tier);
     const farePrice = applicableFare?.price || 0;
 
-    const bookedSeatNumbers = new Set(schedule.tickets.map((t) => t.seatNumber));
-    const lockedSeatNumbers = schedule.seatLocks.map((l) => l.seatNumber);
-    const unavailableSeats = Array.from(new Set([...bookedSeatNumbers, ...lockedSeatNumbers]));
+    const bookedSeatNumbers = Array.from(new Set(schedule.tickets.map((t) => t.seatNumber)));
+    const lockedSeatNumbers = Array.from(new Set(schedule.seatLocks.map((l) => l.seatNumber)));
 
     const travelDateISO = new Date(schedule.departureTime).toISOString().split('T')[0];
 
@@ -192,7 +191,8 @@ export default async function BookingPage(props: PageProps) {
                     busModel={bus.modelName}
                     tier={bus.tier}
                     fare={farePrice}
-                    bookedSeats={unavailableSeats}
+                    bookedSeats={bookedSeatNumbers}
+                    initialLockedSeats={lockedSeatNumbers}
                     proceedUrl={`/checkout?busId=${encodeURIComponent(bus.id)}&scheduleId=${encodeURIComponent(scheduleId)}&origin=${encodeURIComponent(schedule.origin)}&destination=${encodeURIComponent(schedule.destination)}&busModel=${encodeURIComponent(bus.modelName)}&tier=${encodeURIComponent(bus.tier)}&regNo=${encodeURIComponent(bus.registrationNumber)}&time=${encodeURIComponent(formatTime(schedule.departureTime))}&arrival=${encodeURIComponent(formatTime(schedule.arrivalTime))}&date=${encodeURIComponent(travelDateISO)}&fare=${farePrice}`}
                 />
             </div>

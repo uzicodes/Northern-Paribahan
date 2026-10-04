@@ -2,8 +2,10 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { Check, X, ShieldAlert, Armchair, ChevronRight, Info } from "lucide-react";
+import { Check, X, ShieldAlert, Armchair, ChevronRight, Info, Clock } from "lucide-react";
 import { SeatDisplay } from "@/types";
+import { getPusherClient } from "@/lib/pusher";
+import { getClientSessionId } from "@/lib/session";
 
 export type LayoutArchitecture = "PREMIUM_2_1" | "EXECUTIVE_2_2" | "STANDARD_2_2";
 
@@ -14,6 +16,7 @@ export interface SeatLayoutProps {
   tier?: string;
   fare?: number;
   bookedSeats?: string[];
+  initialLockedSeats?: string[];
   seats?: SeatDisplay[]; 
   onSeatSelect?: (seats: string[]) => void;
   onProceed?: (selectedSeats: string[], totalFare: number) => void;
@@ -100,6 +103,7 @@ export default function SeatLayout({
   tier,
   fare = 0,
   bookedSeats: propBookedSeats,
+  initialLockedSeats = [],
   seats: legacySeats,
   onSeatSelect,
   onProceed,
@@ -128,6 +132,31 @@ export default function SeatLayout({
     return set;
   }, [propBookedSeats, legacySeats]);
 
+  // Client Session Identifier for anonymous seat locks
+  const [sessionId, setSessionId] = useState<string>("");
+  useEffect(() => {
+    setSessionId(getClientSessionId());
+  }, []);
+
+  // Real-time externally locked seats
+  const [lockedSeats, setLockedSeats] = useState<string[]>(() =>
+    (initialLockedSeats || []).map((s) => s.toUpperCase())
+  );
+
+  const lockedSet = useMemo(() => {
+    return new Set(lockedSeats.map((s) => s.toUpperCase()));
+  }, [lockedSeats]);
+
+  // Synchronize initialLockedSeats prop updates
+  useEffect(() => {
+    if (initialLockedSeats && initialLockedSeats.length > 0) {
+      setLockedSeats((prev) => {
+        const combined = new Set([...prev, ...initialLockedSeats.map((s) => s.toUpperCase())]);
+        return Array.from(combined);
+      });
+    }
+  }, [initialLockedSeats]);
+
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
 
   // Lazily initialize state to avoid derived state warnings and extra renders (React Compiler fix)
@@ -148,6 +177,65 @@ export default function SeatLayout({
     }
     return [];
   });
+
+  // Subscribe to real-time Pusher events for this schedule
+  useEffect(() => {
+    if (!scheduleId) return;
+
+    let channel: any = null;
+    let pusher: any = null;
+
+    try {
+      pusher = getPusherClient();
+      const channelName = `schedule-${scheduleId}`;
+      channel = pusher.subscribe(channelName);
+
+      channel.bind("seat:locked", (data: { seatNumber: string; sessionId: string; expiresAt: string }) => {
+        const currentSid = getClientSessionId();
+        // Only lock the seat if it was locked by a DIFFERENT user
+        if (data.sessionId !== currentSid) {
+          const seatUpper = data.seatNumber.toUpperCase();
+          setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
+
+          // If current user had selected this seat, revert and notify them
+          setSelectedSeats((prev) => {
+            if (prev.includes(data.seatNumber)) {
+              toast.error(`Seat ${data.seatNumber} was just selected by another passenger`, {
+                description: "Your selection has been updated.",
+              });
+              const updated = prev.filter((s) => s !== data.seatNumber);
+              onSeatSelect?.(updated);
+              if (storageKey && typeof window !== "undefined") {
+                if (updated.length > 0) {
+                  sessionStorage.setItem(storageKey, JSON.stringify(updated));
+                } else {
+                  sessionStorage.removeItem(storageKey);
+                }
+              }
+              return updated;
+            }
+            return prev;
+          });
+        }
+      });
+
+      channel.bind("seat:unlocked", (data: { seatNumber: string }) => {
+        const seatUpper = data.seatNumber.toUpperCase();
+        setLockedSeats((prev) => prev.filter((seat) => seat !== seatUpper));
+      });
+    } catch (err) {
+      console.error("[Pusher] Real-time subscription error:", err);
+    }
+
+    return () => {
+      if (channel) {
+        channel.unbind_all();
+      }
+      if (pusher && scheduleId) {
+        pusher.unsubscribe(`schedule-${scheduleId}`);
+      }
+    };
+  }, [scheduleId, storageKey, onSeatSelect]);
 
   // Generate grid rows based on architecture
   const rows = useMemo(() => {
@@ -172,16 +260,28 @@ export default function SeatLayout({
     return rowList;
   }, [config]);
 
-  // Handle seat selection with 4-seat limit enforcement
+  // Handle seat selection with 4-seat limit enforcement and backend locking
   const handleSeatClick = (seatNumber: string) => {
-    if (bookedSet.has(seatNumber.toUpperCase())) {
+    const seatUpper = seatNumber.toUpperCase();
+
+    if (bookedSet.has(seatUpper)) {
       toast.error(`Seat ${seatNumber} is already booked`, {
         description: "Please select an available seat.",
       });
       return;
     }
 
+    if (lockedSet.has(seatUpper) && !selectedSeats.includes(seatNumber)) {
+      toast.error(`Seat ${seatNumber} is currently selected by another passenger`, {
+        description: "This seat is temporarily locked while they complete checkout.",
+      });
+      return;
+    }
+
+    const activeSessionId = sessionId || getClientSessionId();
+
     if (selectedSeats.includes(seatNumber)) {
+      // ── Unselecting Seat ──────────────────────────────
       const updated = selectedSeats.filter((s) => s !== seatNumber);
       setSelectedSeats(updated);
       onSeatSelect?.(updated);
@@ -193,7 +293,19 @@ export default function SeatLayout({
           sessionStorage.removeItem(storageKey);
         }
       }
+
+      // Fire background unlock request
+      if (scheduleId) {
+        fetch(`/api/schedules/${scheduleId}/seats/unlock`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ seatNumber, sessionId: activeSessionId }),
+        }).catch((err) => {
+          console.error("[Seat Lock] Failed to release seat lock:", err);
+        });
+      }
     } else {
+      // ── Selecting Seat ────────────────────────────────
       if (selectedSeats.length >= 4) {
         toast.error("Maximum 4 seats allowed per booking", {
           description: "Passengers may reserve up to 4 seats per transaction.",
@@ -201,12 +313,64 @@ export default function SeatLayout({
         });
         return;
       }
+
       const updated = [...selectedSeats, seatNumber];
       setSelectedSeats(updated);
       onSeatSelect?.(updated);
       
       if (storageKey && typeof window !== "undefined") {
         sessionStorage.setItem(storageKey, JSON.stringify(updated));
+      }
+
+      // Fire background lock request
+      if (scheduleId) {
+        fetch(`/api/schedules/${scheduleId}/seats/lock`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ seatNumber, sessionId: activeSessionId }),
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+
+              // Revert optimistic selection
+              setSelectedSeats((prev) => {
+                const reverted = prev.filter((s) => s !== seatNumber);
+                onSeatSelect?.(reverted);
+                if (storageKey && typeof window !== "undefined") {
+                  if (reverted.length > 0) {
+                    sessionStorage.setItem(storageKey, JSON.stringify(reverted));
+                  } else {
+                    sessionStorage.removeItem(storageKey);
+                  }
+                }
+                return reverted;
+              });
+
+              if (res.status === 409) {
+                setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
+              }
+
+              toast.error(errData.error || "Sorry, another passenger just selected this seat.");
+            }
+          })
+          .catch((err) => {
+            console.error("[Seat Lock] Error locking seat:", err);
+            // Revert optimistic selection on network error
+            setSelectedSeats((prev) => {
+              const reverted = prev.filter((s) => s !== seatNumber);
+              onSeatSelect?.(reverted);
+              if (storageKey && typeof window !== "undefined") {
+                if (reverted.length > 0) {
+                  sessionStorage.setItem(storageKey, JSON.stringify(reverted));
+                } else {
+                  sessionStorage.removeItem(storageKey);
+                }
+              }
+              return reverted;
+            });
+            toast.error("Network error: Could not hold seat. Please try again.");
+          });
       }
     }
   };
@@ -273,6 +437,15 @@ export default function SeatLayout({
             <span className="text-blue-700 font-semibold">Selected</span>
           </div>
           <div className="flex items-center gap-2">
+            <div className="w-5 h-6 rounded-t-lg rounded-b-md bg-amber-50 border-2 border-amber-300 relative shadow-2xs flex flex-col items-center">
+              <div className="w-3.5 h-1.5 bg-amber-200 rounded-t-sm mt-0.5 border-b border-amber-300" />
+              <div className="flex-1 w-full flex items-center justify-center">
+                <Clock className="w-2.5 h-2.5 text-amber-700" />
+              </div>
+            </div>
+            <span className="text-amber-800 font-medium">In Cart / Held</span>
+          </div>
+          <div className="flex items-center gap-2">
             <div className="w-5 h-6 rounded-t-lg rounded-b-md bg-slate-200 border border-slate-300 relative shadow-inner flex flex-col items-center opacity-75">
               <div className="w-3.5 h-1.5 bg-slate-300 rounded-t-sm mt-0.5 border-b border-slate-300" />
               <div className="flex-1 w-full flex items-center justify-center">
@@ -328,21 +501,25 @@ export default function SeatLayout({
                   {/* Left Column Seats */}
                   <div className="flex items-center gap-2 sm:gap-2.5">
                     {left.map((seatNum) => {
-                      const isBooked = bookedSet.has(seatNum);
+                      const isBooked = bookedSet.has(seatNum.toUpperCase());
+                      const isLocked = !isBooked && lockedSet.has(seatNum.toUpperCase()) && !selectedSeats.includes(seatNum);
                       const isSelected = selectedSeats.includes(seatNum);
+                      const isDisabled = isBooked || isLocked;
 
                       return (
                         <button
                           key={seatNum}
                           type="button"
-                          disabled={isBooked}
+                          disabled={isDisabled}
                           onClick={() => handleSeatClick(seatNum)}
-                          aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isSelected ? "Selected" : "Available"}`}
+                          aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isLocked ? "Held by another passenger" : isSelected ? "Selected" : "Available"}`}
                           className={`
                             w-11 h-13 sm:w-12 sm:h-14 rounded-t-xl rounded-b-lg font-bold flex flex-col items-center justify-between p-1 transition-all duration-150 relative select-none group
                             ${
                               isBooked
                                 ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-inner"
+                                : isLocked
+                                ? "bg-amber-50 text-amber-800 border-2 border-amber-300 cursor-not-allowed opacity-90 shadow-2xs"
                                 : isSelected
                                 ? "bg-blue-600 text-white border-2 border-blue-700 shadow-lg shadow-blue-600/35 scale-105 ring-2 ring-blue-300"
                                 : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 shadow-sm active:scale-95"
@@ -354,6 +531,8 @@ export default function SeatLayout({
                             className={`w-7 sm:w-8 h-2.5 sm:h-3 rounded-t-md rounded-b-xs transition-colors shrink-0 ${
                               isBooked
                                 ? "bg-slate-300 border-b border-slate-400/50"
+                                : isLocked
+                                ? "bg-amber-200 border-b border-amber-300"
                                 : isSelected
                                 ? "bg-blue-500/90 border-b border-blue-700"
                                 : "bg-slate-100 group-hover:bg-blue-100/70 border-b border-slate-200 group-hover:border-blue-200"
@@ -365,12 +544,12 @@ export default function SeatLayout({
                             {/* Armrest Side Indents */}
                             <div
                               className={`absolute left-0 top-1 bottom-1 w-[2px] rounded-r-full ${
-                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                                isBooked ? "bg-slate-300" : isLocked ? "bg-amber-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
                               }`}
                             />
                             <div
                               className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-l-full ${
-                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                                isBooked ? "bg-slate-300" : isLocked ? "bg-amber-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
                               }`}
                             />
 
@@ -380,6 +559,9 @@ export default function SeatLayout({
                             {isSelected && (
                               <Check className="w-3 h-3 absolute top-0.5 right-0.5 text-white drop-shadow-xs" />
                             )}
+                            {isLocked && (
+                              <Clock className="w-3 h-3 absolute top-0.5 right-0.5 text-amber-600 drop-shadow-xs" />
+                            )}
                           </div>
 
                           {/* Lower Seat Lip / Cushion edge */}
@@ -387,6 +569,8 @@ export default function SeatLayout({
                             className={`w-full h-1 rounded-b-md ${
                               isBooked
                                 ? "bg-slate-300/80"
+                                : isLocked
+                                ? "bg-amber-300/80"
                                 : isSelected
                                 ? "bg-blue-700/80"
                                 : "bg-slate-200/80 group-hover:bg-blue-200/60"
@@ -407,21 +591,25 @@ export default function SeatLayout({
                   {/* Right Column Seats */}
                   <div className="flex items-center gap-2 sm:gap-2.5">
                     {right.map((seatNum) => {
-                      const isBooked = bookedSet.has(seatNum);
+                      const isBooked = bookedSet.has(seatNum.toUpperCase());
+                      const isLocked = !isBooked && lockedSet.has(seatNum.toUpperCase()) && !selectedSeats.includes(seatNum);
                       const isSelected = selectedSeats.includes(seatNum);
+                      const isDisabled = isBooked || isLocked;
 
                       return (
                         <button
                           key={seatNum}
                           type="button"
-                          disabled={isBooked}
+                          disabled={isDisabled}
                           onClick={() => handleSeatClick(seatNum)}
-                          aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isSelected ? "Selected" : "Available"}`}
+                          aria-label={`Seat ${seatNum} ${isBooked ? "Booked" : isLocked ? "Held by another passenger" : isSelected ? "Selected" : "Available"}`}
                           className={`
                             w-11 h-13 sm:w-12 sm:h-14 rounded-t-xl rounded-b-lg font-bold flex flex-col items-center justify-between p-1 transition-all duration-150 relative select-none group
                             ${
                               isBooked
                                 ? "bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-inner"
+                                : isLocked
+                                ? "bg-amber-50 text-amber-800 border-2 border-amber-300 cursor-not-allowed opacity-90 shadow-2xs"
                                 : isSelected
                                 ? "bg-blue-600 text-white border-2 border-blue-700 shadow-lg shadow-blue-600/35 scale-105 ring-2 ring-blue-300"
                                 : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/40 shadow-sm active:scale-95"
@@ -433,6 +621,8 @@ export default function SeatLayout({
                             className={`w-7 sm:w-8 h-2.5 sm:h-3 rounded-t-md rounded-b-xs transition-colors shrink-0 ${
                               isBooked
                                 ? "bg-slate-300 border-b border-slate-400/50"
+                                : isLocked
+                                ? "bg-amber-200 border-b border-amber-300"
                                 : isSelected
                                 ? "bg-blue-500/90 border-b border-blue-700"
                                 : "bg-slate-100 group-hover:bg-blue-100/70 border-b border-slate-200 group-hover:border-blue-200"
@@ -444,12 +634,12 @@ export default function SeatLayout({
                             {/* Armrest Side Indents */}
                             <div
                               className={`absolute left-0 top-1 bottom-1 w-[2px] rounded-r-full ${
-                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                                isBooked ? "bg-slate-300" : isLocked ? "bg-amber-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
                               }`}
                             />
                             <div
                               className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-l-full ${
-                                isBooked ? "bg-slate-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
+                                isBooked ? "bg-slate-300" : isLocked ? "bg-amber-300" : isSelected ? "bg-blue-400" : "bg-slate-200"
                               }`}
                             />
 
@@ -459,6 +649,9 @@ export default function SeatLayout({
                             {isSelected && (
                               <Check className="w-3 h-3 absolute top-0.5 right-0.5 text-white drop-shadow-xs" />
                             )}
+                            {isLocked && (
+                              <Clock className="w-3 h-3 absolute top-0.5 right-0.5 text-amber-600 drop-shadow-xs" />
+                            )}
                           </div>
 
                           {/* Lower Seat Lip / Cushion edge */}
@@ -466,6 +659,8 @@ export default function SeatLayout({
                             className={`w-full h-1 rounded-b-md ${
                               isBooked
                                 ? "bg-slate-300/80"
+                                : isLocked
+                                ? "bg-amber-300/80"
                                 : isSelected
                                 ? "bg-blue-700/80"
                                 : "bg-slate-200/80 group-hover:bg-blue-200/60"
