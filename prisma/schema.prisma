@@ -121,6 +121,7 @@ model Schedule {
   
   bookings           Booking[]
   tickets            Ticket[]
+  seatLocks          SeatLock[]
 
   @@index([departureTime])
   @@index([origin, destination])
@@ -158,4 +159,19 @@ model Ticket {
   @@unique([scheduleId, seatNumber])
   @@index([scheduleId])
   @@map("tickets")
+}
+
+model SeatLock {
+  id           String   @id @default(cuid())
+  scheduleId   String   @map("schedule_id")
+  seatNumber   String   @map("seat_number")
+  sessionId    String   @map("session_id") // To identify the anonymous user's browser
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now())
+
+  schedule     Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, seatNumber]) // A specific seat on a specific schedule can only be locked once
+  @@index([expiresAt]) // Useful for a cron job to clean up expired locks
+  @@map("seat_locks")
 }

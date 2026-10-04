@@ -31,6 +31,8 @@
         "pdfkit": "^0.20.2",
         "pg": "^8.23.0",
         "postcss": "^8.5.28",
+        "pusher": "^5.3.4",
+        "pusher-js": "^8.6.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "react-hook-form": "^7.88.0",
