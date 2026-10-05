@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { Check, X, ShieldAlert, Armchair, ChevronRight, Info, Clock } from "lucide-react";
 import { SeatDisplay } from "@/types";
-import { getPusherClient } from "@/lib/pusher";
+import { getPusherClient, subscribeToScheduleChannel, unsubscribeFromScheduleChannel } from "@/lib/pusher";
 import { getClientSessionId } from "@/lib/session";
 
 export type LayoutArchitecture = "PREMIUM_2_1" | "EXECUTIVE_2_2" | "STANDARD_2_2";
@@ -134,8 +134,11 @@ export default function SeatLayout({
 
   // Client Session Identifier for anonymous seat locks
   const [sessionId, setSessionId] = useState<string>("");
+  const sessionIdRef = useRef<string>("");
   useEffect(() => {
-    setSessionId(getClientSessionId());
+    const sid = getClientSessionId();
+    setSessionId(sid);
+    sessionIdRef.current = sid;
   }, []);
 
   // Real-time externally locked seats
@@ -158,6 +161,11 @@ export default function SeatLayout({
   }, [initialLockedSeats]);
 
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
+  const storageKeyRef = useRef(storageKey);
+  storageKeyRef.current = storageKey;
+
+  const onSeatSelectRef = useRef(onSeatSelect);
+  onSeatSelectRef.current = onSeatSelect;
 
   // Lazily initialize state to avoid derived state warnings and extra renders (React Compiler fix)
   const [selectedSeats, setSelectedSeats] = useState<string[]>(() => {
@@ -180,62 +188,82 @@ export default function SeatLayout({
 
   // Subscribe to real-time Pusher events for this schedule
   useEffect(() => {
-    if (!scheduleId) return;
-
-    let channel: any = null;
-    let pusher: any = null;
-
-    try {
-      pusher = getPusherClient();
-      const channelName = `schedule-${scheduleId}`;
-      channel = pusher.subscribe(channelName);
-
-      channel.bind("seat:locked", (data: { seatNumber: string; sessionId: string; expiresAt: string }) => {
-        const currentSid = getClientSessionId();
-        // Only lock the seat if it was locked by a DIFFERENT user
-        if (data.sessionId !== currentSid) {
-          const seatUpper = data.seatNumber.toUpperCase();
-          setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
-
-          // If current user had selected this seat, revert and notify them
-          setSelectedSeats((prev) => {
-            if (prev.includes(data.seatNumber)) {
-              toast.error(`Seat ${data.seatNumber} was just selected by another passenger`, {
-                description: "Your selection has been updated.",
-              });
-              const updated = prev.filter((s) => s !== data.seatNumber);
-              onSeatSelect?.(updated);
-              if (storageKey && typeof window !== "undefined") {
-                if (updated.length > 0) {
-                  sessionStorage.setItem(storageKey, JSON.stringify(updated));
-                } else {
-                  sessionStorage.removeItem(storageKey);
-                }
-              }
-              return updated;
-            }
-            return prev;
-          });
-        }
-      });
-
-      channel.bind("seat:unlocked", (data: { seatNumber: string }) => {
-        const seatUpper = data.seatNumber.toUpperCase();
-        setLockedSeats((prev) => prev.filter((seat) => seat !== seatUpper));
-      });
-    } catch (err) {
-      console.error("[Pusher] Real-time subscription error:", err);
+    if (!scheduleId) {
+      console.warn("[Pusher] scheduleId is not provided; skipping Pusher subscription");
+      return;
     }
 
-    return () => {
-      if (channel) {
-        channel.unbind_all();
-      }
-      if (pusher && scheduleId) {
-        pusher.unsubscribe(`schedule-${scheduleId}`);
+    const channelName = `schedule-${scheduleId}`;
+    console.log(`[Pusher] Subscribing to channel: ${channelName}`);
+    const channel = subscribeToScheduleChannel(scheduleId);
+
+    if (!channel) {
+      console.error(`[Pusher] Could not obtain channel for: ${channelName}`);
+      return;
+    }
+
+    const handleSeatLocked = (data: { seatNumber: string; sessionId: string; expiresAt: string }) => {
+      const currentSid = sessionIdRef.current || getClientSessionId();
+      console.log("Pusher Event Received:", data);
+      console.log("Current Local Session ID:", currentSid);
+
+      // Only lock the seat if it was locked by a DIFFERENT user / browser tab
+      if (data.sessionId !== currentSid) {
+        console.log(`[Pusher] Locking seat ${data.seatNumber} in local state (locked by ${data.sessionId})`);
+        const seatUpper = data.seatNumber.toUpperCase();
+        setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
+
+        // If current user had selected this seat, revert and notify them
+        setSelectedSeats((prev) => {
+          if (prev.includes(data.seatNumber)) {
+            toast.error(`Seat ${data.seatNumber} was just selected by another passenger`, {
+              description: "Your selection has been updated.",
+            });
+            const updated = prev.filter((s) => s !== data.seatNumber);
+            onSeatSelectRef.current?.(updated);
+            if (storageKeyRef.current && typeof window !== "undefined") {
+              if (updated.length > 0) {
+                sessionStorage.setItem(storageKeyRef.current, JSON.stringify(updated));
+              } else {
+                sessionStorage.removeItem(storageKeyRef.current);
+              }
+            }
+            return updated;
+          }
+          return prev;
+        });
+      } else {
+        console.log(`[Pusher] Ignored seat:locked for seat ${data.seatNumber} because sessionId matches current user (${currentSid})`);
       }
     };
-  }, [scheduleId, storageKey, onSeatSelect]);
+
+    const handleSeatUnlocked = (data: { seatNumber: string }) => {
+      console.log("Pusher Event Received:", data);
+      const seatUpper = data.seatNumber.toUpperCase();
+      console.log(`[Pusher] Unlocking seat ${data.seatNumber} in local state`);
+      setLockedSeats((prev) => prev.filter((seat) => seat !== seatUpper));
+    };
+
+    channel.bind("seat:locked", handleSeatLocked);
+    channel.bind("seat:unlocked", handleSeatUnlocked);
+
+    channel.bind("pusher:subscription_succeeded", () => {
+      console.log(`[Pusher] Successfully subscribed to ${channelName}`);
+    });
+
+    channel.bind("pusher:subscription_error", (status: any) => {
+      console.error(`[Pusher] Subscription error on ${channelName}:`, status);
+    });
+
+    return () => {
+      console.log(`[Pusher] Cleaning up listeners for channel: ${channelName}`);
+      channel.unbind("seat:locked", handleSeatLocked);
+      channel.unbind("seat:unlocked", handleSeatUnlocked);
+      channel.unbind("pusher:subscription_succeeded");
+      channel.unbind("pusher:subscription_error");
+      unsubscribeFromScheduleChannel(scheduleId);
+    };
+  }, [scheduleId]);
 
   // Generate grid rows based on architecture
   const rows = useMemo(() => {
@@ -278,7 +306,7 @@ export default function SeatLayout({
       return;
     }
 
-    const activeSessionId = sessionId || getClientSessionId();
+    const activeSessionId = sessionIdRef.current || sessionId || getClientSessionId();
 
     if (selectedSeats.includes(seatNumber)) {
       // ── Unselecting Seat ──────────────────────────────

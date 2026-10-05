@@ -15,7 +15,9 @@ function generateUUID(): string {
 }
 
 /**
- * Get or create a persistent client-side session ID stored in localStorage.
+ * Get or create a persistent client-side session ID stored in sessionStorage (isolated per browser tab).
+ * Using sessionStorage ensures that multiple tabs in the same browser have independent session IDs,
+ * allowing real-time multi-tab testing without conflicting ownership of seat locks.
  * Client-safe: returns empty string if executed on the server.
  */
 export function getClientSessionId(): string {
@@ -24,10 +26,10 @@ export function getClientSessionId(): string {
   }
 
   try {
-    let sessionId = localStorage.getItem(SESSION_STORAGE_KEY);
+    let sessionId = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (!sessionId) {
       sessionId = generateUUID();
-      localStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+      sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
     }
     return sessionId;
   } catch {
