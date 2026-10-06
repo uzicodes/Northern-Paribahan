@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
@@ -20,7 +21,7 @@ function decodeRole(token: string | null): string | null {
     }
 }
 
-export default function NavbarClient() {
+export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const [authState, setAuthState] = useState<{ isLoggedIn: boolean; token: string | null }>(() => {
@@ -72,8 +73,19 @@ export default function NavbarClient() {
 
     const isActive = (path: string) => pathname === path;
 
+    if (pathname?.startsWith('/admin')) {
+        return null;
+    }
+
     return (
-        <nav className="relative flex items-center gap-3 text-sm">
+        <header className="sticky top-3 sm:top-4 z-40 w-full px-3 sm:px-6 flex justify-center pointer-events-none">
+            <div className="pointer-events-auto w-full max-w-5xl bg-[#172144]/95 backdrop-blur-md border border-[#223062] rounded-full shadow-xl shadow-black/20 px-4 sm:px-6 h-[58px] flex items-center justify-between transition-all duration-300">
+                <Link href="/" className="font-semibold text-lg flex items-center gap-2.5">
+                    <Image src="/logo.webp" alt="Northern Paribahan Logo" width={32} height={32} style={{ display: "inline-block", verticalAlign: "middle" }} priority />
+                    <span className={satisfy.className} style={{ color: "#FCA311", fontSize: "24px" }}>Northern Paribahan</span>
+                </Link>
+                <div style={{ color: "#F1F604" }}>
+                    <nav className="relative flex items-center gap-3 text-sm">
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1.5 lg:gap-2">
                 <Link
@@ -206,6 +218,9 @@ export default function NavbarClient() {
                 showContactPopup={showContactPopup}
                 setShowContactPopup={setShowContactPopup}
             />
-        </nav>
+                    </nav>
+                </div>
+            </div>
+        </header>
     );
 }

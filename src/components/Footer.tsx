@@ -1,8 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { satisfy } from '@/lib/fonts';
 
 export default function Footer() {
+    const pathname = usePathname();
+
+    if (pathname?.startsWith('/admin')) {
+        return null;
+    }
+
     return (
         <footer className="border-t mt-auto rounded-3xl mx-4 my-3" style={{ backgroundColor: '#172144' }}>
             <div className="max-w-6xl mx-auto px-4 py-6">
@@ -11,7 +20,7 @@ export default function Footer() {
                     {/* Company Info */}
                     <div className="col-span-1 md:col-span-1">
                         <Link href="/" className="flex items-center gap-2 mb-3">
-                            <Image src="/logo.png" alt="Northern Paribahan Logo" width={36} height={36} className="h-9 w-9" />
+                            <Image src="/logo.webp" alt="Northern Paribahan Logo" width={36} height={36} className="h-9 w-9" />
                             <span className={`font-bold text-lg ${satisfy.className}`} style={{ color: '#FCA311', fontSize: '22px' }}>
                                 Northern Paribahan
                             </span>

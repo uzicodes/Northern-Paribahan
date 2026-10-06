@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
                     <div className="text-center mb-6">
                         <Link href="/" className="inline-flex items-center justify-center gap-2.5 mb-2 group">
                             <Image 
-                                src="/logo.png" 
+                                src="/logo.webp" 
                                 alt="Northern Paribahan Logo" 
                                 width={38} 
                                 height={38} 

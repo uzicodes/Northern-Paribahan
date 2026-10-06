@@ -5,7 +5,9 @@ import { Toaster } from 'sonner';
 import localFont from 'next/font/local';
 import SessionManager from '@/components/SessionManager';
 import SmoothScroll from '@/components/SmoothScroll';
-import PublicShell from '@/components/PublicShell';
+import Navbar from '@/components/Navbar';
+import PageLoader from '@/components/PageLoader';
+import Footer from '@/components/Footer';
 
 const satoshi = localFont({
     src: [
@@ -34,7 +36,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <SmoothScroll>
                     <SessionManager />
                     <Toaster richColors position="bottom-right" />
-                    <PublicShell>{children}</PublicShell>
+                    <Navbar />
+                    <main className="flex-grow">
+                        <PageLoader>{children}</PageLoader>
+                    </main>
+                    <Footer />
                 </SmoothScroll>
             </body>
         </html>

@@ -100,7 +100,7 @@ export default function UpdatePasswordPage() {
                         <div className="relative z-10">
                             <Link href="/" className="inline-flex items-center gap-3 mb-8 group">
                                 <div className="p-2 bg-white/5 border border-white/10 rounded-2xl group-hover:border-[#FCA311]/40 transition-all">
-                                    <Image src="/logo.png" alt="Northern Paribahan Logo" width={44} height={44} className="h-10 w-auto object-contain" priority />
+                                    <Image src="/logo.webp" alt="Northern Paribahan Logo" width={44} height={44} className="h-10 w-auto object-contain" priority />
                                 </div>
                                 <div>
                                     <span className={`${satisfy.className} text-[#FCA311] text-3xl block leading-none`}>
@@ -155,7 +155,7 @@ export default function UpdatePasswordPage() {
                             {/* Mobile Brand Header */}
                             <div className="lg:hidden text-center mb-8">
                                 <Link href="/" className="inline-flex items-center gap-3">
-                                    <Image src="/logo.png" alt="Logo" width={40} height={40} className="h-9 w-auto" />
+                                    <Image src="/logo.webp" alt="Logo" width={40} height={40} className="h-9 w-auto" />
                                     <span className={`${satisfy.className} text-[#FCA311] text-2xl`}>Northern Paribahan</span>
                                 </Link>
                             </div>

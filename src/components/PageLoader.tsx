@@ -6,6 +6,7 @@ import GlobalLoader from './GlobalLoader';
 
 export default function PageLoader({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const isAdmin = pathname?.startsWith('/admin');
     const [loaderState, dispatch] = useReducer(
         (_state: { isLoading: boolean }, nextLoading: boolean) => ({ isLoading: nextLoading }),
         { isLoading: true }
@@ -13,6 +14,11 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
     const { isLoading } = loaderState;
 
     useEffect(() => {
+        if (isAdmin) {
+            dispatch(false);
+            return;
+        }
+
         dispatch(true);
 
         const timer = requestAnimationFrame(() => {
@@ -47,6 +53,10 @@ export default function PageLoader({ children }: { children: React.ReactNode }) 
 
         return () => cancelAnimationFrame(timer);
     }, [pathname]);
+
+    if (isAdmin) {
+        return <>{children}</>;
+    }
 
     return (
         <>
