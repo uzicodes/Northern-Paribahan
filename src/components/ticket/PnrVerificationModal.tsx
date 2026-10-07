@@ -149,6 +149,11 @@ export default function PnrVerificationModal({
     });
   };
 
+  const handleFormAction = (formData: FormData) => {
+    const raw = (formData.get('pnr') as string) || pnrInput;
+    handleSearch(raw);
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(true);
@@ -210,10 +215,7 @@ export default function PnrVerificationModal({
         <div className="p-5 sm:p-6 space-y-5 max-h-[80vh] overflow-y-auto">
           {/* Search Input Form */}
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSearch();
-            }}
+            action={handleFormAction}
             className="space-y-2"
           >
             <label htmlFor="pnr-input" className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -227,6 +229,7 @@ export default function PnrVerificationModal({
                 />
                 <input
                   id="pnr-input"
+                  name="pnr"
                   type="text"
                   value={pnrInput}
                   onChange={(e) => setCustomInput(e.target.value)}
