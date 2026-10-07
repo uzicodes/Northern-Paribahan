@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { X, ShieldAlert, Armchair, ChevronRight, Info, Clock } from "lucide-react";
 import { SeatDisplay } from "@/types";
 import { getPusherClient, subscribeToScheduleChannel, unsubscribeFromScheduleChannel } from "@/lib/pusher";
 import { getClientSessionId } from "@/lib/session";
+
+const emptySubscribe = () => () => {};
 
 export type LayoutArchitecture = "PREMIUM_2_1" | "EXECUTIVE_2_2" | "STANDARD_2_2";
 
@@ -132,33 +134,33 @@ export default function SeatLayout({
     return set;
   }, [propBookedSeats, legacySeats]);
 
-  // Client Session Identifier for anonymous seat locks
-  const [sessionId, setSessionId] = useState<string>("");
-  const sessionIdRef = useRef<string>("");
-  useEffect(() => {
-    const sid = getClientSessionId();
-    setSessionId(sid);
-    sessionIdRef.current = sid;
-  }, []);
+  // Client Session Identifier for anonymous seat locks (hydration-safe, zero extra renders)
+  const sessionId = useSyncExternalStore(
+    emptySubscribe,
+    getClientSessionId,
+    () => ""
+  );
 
   // Real-time externally locked seats
   const [lockedSeats, setLockedSeats] = useState<string[]>(() =>
     (initialLockedSeats || []).map((s) => s.toUpperCase())
   );
 
-  const lockedSet = useMemo(() => {
-    return new Set(lockedSeats.map((s) => s.toUpperCase()));
-  }, [lockedSeats]);
-
-  // Synchronize initialLockedSeats prop updates
-  useEffect(() => {
+  // Adjust state during render if initialLockedSeats prop changes (no extra effect render)
+  const [prevInitialLockedSeats, setPrevInitialLockedSeats] = useState(initialLockedSeats);
+  if (initialLockedSeats !== prevInitialLockedSeats) {
+    setPrevInitialLockedSeats(initialLockedSeats);
     if (initialLockedSeats && initialLockedSeats.length > 0) {
       setLockedSeats((prev) => {
         const combined = new Set([...prev, ...initialLockedSeats.map((s) => s.toUpperCase())]);
         return Array.from(combined);
       });
     }
-  }, [initialLockedSeats]);
+  }
+
+  const lockedSet = useMemo(() => {
+    return new Set(lockedSeats.map((s) => s.toUpperCase()));
+  }, [lockedSeats]);
 
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
   const storageKeyRef = useRef(storageKey);
@@ -203,7 +205,7 @@ export default function SeatLayout({
     }
 
     const handleSeatLocked = (data: { seatNumber: string; sessionId: string; expiresAt: string }) => {
-      const currentSid = sessionIdRef.current || getClientSessionId();
+      const currentSid = sessionId || getClientSessionId();
       console.log("Pusher Event Received:", data);
       console.log("Current Local Session ID:", currentSid);
 
@@ -306,7 +308,7 @@ export default function SeatLayout({
       return;
     }
 
-    const activeSessionId = sessionIdRef.current || sessionId || getClientSessionId();
+    const activeSessionId = sessionId || getClientSessionId();
 
     if (selectedSeats.includes(seatNumber)) {
       // ── Unselecting Seat ──────────────────────────────

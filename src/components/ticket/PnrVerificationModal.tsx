@@ -41,11 +41,18 @@ export default function PnrVerificationModal({
   const [copiedId, setCopiedId] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  const handleClose = () => {
+    setPnrInput('');
+    setError(null);
+    setTicket(null);
+    onClose();
+  };
+
   // Handle escape key to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
 
@@ -60,15 +67,38 @@ export default function PnrVerificationModal({
     };
   }, [isOpen, onClose]);
 
-  // Sync initial PNR and perform automatic verification if provided
-  useEffect(() => {
-    if (isOpen && initialPnr) {
-      setPnrInput(initialPnr);
-      handleSearch(initialPnr);
-    } else if (isOpen && !initialPnr && !ticket) {
-      setPnrInput('');
+  // Adjust state during render if initialPnr prop changes
+  const [prevInitialPnr, setPrevInitialPnr] = useState(initialPnr);
+  if (initialPnr !== prevInitialPnr) {
+    setPrevInitialPnr(initialPnr);
+    setPnrInput(initialPnr);
+    if (!initialPnr) {
+      setTicket(null);
       setError(null);
     }
+  }
+
+  // Pure data synchronization for initialPnr with cleanup guard
+  useEffect(() => {
+    if (!isOpen || !initialPnr) return;
+
+    let ignore = false;
+    startTransition(async () => {
+      const res = await verifyTicketAction(initialPnr.trim());
+      if (!ignore) {
+        if (res.success) {
+          setTicket(res.data);
+          setError(null);
+        } else {
+          setTicket(null);
+          setError(res.error);
+        }
+      }
+    });
+
+    return () => {
+      ignore = true;
+    };
   }, [isOpen, initialPnr]);
 
   const handleSearch = (searchRef?: string) => {
@@ -108,7 +138,7 @@ export default function PnrVerificationModal({
       {/* Dark Dimmed Backdrop */}
       <div
         className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity"
-        onClick={onClose}
+        onClick={handleClose}
         aria-hidden="true"
       />
 
@@ -141,7 +171,7 @@ export default function PnrVerificationModal({
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Close modal"
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
           >
