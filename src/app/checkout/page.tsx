@@ -740,7 +740,7 @@ function CheckoutContent() {
                                     {selectedSeats.map((seat) => (
                                         <span
                                             key={seat}
-                                            className="px-3 py-1 bg-blue-600 text-white font-bold text-xs rounded-lg shadow-2xs"
+                                            className="px-3 py-1 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow-2xs"
                                         >
                                             Seat {seat}
                                         </span>
