@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import { syncUserSession } from "@/lib/auth-sync";
 
 const INACTIVITY_TIMEOUT = 30 * 60 * 1000;  // 30 minutes in ms
 const MAX_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
@@ -117,8 +118,8 @@ export default function SessionManager() {
                         LOGIN_TIMESTAMP_KEY,
                         Date.now().toString()
                     );
-                    // Securely provision user record via POST without GET side effects
-                    fetch('/api/auth/callback', { method: 'POST' }).catch(() => {});
+                    // Securely provision user record via data-layer Server Action
+                    syncUserSession().catch(() => {});
                 }
 
                 // Start both timers

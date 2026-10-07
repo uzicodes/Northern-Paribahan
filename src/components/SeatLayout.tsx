@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect, useRef, useSyncExternalStore } from "react";
+import React, { useState, useReducer, useMemo, useEffect, useRef, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { X, ShieldAlert, Armchair, ChevronRight, Info, Clock } from "lucide-react";
 import { SeatDisplay } from "@/types";
@@ -8,6 +8,56 @@ import { getPusherClient, subscribeToScheduleChannel, unsubscribeFromScheduleCha
 import { getClientSessionId } from "@/lib/session";
 
 const emptySubscribe = () => () => {};
+
+interface SeatingState {
+  lockedSeats: string[];
+  selectedSeats: string[];
+}
+
+type SeatingAction =
+  | { type: "SYNC_INITIAL_LOCKED"; initialLockedSeats: string[] }
+  | { type: "SEAT_LOCKED_EXTERNALLY"; seatNumber: string }
+  | { type: "SEAT_UNLOCKED_EXTERNALLY"; seatNumber: string }
+  | { type: "SET_SELECTED_SEATS"; seats: string[] };
+
+function seatingReducer(state: SeatingState, action: SeatingAction): SeatingState {
+  switch (action.type) {
+    case "SYNC_INITIAL_LOCKED": {
+      const combined = new Set([
+        ...state.lockedSeats,
+        ...action.initialLockedSeats.map((s) => s.toUpperCase()),
+      ]);
+      return {
+        ...state,
+        lockedSeats: Array.from(combined),
+      };
+    }
+    case "SEAT_LOCKED_EXTERNALLY": {
+      const seatUpper = action.seatNumber.toUpperCase();
+      const updatedLocked = Array.from(new Set([...state.lockedSeats, seatUpper]));
+      const updatedSelected = state.selectedSeats.filter((s) => s.toUpperCase() !== seatUpper);
+      return {
+        lockedSeats: updatedLocked,
+        selectedSeats: updatedSelected,
+      };
+    }
+    case "SEAT_UNLOCKED_EXTERNALLY": {
+      const seatUpper = action.seatNumber.toUpperCase();
+      return {
+        ...state,
+        lockedSeats: state.lockedSeats.filter((s) => s !== seatUpper),
+      };
+    }
+    case "SET_SELECTED_SEATS": {
+      return {
+        ...state,
+        selectedSeats: action.seats,
+      };
+    }
+    default:
+      return state;
+  }
+}
 
 export type LayoutArchitecture = "PREMIUM_2_1" | "EXECUTIVE_2_2" | "STANDARD_2_2";
 
@@ -141,27 +191,6 @@ export default function SeatLayout({
     () => ""
   );
 
-  // Real-time externally locked seats
-  const [lockedSeats, setLockedSeats] = useState<string[]>(() =>
-    (initialLockedSeats || []).map((s) => s.toUpperCase())
-  );
-
-  // Adjust state during render if initialLockedSeats prop changes (no extra effect render)
-  const [prevInitialLockedSeats, setPrevInitialLockedSeats] = useState(initialLockedSeats);
-  if (initialLockedSeats !== prevInitialLockedSeats) {
-    setPrevInitialLockedSeats(initialLockedSeats);
-    if (initialLockedSeats && initialLockedSeats.length > 0) {
-      setLockedSeats((prev) => {
-        const combined = new Set([...prev, ...initialLockedSeats.map((s) => s.toUpperCase())]);
-        return Array.from(combined);
-      });
-    }
-  }
-
-  const lockedSet = useMemo(() => {
-    return new Set(lockedSeats.map((s) => s.toUpperCase()));
-  }, [lockedSeats]);
-
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
   const storageKeyRef = useRef(storageKey);
   storageKeyRef.current = storageKey;
@@ -169,24 +198,51 @@ export default function SeatLayout({
   const onSeatSelectRef = useRef(onSeatSelect);
   onSeatSelectRef.current = onSeatSelect;
 
-  // Lazily initialize state to avoid derived state warnings and extra renders (React Compiler fix)
-  const [selectedSeats, setSelectedSeats] = useState<string[]>(() => {
-    if (typeof window === "undefined" || !storageKey) return [];
-    try {
-      const saved = sessionStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter(
-            (seat): seat is string => typeof seat === "string" && !bookedSet.has(seat.toUpperCase())
-          ).slice(0, 4);
+  // Combine lockedSeats and selectedSeats into useReducer to eliminate multiple setState calls
+  const [seatingState, dispatchSeating] = useReducer(
+    seatingReducer,
+    null,
+    () => {
+      let initialSelected: string[] = [];
+      if (typeof window !== "undefined" && storageKey) {
+        try {
+          const saved = sessionStorage.getItem(storageKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+              initialSelected = parsed.filter(
+                (seat): seat is string => typeof seat === "string" && !bookedSet.has(seat.toUpperCase())
+              ).slice(0, 4);
+            }
+          }
+        } catch {
+          // Ignore parse errors
         }
       }
-    } catch {
-      // Ignore parse errors
+      return {
+        lockedSeats: (initialLockedSeats || []).map((s) => s.toUpperCase()),
+        selectedSeats: initialSelected,
+      };
     }
-    return [];
-  });
+  );
+
+  const { lockedSeats, selectedSeats } = seatingState;
+
+  const selectedSeatsRef = useRef(selectedSeats);
+  selectedSeatsRef.current = selectedSeats;
+
+  // Adjust state during render if initialLockedSeats prop changes (no extra effect render)
+  const [prevInitialLockedSeats, setPrevInitialLockedSeats] = useState(initialLockedSeats);
+  if (initialLockedSeats !== prevInitialLockedSeats) {
+    setPrevInitialLockedSeats(initialLockedSeats);
+    if (initialLockedSeats && initialLockedSeats.length > 0) {
+      dispatchSeating({ type: "SYNC_INITIAL_LOCKED", initialLockedSeats });
+    }
+  }
+
+  const lockedSet = useMemo(() => {
+    return new Set(lockedSeats.map((s) => s.toUpperCase()));
+  }, [lockedSeats]);
 
   // Subscribe to real-time Pusher events for this schedule
   useEffect(() => {
@@ -212,28 +268,25 @@ export default function SeatLayout({
       // Only lock the seat if it was locked by a DIFFERENT user / browser tab
       if (data.sessionId !== currentSid) {
         console.log(`[Pusher] Locking seat ${data.seatNumber} in local state (locked by ${data.sessionId})`);
-        const seatUpper = data.seatNumber.toUpperCase();
-        setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
 
         // If current user had selected this seat, revert and notify them
-        setSelectedSeats((prev) => {
-          if (prev.includes(data.seatNumber)) {
-            toast.error(`Seat ${data.seatNumber} was just selected by another passenger`, {
-              description: "Your selection has been updated.",
-            });
-            const updated = prev.filter((s) => s !== data.seatNumber);
-            onSeatSelectRef.current?.(updated);
-            if (storageKeyRef.current && typeof window !== "undefined") {
-              if (updated.length > 0) {
-                sessionStorage.setItem(storageKeyRef.current, JSON.stringify(updated));
-              } else {
-                sessionStorage.removeItem(storageKeyRef.current);
-              }
+        if (selectedSeatsRef.current.includes(data.seatNumber)) {
+          toast.error(`Seat ${data.seatNumber} was just selected by another passenger`, {
+            description: "Your selection has been updated.",
+          });
+          const updated = selectedSeatsRef.current.filter((s) => s !== data.seatNumber);
+          onSeatSelectRef.current?.(updated);
+          if (storageKeyRef.current && typeof window !== "undefined") {
+            if (updated.length > 0) {
+              sessionStorage.setItem(storageKeyRef.current, JSON.stringify(updated));
+            } else {
+              sessionStorage.removeItem(storageKeyRef.current);
             }
-            return updated;
           }
-          return prev;
-        });
+        }
+
+        // Single atomic state dispatch! Updates lockedSeats and selectedSeats together
+        dispatchSeating({ type: "SEAT_LOCKED_EXTERNALLY", seatNumber: data.seatNumber });
       } else {
         console.log(`[Pusher] Ignored seat:locked for seat ${data.seatNumber} because sessionId matches current user (${currentSid})`);
       }
@@ -243,7 +296,7 @@ export default function SeatLayout({
       console.log("Pusher Event Received:", data);
       const seatUpper = data.seatNumber.toUpperCase();
       console.log(`[Pusher] Unlocking seat ${data.seatNumber} in local state`);
-      setLockedSeats((prev) => prev.filter((seat) => seat !== seatUpper));
+      dispatchSeating({ type: "SEAT_UNLOCKED_EXTERNALLY", seatNumber: data.seatNumber });
     };
 
     channel.bind("seat:locked", handleSeatLocked);
@@ -289,6 +342,10 @@ export default function SeatLayout({
     }
     return rowList;
   }, [config]);
+
+  const setSelectedSeats = (seats: string[]) => {
+    dispatchSeating({ type: "SET_SELECTED_SEATS", seats });
+  };
 
   // Handle seat selection with 4-seat limit enforcement and backend locking
   const handleSeatClick = (seatNumber: string) => {
@@ -363,9 +420,10 @@ export default function SeatLayout({
             if (!res.ok) {
               const errData = await res.json().catch(() => ({}));
 
-              // Revert optimistic selection
-              setSelectedSeats((prev) => {
-                const reverted = prev.filter((s) => s !== seatNumber);
+              if (res.status === 409) {
+                // Revert optimistic selection and record external lock atomically
+                dispatchSeating({ type: "SEAT_LOCKED_EXTERNALLY", seatNumber });
+                const reverted = selectedSeatsRef.current.filter((s) => s !== seatNumber);
                 onSeatSelect?.(reverted);
                 if (storageKey && typeof window !== "undefined") {
                   if (reverted.length > 0) {
@@ -374,11 +432,17 @@ export default function SeatLayout({
                     sessionStorage.removeItem(storageKey);
                   }
                 }
-                return reverted;
-              });
-
-              if (res.status === 409) {
-                setLockedSeats((prev) => Array.from(new Set([...prev, seatUpper])));
+              } else {
+                const reverted = selectedSeatsRef.current.filter((s) => s !== seatNumber);
+                setSelectedSeats(reverted);
+                onSeatSelect?.(reverted);
+                if (storageKey && typeof window !== "undefined") {
+                  if (reverted.length > 0) {
+                    sessionStorage.setItem(storageKey, JSON.stringify(reverted));
+                  } else {
+                    sessionStorage.removeItem(storageKey);
+                  }
+                }
               }
 
               toast.error(errData.error || "Sorry, another passenger just selected this seat.");
@@ -387,18 +451,16 @@ export default function SeatLayout({
           .catch((err) => {
             console.error("[Seat Lock] Error locking seat:", err);
             // Revert optimistic selection on network error
-            setSelectedSeats((prev) => {
-              const reverted = prev.filter((s) => s !== seatNumber);
-              onSeatSelect?.(reverted);
-              if (storageKey && typeof window !== "undefined") {
-                if (reverted.length > 0) {
-                  sessionStorage.setItem(storageKey, JSON.stringify(reverted));
-                } else {
-                  sessionStorage.removeItem(storageKey);
-                }
+            const reverted = selectedSeatsRef.current.filter((s) => s !== seatNumber);
+            setSelectedSeats(reverted);
+            onSeatSelect?.(reverted);
+            if (storageKey && typeof window !== "undefined") {
+              if (reverted.length > 0) {
+                sessionStorage.setItem(storageKey, JSON.stringify(reverted));
+              } else {
+                sessionStorage.removeItem(storageKey);
               }
-              return reverted;
-            });
+            }
             toast.error("Network error: Could not hold seat. Please try again.");
           });
       }

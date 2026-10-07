@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useTransition } from 'react';
+import React, { useState, useReducer, useEffect, useTransition } from 'react';
 import {
   X,
   Search,
@@ -24,6 +24,32 @@ import {
 import { verifyTicketAction } from '@/actions/verifyTicket';
 import { VerifiedTicket } from '@/types/ticket';
 
+interface VerificationState {
+  ticket: VerifiedTicket | null;
+  error: string | null;
+}
+
+type VerificationAction =
+  | { type: 'VERIFY_START' }
+  | { type: 'VERIFY_SUCCESS'; ticket: VerifiedTicket }
+  | { type: 'VERIFY_ERROR'; error: string }
+  | { type: 'RESET' };
+
+function verificationReducer(state: VerificationState, action: VerificationAction): VerificationState {
+  switch (action.type) {
+    case 'VERIFY_START':
+      return { ...state, error: null };
+    case 'VERIFY_SUCCESS':
+      return { ticket: action.ticket, error: null };
+    case 'VERIFY_ERROR':
+      return { ticket: null, error: action.error };
+    case 'RESET':
+      return { ticket: null, error: null };
+    default:
+      return state;
+  }
+}
+
 interface PnrVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -35,16 +61,22 @@ export default function PnrVerificationModal({
   onClose,
   initialPnr = '',
 }: PnrVerificationModalProps) {
-  const [pnrInput, setPnrInput] = useState(initialPnr);
-  const [ticket, setTicket] = useState<VerifiedTicket | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Derive pnrInput directly: user override takes precedence, fallback to initialPnr prop
+  const [customInput, setCustomInput] = useState<string | null>(null);
+  const pnrInput = customInput ?? initialPnr;
+
+  // Single reducer for all verification state to prevent multiple setState calls
+  const [{ ticket, error }, dispatch] = useReducer(verificationReducer, {
+    ticket: null,
+    error: null,
+  });
+
   const [copiedId, setCopiedId] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleClose = () => {
-    setPnrInput('');
-    setError(null);
-    setTicket(null);
+    setCustomInput(null);
+    dispatch({ type: 'RESET' });
     onClose();
   };
 
@@ -67,15 +99,12 @@ export default function PnrVerificationModal({
     };
   }, [isOpen, onClose]);
 
-  // Adjust state during render if initialPnr prop changes
+  // Reset verification state during render if initialPnr prop changes
   const [prevInitialPnr, setPrevInitialPnr] = useState(initialPnr);
   if (initialPnr !== prevInitialPnr) {
     setPrevInitialPnr(initialPnr);
-    setPnrInput(initialPnr);
-    if (!initialPnr) {
-      setTicket(null);
-      setError(null);
-    }
+    setCustomInput(null);
+    dispatch({ type: 'RESET' });
   }
 
   // Pure data synchronization for initialPnr with cleanup guard
@@ -87,11 +116,9 @@ export default function PnrVerificationModal({
       const res = await verifyTicketAction(initialPnr.trim());
       if (!ignore) {
         if (res.success) {
-          setTicket(res.data);
-          setError(null);
+          dispatch({ type: 'VERIFY_SUCCESS', ticket: res.data });
         } else {
-          setTicket(null);
-          setError(res.error);
+          dispatch({ type: 'VERIFY_ERROR', error: res.error });
         }
       }
     });
@@ -104,19 +131,20 @@ export default function PnrVerificationModal({
   const handleSearch = (searchRef?: string) => {
     const query = (searchRef ?? pnrInput).trim();
     if (!query) {
-      setError('Please provide a Booking Reference / PNR or Transaction ID.');
+      dispatch({
+        type: 'VERIFY_ERROR',
+        error: 'Please provide a Booking Reference / PNR or Transaction ID.',
+      });
       return;
     }
 
-    setError(null);
+    dispatch({ type: 'VERIFY_START' });
     startTransition(async () => {
       const res = await verifyTicketAction(query);
       if (res.success) {
-        setTicket(res.data);
-        setError(null);
+        dispatch({ type: 'VERIFY_SUCCESS', ticket: res.data });
       } else {
-        setTicket(null);
-        setError(res.error);
+        dispatch({ type: 'VERIFY_ERROR', error: res.error });
       }
     });
   };
@@ -201,7 +229,7 @@ export default function PnrVerificationModal({
                   id="pnr-input"
                   type="text"
                   value={pnrInput}
-                  onChange={(e) => setPnrInput(e.target.value)}
+                  onChange={(e) => setCustomInput(e.target.value)}
                   placeholder="e.g. cm3xyz123 or SSLC-TRANS-987"
                   className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#172144] focus:border-transparent transition-all"
                 />
