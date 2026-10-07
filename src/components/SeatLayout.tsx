@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useReducer, useMemo, useEffect, useRef, useSyncExternalStore } from "react";
+import React, { useState, useReducer, useMemo, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { X, ShieldAlert, Armchair, ChevronRight, Info, Clock } from "lucide-react";
 import { SeatDisplay } from "@/types";
 import { getPusherClient, subscribeToScheduleChannel, unsubscribeFromScheduleChannel } from "@/lib/pusher";
 import { getClientSessionId } from "@/lib/session";
 
-const emptySubscribe = () => () => {};
+const EMPTY_LOCKED_SEATS: string[] = [];
 
 interface SeatingState {
   lockedSeats: string[];
@@ -155,7 +155,7 @@ export default function SeatLayout({
   tier,
   fare = 0,
   bookedSeats: propBookedSeats,
-  initialLockedSeats = [],
+  initialLockedSeats = EMPTY_LOCKED_SEATS,
   seats: legacySeats,
   onSeatSelect,
   onProceed,
@@ -184,12 +184,11 @@ export default function SeatLayout({
     return set;
   }, [propBookedSeats, legacySeats]);
 
-  // Client Session Identifier for anonymous seat locks (hydration-safe, zero extra renders)
-  const sessionId = useSyncExternalStore(
-    emptySubscribe,
-    getClientSessionId,
-    () => ""
-  );
+  // Session identifier for anonymous seat locks — only used in event handlers, never rendered in JSX
+  const sessionIdRef = useRef<string>("");
+  if (!sessionIdRef.current && typeof window !== "undefined") {
+    sessionIdRef.current = getClientSessionId();
+  }
 
   const storageKey = busId && scheduleId ? `selected_seats_${busId}_${scheduleId}` : null;
   const storageKeyRef = useRef(storageKey);
@@ -261,7 +260,7 @@ export default function SeatLayout({
     }
 
     const handleSeatLocked = (data: { seatNumber: string; sessionId: string; expiresAt: string }) => {
-      const currentSid = sessionId || getClientSessionId();
+      const currentSid = sessionIdRef.current || getClientSessionId();
       console.log("Pusher Event Received:", data);
       console.log("Current Local Session ID:", currentSid);
 
@@ -365,7 +364,7 @@ export default function SeatLayout({
       return;
     }
 
-    const activeSessionId = sessionId || getClientSessionId();
+    const activeSessionId = sessionIdRef.current || getClientSessionId();
 
     if (selectedSeats.includes(seatNumber)) {
       // ── Unselecting Seat ──────────────────────────────
