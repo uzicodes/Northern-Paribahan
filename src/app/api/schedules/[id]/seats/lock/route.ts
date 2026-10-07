@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { pusherServer } from '@/lib/pusher';
 import { resolveServerSessionId } from '@/lib/session';
+import { seatLockRateLimit } from '@/lib/ratelimit';
 
 export async function POST(
   request: Request,
@@ -12,6 +13,34 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
     const { seatNumber, sessionId: rawSessionId } = body;
     const sessionId = resolveServerSessionId(request, rawSessionId);
+
+    // Rate limiting check via Upstash Redis (10 requests per 10 seconds)
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp;
+    const identifier = clientIp || sessionId || 'anonymous';
+
+    if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+      try {
+        const { success, limit, remaining, reset } = await seatLockRateLimit.limit(identifier);
+        if (!success) {
+          return NextResponse.json(
+            { error: 'Too many seat selection requests. Please wait a moment and try again.' },
+            {
+              status: 429,
+              headers: {
+                'Retry-After': Math.max(1, Math.ceil((reset - Date.now()) / 1000)).toString(),
+                'X-RateLimit-Limit': limit.toString(),
+                'X-RateLimit-Remaining': remaining.toString(),
+                'X-RateLimit-Reset': reset.toString(),
+              },
+            }
+          );
+        }
+      } catch (rateLimitErr) {
+        console.error('[RateLimit Error] Failed to verify rate limit:', rateLimitErr);
+      }
+    }
 
     if (!scheduleId || !seatNumber || !sessionId) {
       return NextResponse.json(
