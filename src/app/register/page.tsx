@@ -169,26 +169,26 @@ function RegisterContent() {
 
     return (
         <div 
-            className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6"
+            className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center py-6 sm:py-8 px-4 sm:px-6"
             style={{ backgroundColor: '#C9CBA3' }}
         >
             <div className="w-full max-w-md">
                 {/* Single Form Card */}
-                <div className="w-full bg-white rounded-3xl shadow-xl p-7 sm:p-9 border border-black/5">
+                <div className="w-full bg-white rounded-3xl shadow-xl p-5 sm:p-7 border border-black/5">
                     {/* Brand Header */}
-                    <div className="text-center mb-6">
-                        <Link href="/" className="inline-block mb-2 group">
-                            <span className={`${satisfy.className} text-[#FCA311] text-3xl sm:text-4xl font-bold transition-colors duration-200 group-hover:text-[#172144]`}>
+                    <div className="text-center mb-4">
+                        <Link href="/" className="inline-block mb-1 group">
+                            <span className={`${satisfy.className} text-[#FCA311] text-2xl sm:text-3xl font-bold transition-colors duration-200 group-hover:text-[#172144]`}>
                                 Northern Paribahan
                             </span>
                         </Link>
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Create Account</h1>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">Sign up today for instant intercity ticket bookings</p>
+                        <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">Create Account</h1>
+                        <p className="text-xs text-gray-500 mt-0.5">Sign up today for instant intercity ticket bookings</p>
                     </div>
 
                     {/* Error Alert */}
                     {error && (
-                        <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs sm:text-sm flex items-start gap-2.5 animate-in fade-in duration-200">
+                        <div className="mb-3.5 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs sm:text-sm flex items-start gap-2.5 animate-in fade-in duration-200">
                             <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" />
                             <span className="font-medium leading-relaxed">{error}</span>
                         </div>
@@ -199,7 +199,7 @@ function RegisterContent() {
                         type="button"
                         onClick={handleGoogleSignUp}
                         disabled={googleLoading}
-                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] cursor-pointer ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`w-full bg-white border border-gray-300 text-gray-700 py-2 sm:py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm hover:bg-gray-50 hover:border-gray-400 hover:shadow-xs transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] cursor-pointer ${googleLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {googleLoading ? (
                             <Loader2 className="animate-spin h-4 w-4 text-gray-500" />
@@ -215,16 +215,16 @@ function RegisterContent() {
                     </button>
 
                     {/* Divider */}
-                    <div className="flex items-center gap-3 my-4 sm:my-5">
+                    <div className="flex items-center gap-3 my-3 sm:my-3.5">
                         <div className="flex-grow h-px bg-gray-200"></div>
                         <span className="text-[11px] uppercase tracking-wider text-gray-400 font-bold">Or register with email</span>
                         <div className="flex-grow h-px bg-gray-200"></div>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-3.5">
+                    <form onSubmit={handleSubmit} className="space-y-2.5">
                         <div>
-                            <label htmlFor="reg-name" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1.5">
+                            <label htmlFor="reg-name" className="block text-xs font-bold uppercase tracking-wider text-red-700 mb-1">
                                 Full Name
                             </label>
                             <div className="relative">
@@ -238,13 +238,13 @@ function RegisterContent() {
                                     onChange={(e) => dispatch({ name: e.target.value })}
                                     placeholder="e.g. Asif Ahmed"
                                     required
-                                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
+                                    className="w-full pl-10 pr-4 py-2 sm:py-2.5 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="reg-email" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1.5">
+                            <label htmlFor="reg-email" className="block text-xs font-bold uppercase tracking-wider text-red-700 mb-1">
                                 Email Address
                             </label>
                             <div className="relative">
@@ -258,14 +258,14 @@ function RegisterContent() {
                                     onChange={(e) => dispatch({ email: e.target.value })}
                                     placeholder="name@example.com"
                                     required
-                                    className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
+                                    className="w-full pl-10 pr-4 py-2 sm:py-2.5 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between mb-1.5">
-                                <label htmlFor="reg-phone" className="block text-xs font-bold uppercase tracking-wider text-gray-600">
+                            <div className="flex items-center justify-between mb-1">
+                                <label htmlFor="reg-phone" className="block text-xs font-bold uppercase tracking-wider text-red-700">
                                     Phone Number
                                 </label>
                                 <span className="text-[11px] text-gray-400 font-medium">
@@ -273,7 +273,7 @@ function RegisterContent() {
                                 </span>
                             </div>
                             <div className="relative flex rounded-xl border border-gray-300 bg-gray-50/50 focus-within:bg-white focus-within:border-[#172144] focus-within:ring-2 focus-within:ring-[#172144]/15 transition-all overflow-hidden">
-                                <div className="flex items-center px-3.5 bg-gray-100/70 border-r border-gray-200 text-gray-600 text-xs sm:text-sm font-semibold select-none shrink-0 gap-1">
+                                <div className="flex items-center px-3 bg-gray-100/70 border-r border-gray-200 text-gray-600 text-xs sm:text-sm font-semibold select-none shrink-0 gap-1">
                                     <Phone size={14} className="text-gray-400" />
                                     <span>+880</span>
                                 </div>
@@ -282,18 +282,18 @@ function RegisterContent() {
                                     type="tel"
                                     value={phoneNumber}
                                     onChange={(e) => {
-                                        const cleaned = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                        dispatch({ phoneNumber: cleaned });
+                                         const cleaned = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                         dispatch({ phoneNumber: cleaned });
                                     }}
                                     placeholder="1XXXXXXXXX"
                                     required
-                                    className="w-full px-3 py-2.5 sm:py-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                                    className="w-full px-3 py-2 sm:py-2.5 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="reg-password" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1.5">
+                            <label htmlFor="reg-password" className="block text-xs font-bold uppercase tracking-wider text-red-700 mb-1">
                                 Password
                             </label>
                             <div className="relative">
@@ -307,7 +307,7 @@ function RegisterContent() {
                                     onChange={(e) => dispatch({ password: e.target.value })}
                                     placeholder="Minimum 6 characters"
                                     required
-                                    className="w-full pl-10 pr-11 py-2.5 sm:py-3 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
+                                    className="w-full pl-10 pr-11 py-2 sm:py-2.5 bg-gray-50/50 border border-gray-300 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#172144] focus:ring-2 focus:ring-[#172144]/15 outline-none transition-all duration-150"
                                 />
                                 <button
                                     type="button"
@@ -323,7 +323,7 @@ function RegisterContent() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`w-full mt-2 bg-[#172144] hover:bg-[#101730] text-white py-3 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`w-full mt-3.5 sm:mt-4 bg-[#172144] hover:bg-[#101730] text-white py-2.5 sm:py-3.5 px-4 rounded-xl font-bold text-sm shadow-md hover:shadow-lg hover:shadow-[#172144]/20 transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {loading ? (
                                 <>
@@ -335,7 +335,7 @@ function RegisterContent() {
                             )}
                         </button>
 
-                        <p className="text-center text-xs sm:text-sm text-gray-600 pt-2">
+                        <p className="text-center text-xs text-gray-600 pt-1.5">
                             Already have an account?{' '}
                             <Link 
                                 href="/login" 

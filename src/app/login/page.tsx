@@ -155,7 +155,7 @@ function LoginContent() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1.5">
+                            <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-red-700 mb-1.5">
                                 Email Address
                             </label>
                             <div className="relative">
@@ -176,7 +176,7 @@ function LoginContent() {
 
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-gray-600">
+                                <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-red-700">
                                     Password
                                 </label>
                                 <Link 
