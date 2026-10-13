@@ -40,35 +40,57 @@ const LOCATIONS = [
 const POPULAR_ROUTES = [
     {
         from: 'Dhaka',
-        to: 'Bogura',
-        duration: '5h 30m',
-        fare: 850,
-        type: 'AC & Non-AC',
-        departures: '18 Daily Departures',
-    },
-    {
-        from: 'Rajshahi',
-        to: 'Dhaka',
-        duration: '6h 00m',
-        fare: 750,
-        type: 'Express Coach',
-        departures: '14 Daily Departures',
-    },
-    {
-        from: 'Bogura',
-        to: 'Dhaka',
-        duration: '5h 30m',
-        fare: 900,
-        type: 'Multi-Axle Volvo',
-        departures: '16 Daily Departures',
+        to: 'Chittagong',
+        toLabel: 'Chittagong (CTG)',
+        busModel: 'Scania Legacy SR2 Multi-Axle',
+        duration: '4h 30m',
+        fare: 1200,
+        departures: '24 Daily Departures',
     },
     {
         from: 'Dhaka',
         to: "Cox's Bazar",
-        duration: '8h 30m',
-        fare: 1400,
-        type: 'Ultra Luxury Sleeper',
-        departures: '8 Daily Departures',
+        toLabel: "Cox's Bazar",
+        busModel: "MAN 24.460 Lion's Coach",
+        duration: '7h 30m',
+        fare: 1600,
+        departures: '18 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: 'Rajshahi',
+        toLabel: 'Rajshahi',
+        busModel: 'Volvo B9R Multi-Axle',
+        duration: '5h 00m',
+        fare: 850,
+        departures: '16 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: 'Sylhet',
+        toLabel: 'Sylhet',
+        busModel: 'Mercedes-Benz OM 906',
+        duration: '4h 45m',
+        fare: 950,
+        departures: '14 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: 'Khulna',
+        toLabel: 'Khulna',
+        busModel: 'Scania Touring HD',
+        duration: '3h 45m',
+        fare: 800,
+        departures: '16 Daily Departures',
+    },
+    {
+        from: 'Dhaka',
+        to: 'Barisal',
+        toLabel: 'Barisal',
+        busModel: 'MAN 24.460 Highway King',
+        duration: '3h 00m',
+        fare: 700,
+        departures: '12 Daily Departures',
     },
 ];
 
@@ -482,28 +504,31 @@ export default function Page() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {POPULAR_ROUTES.map((route) => (
                             <div
-                                key={`${route.from}-${route.to}-${route.type}`}
+                                key={`${route.from}-${route.to}-${route.busModel}`}
                                 className="bg-gradient-to-br from-[#172144] to-[#212c58] rounded-2xl p-5 shadow-lg border border-[#2c3a72] hover:border-[#FCA311]/60 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group text-white"
                             >
                                 <div>
-                                    <div className="flex items-center justify-between mb-3">
-                                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#FCA311]/15 text-[#FCA311] border border-[#FCA311]/30">
-                                            {route.type}
-                                        </span>
-                                        <span className="text-xs text-slate-300 flex items-center gap-1.5 font-medium">
+                                    <div className="flex items-center justify-between gap-2 mb-3">
+                                        <div className="flex items-center gap-2 min-w-0">
+                                            <span className="text-lg font-bold text-white">{route.from}</span>
+                                            <ArrowRight size={16} className="text-[#FCA311] group-hover:translate-x-1 transition-transform shrink-0" />
+                                            <span className="text-lg font-bold text-white truncate">{route.toLabel || route.to}</span>
+                                        </div>
+                                        <span className="text-xs text-slate-300 flex items-center gap-1.5 font-medium bg-white/5 px-2.5 py-1 rounded-full border border-white/10 shrink-0">
                                             <Clock size={13} className="text-[#FCA311]" /> {route.duration}
                                         </span>
                                     </div>
 
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-lg font-bold text-white">{route.from}</span>
-                                        <ArrowRight size={16} className="text-[#FCA311] group-hover:translate-x-1 transition-transform" />
-                                        <span className="text-lg font-bold text-white">{route.to}</span>
+                                    {/* Coach model */}
+                                    <div className="flex items-center gap-2 text-xs text-slate-200 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/5 mb-2.5">
+                                        <Bus size={13} className="text-[#FCA311] shrink-0" />
+                                        <span className="font-medium truncate">{route.busModel}</span>
                                     </div>
+
                                     <p className="text-xs text-slate-400 mb-4">{route.departures}</p>
                                 </div>
 
-                                <div className="pt-4 border-t border-white/10 flex items-center justify-between mt-2">
+                                <div className="pt-3 border-t border-white/10 flex items-center justify-between mt-auto">
                                     <div>
                                         <span className="text-[11px] text-slate-400 uppercase font-medium">Starts from</span>
                                         <p className="text-2xl font-black text-[#FCA311]">৳{route.fare}</p>
@@ -511,7 +536,7 @@ export default function Page() {
                                     <button
                                         type="button"
                                         onClick={() => handleQuickRouteSelect(route.from, route.to)}
-                                        className="bg-[#c44d4d] hover:bg-[#a93b3b] text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-1.5"
+                                        className="bg-[#c44d4d] hover:bg-[#a93b3b] text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center gap-1.5 cursor-pointer"
                                     >
                                         Book Seat <ArrowRight size={13} />
                                     </button>
