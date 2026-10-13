@@ -137,8 +137,8 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Today's Departure Operations Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700/60 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700/60 flex items-center justify-between">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900 dark:text-white">Today&apos;s Departure Operations</h2>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Live schedule status and coach occupancy for today</p>
@@ -162,9 +162,9 @@ export default async function AdminDashboardPage() {
                     <>
                         {/* Desktop Table */}
                         <div className="hidden sm:block overflow-x-auto">
-                            <table className="w-full text-left text-sm">
+                            <table className="w-full text-left text-sm border-collapse">
                                 <thead>
-                                    <tr className="bg-gray-50/80 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700/60">
+                                    <tr className="bg-gray-50/90 dark:bg-gray-900/60 border-b border-gray-200 dark:border-gray-700 divide-x divide-gray-200 dark:divide-gray-700">
                                         <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure</th>
                                         <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Route</th>
                                         <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach Info</th>
@@ -172,7 +172,7 @@ export default async function AdminDashboardPage() {
                                         <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700/60">
+                                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                                     {todaySchedules.map((schedule) => {
                                         const capacity = schedule.bus?.capacity || 40;
                                         const booked = schedule._count.tickets;
@@ -181,7 +181,7 @@ export default async function AdminDashboardPage() {
                                         const tier = schedule.bus?.tier || "ECONOMY";
 
                                         return (
-                                            <tr key={schedule.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors">
+                                            <tr key={schedule.id} className="divide-x divide-gray-200 dark:divide-gray-700 hover:bg-gray-50/60 dark:hover:bg-gray-700/40 transition-colors">
                                                 {/* Departure */}
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="font-semibold text-gray-900 dark:text-white">
@@ -243,7 +243,7 @@ export default async function AdminDashboardPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${status.className}`}>
                                                         {status.isBoarding && (
-                                                            <span className="relative flex h-2 w-2 mr-1.5">
+                                                             <span className="relative flex h-2 w-2 mr-1.5">
                                                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                                             </span>
@@ -259,7 +259,7 @@ export default async function AdminDashboardPage() {
                         </div>
 
                         {/* Mobile Card View */}
-                        <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700/60">
+                        <div className="sm:hidden divide-y divide-gray-200 dark:divide-gray-700">
                             {todaySchedules.map((schedule) => {
                                 const capacity = schedule.bus?.capacity || 40;
                                 const booked = schedule._count.tickets;

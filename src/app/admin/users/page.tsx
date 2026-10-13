@@ -89,20 +89,20 @@ export default async function AdminUsersPage({
             </form>
 
             {/* Users Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {/* Desktop */}
                 <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-left text-sm border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/80">
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">User</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Contact</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Bookings</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Role</th>
-                                <th className="px-6 py-3"><span className="sr-only">Actions</span></th>
+                            <tr className="bg-gray-50/90 border-b border-gray-200 divide-x divide-gray-200">
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">User</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Contact</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Bookings</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Role</th>
+                                <th className="px-4 py-3.5 text-center w-12"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-200 bg-white">
                             {filtered.map((u) => {
                                 const displayName = u.name || "Unknown";
                                 const initials = displayName
@@ -111,7 +111,7 @@ export default async function AdminUsersPage({
                                     .join("");
 
                                 return (
-                                    <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <tr key={u.id} className="divide-x divide-gray-200 hover:bg-gray-50/60 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm shrink-0">
@@ -147,7 +147,7 @@ export default async function AdminUsersPage({
                                                 {u.role === "ADMIN" ? "Admin" : "User"}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-center">
                                             <button type="button" aria-label={`More actions for user ${displayName}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors">
                                                 <MoreVertical size={16} />
                                             </button>
@@ -165,7 +165,7 @@ export default async function AdminUsersPage({
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="md:hidden divide-y divide-gray-100">
+                <div className="md:hidden divide-y divide-gray-200">
                     {filtered.map((u) => {
                         const displayName = u.name || "Unknown";
                         const initials = displayName

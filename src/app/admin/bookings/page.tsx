@@ -168,23 +168,23 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
             </form>
 
             {/* Bookings Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {/* Desktop View */}
                 <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full text-left text-sm border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/80">
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Booking Ref</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Passenger</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider min-w-[260px] whitespace-nowrap">Route</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach / Seats</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure Date</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-3 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider text-right">Amount</th>
-                                <th className="px-6 py-3 text-right"><span className="sr-only">Actions</span></th>
+                            <tr className="bg-gray-50/90 border-b border-gray-200 divide-x divide-gray-200">
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Booking Ref</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Passenger</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider min-w-[260px] whitespace-nowrap">Route</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Coach / Seats</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Departure Date</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider text-right">Amount</th>
+                                <th className="px-4 py-3.5 text-center w-12"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-200 bg-white">
                             {filtered.map((b) => {
                                 const origin = b.schedule?.origin || b.schedule?.route?.origin || "Origin";
                                 const destination = b.schedule?.destination || b.schedule?.route?.destination || "Destination";
@@ -193,10 +193,10 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                                 return (
                                     <tr
                                         key={b.id}
-                                        className={`transition-colors ${
+                                        className={`divide-x divide-gray-200 transition-colors ${
                                             isHighlighted
                                                 ? "bg-amber-50/80 hover:bg-amber-100/70"
-                                                : "hover:bg-gray-50/50"
+                                                : "hover:bg-gray-50/60"
                                         }`}
                                     >
                                         <td className={`px-6 py-4 ${isHighlighted ? "border-l-4 border-l-amber-500" : ""}`}>
@@ -261,11 +261,11 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                                         <td className="px-6 py-4 text-right font-bold text-gray-900">
                                             ৳ {b.totalFare.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4 text-center">
                                             <Link
                                                 href={`/verify-ticket?pnr=${encodeURIComponent(b.id)}`}
                                                 aria-label={`Inspect ticket ${b.id}`}
-                                                className="inline-flex items-center gap-1 p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                className="inline-flex items-center justify-center p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-indigo-600 transition-colors"
                                                 title="View Ticket Details"
                                             >
                                                 <Eye size={16} />
@@ -286,7 +286,7 @@ export default async function AdminBookingsPage({ searchParams }: AdminBookingsP
                 </div>
 
                 {/* Mobile View */}
-                <div className="md:hidden divide-y divide-gray-100">
+                <div className="md:hidden divide-y divide-gray-200">
                     {filtered.map((b) => {
                         const origin = b.schedule?.origin || b.schedule?.route?.origin || "Origin";
                         const destination = b.schedule?.destination || b.schedule?.route?.destination || "Destination";
